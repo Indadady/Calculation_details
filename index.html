@@ -2,123 +2,134 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>고객 제출용 가격 산출 내역서 - TOURMAKER</title>
 
-    <!-- 카카오톡 공유 썸네일 (Open Graph) 설정 -->
     <meta property="og:title" content="투어메이커 가격 산출 내역서">
     <meta property="og:description" content="고객 제출용 공식 행사비 산출 내역서 (국내/해외 통합)">
     <meta property="og:image" content="https://blogger.googleusercontent.com/img/a/AVvXsEhPxG_ONo2BdFAGDNnn-pHIGJTrAq374YbqgwTTlyIZTP22kOWTDD_AyjKDNFPhsHg5t1Iq6zV0dL_NZIj4o97Kd0eWJYCv-NHhtIqme-Mp3htGhAdkqVv5NRU3Jc9TbdbvvVKrPslObA1oNABpgl12QtGwirC2QM5lcPCVoWm8pIbeKuZBbeDHAvpbKEQ">
     <meta property="og:type" content="website">
 
-    <!-- 구글 애널리틱스 (GA4) 탑재 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        // 실제 발급받은 GA4 측정 ID로 변경해주세요
         gtag('config', 'G-XXXXXXXXXX'); 
     </script>
 
-    <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; }
+        body { font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; -webkit-text-size-adjust: 100%; }
         
-        /* 인쇄(PDF 출력) 전용 완벽 비율 세팅 */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+        .tab-btn { position: relative; }
+        .tab-btn.active { color: #1e40af; font-weight: 700; }
+        .tab-btn.active::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 3px; background: #2563eb; }
+
+        @media (max-width: 1023px) {
+            .mobile-hidden { display: none !important; }
+        }
+
         @media print {
             body { background-color: white !important; }
             body * { visibility: hidden; }
             #print-section, #print-section * { visibility: visible; }
             #print-section { 
-                position: absolute; 
-                left: 0; 
-                top: 0; 
-                width: 100%; 
-                max-width: 100% !important; 
-                background: white; 
-                padding: 0 !important; 
-                margin: 0 !important;
-                box-shadow: none !important;
-                /* A4 1장에 꽉 차도록 강제 높이 지정 */
-                min-height: 277mm !important;
-                height: 100vh !important;
-                display: flex;
-                flex-direction: column;
+                position: absolute; left: 0; top: 0; width: 100%; max-width: 100% !important; 
+                background: white; padding: 0 !important; margin: 0 !important; box-shadow: none !important;
+                min-height: auto !important; height: auto !important;
             }
             .no-print { display: none !important; }
             
-            /* 프린트 시 배경색 강제 적용 */
             .print-bg-gray { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .print-bg-header { background-color: #e2e8f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .print-bg-blue { background-color: #eff6ff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .print-bg-yellow { background-color: #fef08a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .print-bg-yellow-light { background-color: #fef9c3 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
             table { border-collapse: collapse !important; width: 100% !important; }
             th, td { border: 1px solid #1e293b !important; }
             
-            /* A4 여백 설정 (위아래 10mm) */
             @page { size: A4 portrait; margin: 10mm; } 
         }
         
-        /* 웹뷰에서도 A4 비율로 꽉 차 보이게 설정 */
-        #print-section {
-            display: flex;
-            flex-direction: column;
-            min-height: 1100px;
-        }
-
-        /* 테이블 기본 스타일 */
+        #print-section { display: flex; flex-direction: column; min-height: 1050px; }
         table { border-collapse: collapse; width: 100%; }
         th, td { border: 1px solid #1e293b; padding: 6px 8px; font-size: 12px; vertical-align: middle; }
         th { text-align: center; font-weight: bold; }
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .text-left { text-align: left; }
-        .bg-header { background-color: #e2e8f0; }
-        
-        .bg-yellow-100 { background-color: #fef08a; }
-        .bg-yellow-50 { background-color: #fef9c3; }
 
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .pc-1 #print-section th, .pc-1 #print-section td { padding: 5px 7px; font-size: 11.5px; }
+        .pc-1 .footer-notes p { font-size: 11px; }
+        .pc-2 #print-section th, .pc-2 #print-section td { padding: 4px 6px; font-size: 11px; }
+        .pc-2 .doc-title h2 { font-size: 26px; } .pc-2 .footer-notes p { font-size: 10.5px; }
+        .pc-3 #print-section th, .pc-3 #print-section td { padding: 3px 5px; font-size: 10px; }
+        .pc-3 .doc-title h2 { font-size: 24px; } .pc-3 .footer-notes p { font-size: 10px; }
+        .pc-4 #print-section th, .pc-4 #print-section td { padding: 2.5px 4px; font-size: 9.5px; }
+        .pc-4 .doc-title h2 { font-size: 22px; } .pc-4 .footer-notes p { font-size: 9px; line-height: 1.4; }
+        .pc-5 #print-section th, .pc-5 #print-section td { padding: 2px 4px; font-size: 9px; }
+        .pc-5 .doc-title h2 { font-size: 20px; } .pc-5 .footer-notes p { font-size: 8.5px; line-height: 1.3; }
+        .pc-6 #print-section th, .pc-6 #print-section td { padding: 2px 3px; font-size: 8.5px; }
+        .pc-6 .doc-title h2 { font-size: 18px; } .pc-6 .footer-notes p { font-size: 8px; }
+        .pc-7 #print-section th, .pc-7 #print-section td { padding: 1.5px 3px; font-size: 8px; }
+        .pc-7 .footer-notes p { font-size: 7.5px; }
+        .pc-8 #print-section th, .pc-8 #print-section td { padding: 1px 2.5px; font-size: 7.5px; }
+        .pc-8 .footer-notes p { font-size: 7px; }
+        .pc-9 #print-section th, .pc-9 #print-section td { padding: 1px 2px; font-size: 7px; }
+        .pc-10 #print-section th, .pc-10 #print-section td { padding: 0.5px 1.5px; font-size: 6.5px; }
     </style>
 </head>
-<body class="min-h-screen bg-gray-100 flex flex-col">
+<body class="min-h-screen bg-gray-100 flex flex-col relative">
 
-    <!-- 헤더 바 -->
-    <div class="bg-slate-900 text-white p-4 flex justify-between items-center no-print shadow-md z-10">
-        <div class="flex items-center gap-3">
-            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHfgIX70O5k6Anuo0UgALIdaG9jSga9auHu3uyz0uEirylGPAJnjN_qQbvEGMUvPqUQf_g9FMNUHRxlDcUBf4vZ3Mpy4TnA9WxbmzWYK11gt2zuy_Irl4wctNFjcjLyPo0GPXV792o_J7L9guRMuDfeC1gy7USwywjYbECZgzcsHybuGRRAXAnO1eNmP8/s320/logo.png" alt="Tourmaker" class="h-8 filter brightness-0 invert">
-            <h1 class="text-xl font-bold tracking-tight">고객 제출용 가격 산출 내역서</h1>
-        </div>
-        <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-md font-semibold shadow transition">
-            PDF 내보내기 / 인쇄
-        </button>
+    <!-- 토스트 알림 (링크 복사 성공 시 표시) -->
+    <div id="toastMessage" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-5 py-3 rounded shadow-2xl opacity-0 transition-opacity duration-300 pointer-events-none z-50 font-bold text-sm lg:text-base flex items-center gap-2">
+        ✅ 링크가 복사되었습니다. 카톡에 붙여넣기 하세요!
     </div>
 
-    <div class="flex-1 flex flex-col lg:flex-row overflow-hidden h-[calc(100vh-72px)]">
+    <!-- 헤더 바 -->
+    <div class="bg-slate-900 text-white p-3 lg:p-4 flex justify-between items-center no-print shadow-md z-20 sticky top-0">
+        <div class="flex items-center gap-2 lg:gap-3">
+            <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHfgIX70O5k6Anuo0UgALIdaG9jSga9auHu3uyz0uEirylGPAJnjN_qQbvEGMUvPqUQf_g9FMNUHRxlDcUBf4vZ3Mpy4TnA9WxbmzWYK11gt2zuy_Irl4wctNFjcjLyPo0GPXV792o_J7L9guRMuDfeC1gy7USwywjYbECZgzcsHybuGRRAXAnO1eNmP8/s320/logo.png" alt="Tourmaker" class="h-6 lg:h-8 filter brightness-0 invert">
+            <h1 class="text-sm lg:text-xl font-bold tracking-tight whitespace-nowrap">고객 제출용 가격 산출 내역서</h1>
+        </div>
+        <div class="flex items-center gap-2">
+            <!-- 핵심 기능: 링크 복사 버튼 추가 -->
+            <button onclick="shareLink()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 lg:px-4 lg:py-2 rounded-md text-xs lg:text-base font-semibold shadow transition whitespace-nowrap">
+                <span class="hidden lg:inline">🔗 </span>데이터 공유
+            </button>
+            <button onclick="printPDF()" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 lg:px-4 lg:py-2 rounded-md text-xs lg:text-base font-semibold shadow transition whitespace-nowrap">
+                PDF 내보내기
+            </button>
+        </div>
+    </div>
+
+    <!-- 모바일 전용 탭 -->
+    <div class="lg:hidden flex bg-white border-b-2 border-gray-200 sticky top-[48px] z-10 no-print" id="mobileTabs">
+        <button id="tabInput" class="tab-btn active flex-1 py-3 text-sm font-semibold text-slate-500" onclick="switchTab('input')">데이터 입력</button>
+        <button id="tabPreview" class="tab-btn flex-1 py-3 text-sm font-semibold text-slate-500" onclick="switchTab('preview')">산출내역서 보기</button>
+    </div>
+
+    <div class="flex-1 flex flex-col lg:flex-row overflow-hidden lg:h-[calc(100vh-72px)] h-[calc(100vh-100px)]">
+        
         <!-- 좌측: 데이터 입력 패널 -->
-        <div class="w-full lg:w-[480px] bg-white border-r border-gray-300 p-5 overflow-y-auto custom-scrollbar no-print flex-shrink-0">
+        <div id="panelInput" class="w-full lg:w-[480px] bg-white border-r border-gray-300 p-4 lg:p-5 overflow-y-auto custom-scrollbar no-print flex-shrink-0 h-full">
             <h2 class="text-lg font-extrabold mb-4 border-b-2 border-slate-900 pb-2 text-slate-800">문서 데이터 입력</h2>
             
             <div class="space-y-6 text-sm">
-                
                 <!-- 1. 기본/헤더 정보 -->
                 <div class="space-y-3">
                     <h3 class="font-bold text-blue-800 border-l-4 border-blue-800 pl-2">1. 기본 정보 설정</h3>
                     <div class="grid grid-cols-2 gap-3">
-                        <div><label class="block text-gray-600 mb-1">고객명 (기관명)</label><input type="text" id="inp-clientName" class="w-full border rounded p-1.5" value="문곡중학교"></div>
-                        <div><label class="block text-gray-600 mb-1">문서 제목 (행사명)</label><input type="text" id="inp-docTitle" class="w-full border rounded p-1.5" value="일본 오사카 여행"></div>
-                        <div class="col-span-2"><label class="block text-gray-600 mb-1">여행일</label><input type="text" id="inp-travelDate" class="w-full border rounded p-1.5" value="2025.05.12~05.15"></div>
-                        <div class="col-span-2"><label class="block text-gray-600 mb-1">여행인원 표기</label><input type="text" id="inp-paxStr" class="w-full border rounded p-1.5" value="38명기준(학생 33+ 교사5)"></div>
-                        <div><label class="block text-gray-600 mb-1">발송일자</label><input type="text" id="inp-issueDate" class="w-full border rounded p-1.5" value="2026.03.10"></div>
+                        <div><label class="block text-gray-600 mb-1 text-xs">고객명 (기관명)</label><input type="text" id="inp-clientName" class="w-full border border-gray-300 rounded p-1.5 focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        <div><label class="block text-gray-600 mb-1 text-xs">문서 제목 (행사명)</label><input type="text" id="inp-docTitle" class="w-full border border-gray-300 rounded p-1.5 focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        <div class="col-span-2"><label class="block text-gray-600 mb-1 text-xs">여행일</label><input type="text" id="inp-travelDate" class="w-full border border-gray-300 rounded p-1.5 focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        <div class="col-span-2"><label class="block text-gray-600 mb-1 text-xs">여행인원 표기</label><input type="text" id="inp-paxStr" class="w-full border border-gray-300 rounded p-1.5 focus:ring-2 focus:ring-blue-500 outline-none"></div>
+                        <div><label class="block text-gray-600 mb-1 text-xs">발송일자</label><input type="text" id="inp-issueDate" class="w-full border border-gray-300 rounded p-1.5 focus:ring-2 focus:ring-blue-500 outline-none"></div>
                         <div>
-                            <label class="block text-gray-600 mb-1">통화/지역 선택</label>
-                            <select id="inp-currency" class="w-full border rounded p-1.5 font-bold text-blue-800">
+                            <label class="block text-gray-600 mb-1 text-xs">통화/지역 선택</label>
+                            <select id="inp-currency" class="w-full border border-gray-300 rounded p-1.5 font-bold text-blue-800 outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="JPY">JPY (해외/엔화)</option>
                                 <option value="USD">USD (해외/달러)</option>
                                 <option value="CNY">CNY (해외/위안화)</option>
@@ -127,9 +138,9 @@
                             </select>
                         </div>
                         <div class="col-span-2 flex items-center gap-2" id="wrap-exRate">
-                            <label class="text-gray-600 whitespace-nowrap">적용 환율:</label>
-                            <input type="number" step="0.1" id="inp-exRate" class="w-24 border rounded p-1.5 text-right font-bold text-blue-700 bg-blue-50" value="9.5">
-                            <span class="text-gray-500 text-xs">기준(송금)</span>
+                            <label class="text-gray-600 whitespace-nowrap text-xs">적용 환율:</label>
+                            <input type="number" step="0.1" id="inp-exRate" class="w-24 border border-gray-300 rounded p-1.5 text-right font-bold text-blue-700 bg-blue-50 outline-none">
+                            <span class="text-gray-500 text-[10px] lg:text-xs">기준(송금)</span>
                         </div>
                     </div>
                 </div>
@@ -137,139 +148,99 @@
                 <!-- 2. 항공료/교통비 영역 -->
                 <div class="space-y-3">
                     <h3 id="title-flight-area" class="font-bold text-slate-800 border-l-4 border-slate-800 pl-2">2. 항공료 영역 (원화 직접 입력)</h3>
-                    <div class="bg-gray-50 p-2 rounded border grid grid-cols-12 gap-2 items-center">
-                        <div class="col-span-3"><input type="text" id="inp-f1-name" class="w-full border rounded p-1" value="에어로케이" placeholder="항목"></div>
-                        <div class="col-span-4"><input type="text" id="inp-f1-desc" class="w-full border rounded p-1" value="인천-오사카-인천" placeholder="내용"></div>
-                        <div class="col-span-2"><input type="number" id="inp-f1-qty" class="w-full border rounded p-1 text-center" value="38" placeholder="수량"></div>
-                        <div class="col-span-3"><input type="number" id="inp-f1-krw" class="w-full border rounded p-1 text-right" value="326900" placeholder="단가(₩)"></div>
-                        <div class="col-span-12"><input type="text" id="inp-f1-note" class="w-full border rounded p-1 text-xs" value="그룹가 예상가" placeholder="비고"></div>
-                    </div>
-                    <div class="bg-gray-50 p-2 rounded border grid grid-cols-12 gap-2 items-center">
-                        <div class="col-span-3"><input type="text" id="inp-f2-name" class="w-full border rounded p-1" value="발권수수료" placeholder="항목"></div>
-                        <div class="col-span-4"><input type="text" id="inp-f2-desc" class="w-full border rounded p-1" placeholder="내용"></div>
-                        <div class="col-span-2"><input type="number" id="inp-f2-qty" class="w-full border rounded p-1 text-center" value="38" placeholder="수량"></div>
-                        <div class="col-span-3"><input type="number" id="inp-f2-krw" class="w-full border rounded p-1 text-right" value="22000" placeholder="단가(₩)"></div>
-                        <div class="col-span-12"><input type="text" id="inp-f2-note" class="w-full border rounded p-1 text-xs" value="항공 발권 대리점" placeholder="비고"></div>
+                    <div id="flight-inputs-container">
+                        <!-- JS로 동적 생성됨 -->
                     </div>
                 </div>
 
-                <!-- 3. 현지 발생비용 (20개 슬롯 확장) -->
+                <!-- 3. 현지 발생비용 -->
                 <div class="space-y-3">
                     <h3 id="title-local-expense" class="font-bold text-green-800 border-l-4 border-green-800 pl-2 flex justify-between items-center">
-                        3. 해외현지 발생비용 (외화 입력)
-                        <span class="text-xs font-normal text-gray-500">*원화 자동 환산</span>
+                        <span>3. 해외현지 발생비용 (외화 입력)</span>
+                        <span class="text-[10px] lg:text-xs font-normal text-gray-500">*원화 자동 환산</span>
                     </h3>
-                    <p class="text-xs text-gray-500 mb-1">연속된 항목명+내용이 같으면 출력물에서 셀이 자동 병합됩니다.</p>
+                    <p class="text-[10px] lg:text-xs text-gray-500 mb-1">연속된 항목명+내용이 같으면 셀이 자동 병합됩니다.</p>
                     <div id="local-inputs-container" class="space-y-2"></div>
                 </div>
 
                 <!-- 4. 국내 비용 -->
-                <div class="space-y-3">
+                <div class="space-y-3 pb-8">
                     <h3 class="font-bold text-orange-800 border-l-4 border-orange-800 pl-2">4. 국내 비용 (원화 직접 입력)</h3>
-                    <div class="bg-gray-50 p-2 rounded border grid grid-cols-12 gap-2 items-center">
-                        <div class="col-span-3"><input type="text" id="inp-d1-name" class="w-full border rounded p-1" value="여행자보험" placeholder="항목"></div>
-                        <div class="col-span-4"><input type="text" id="inp-d1-desc" class="w-full border rounded p-1" value="1억원 기준" placeholder="내용"></div>
-                        <div class="col-span-2"><input type="number" id="inp-d1-qty" class="w-full border rounded p-1 text-center" value="38" placeholder="수량"></div>
-                        <div class="col-span-3"><input type="number" id="inp-d1-krw" class="w-full border rounded p-1 text-right" value="5000" placeholder="단가(₩)"></div>
-                        <div class="col-span-12"><input type="text" id="inp-d1-note" class="w-full border rounded p-1 text-xs" value="주민번호 필요" placeholder="비고"></div>
-                    </div>
-                    <div class="bg-gray-50 p-2 rounded border grid grid-cols-12 gap-2 items-center">
-                        <div class="col-span-3"><input type="text" id="inp-d2-name" class="w-full border rounded p-1" value="진행수수료" placeholder="항목"></div>
-                        <div class="col-span-4"><input type="text" id="inp-d2-desc" class="w-full border rounded p-1" value="운영 관리비" placeholder="내용"></div>
-                        <div class="col-span-2"><input type="number" id="inp-d2-qty" class="w-full border rounded p-1 text-center" value="1" placeholder="수량"></div>
-                        <div class="col-span-3"><input type="number" id="inp-d2-krw" class="w-full border rounded p-1 text-right" value="3900000" placeholder="단가(₩)"></div>
-                        <div class="col-span-12"><input type="text" id="inp-d2-note" class="w-full border rounded p-1 text-xs" placeholder="비고"></div>
-                    </div>
-                    <div class="bg-gray-50 p-2 rounded border grid grid-cols-12 gap-2 items-center">
-                        <div class="col-span-3"><input type="text" id="inp-d3-name" class="w-full border rounded p-1" value="공항수송" placeholder="항목"></div>
-                        <div class="col-span-4"><input type="text" id="inp-d3-desc" class="w-full border rounded p-1" value="공항 왕복 차량비" placeholder="내용"></div>
-                        <div class="col-span-2"><input type="number" id="inp-d3-qty" class="w-full border rounded p-1 text-center" value="1" placeholder="수량"></div>
-                        <div class="col-span-3"><input type="number" id="inp-d3-krw" class="w-full border rounded p-1 text-right" value="0" placeholder="단가(₩)"></div>
-                        <div class="col-span-12"><input type="text" id="inp-d3-note" class="w-full border rounded p-1 text-xs" value="" placeholder="비고(빈칸가능)"></div>
+                    <div id="domestic-inputs-container" class="space-y-2">
+                        <!-- JS로 동적 생성됨 -->
                     </div>
                 </div>
-
             </div>
         </div>
 
         <!-- 우측: 출력물 (공문서 형태) -->
-        <div class="w-full lg:flex-1 p-8 overflow-y-auto bg-[#525659] flex justify-center items-start custom-scrollbar">
-            <!-- A4 사이즈 비율에 맞춘 문서 영역 -->
-            <div id="print-section" class="bg-white px-8 py-8 shadow-2xl w-full max-w-[850px]">
-                
-                <!-- 상단 헤더표 및 타이틀 (고정 영역) -->
-                <div>
+        <div id="panelPreview" class="w-full lg:flex-1 p-2 lg:p-8 overflow-y-auto bg-[#525659] flex justify-center items-start custom-scrollbar h-full mobile-hidden">
+            <div id="print-section" class="bg-white px-5 py-6 lg:px-8 lg:py-8 shadow-2xl w-full max-w-[850px]">
+                <div id="doc-header-area">
                     <div class="flex justify-between items-start mb-5">
-                        <div class="w-[45%]">
-                            <table class="w-full text-left print-border">
+                        <div class="w-[50%] lg:w-[45%]">
+                            <table class="w-full text-left">
                                 <tbody>
                                     <tr>
-                                        <th class="w-[30%] print-bg-header bg-header text-slate-800">고객명</th>
-                                        <td class="font-bold text-slate-900" id="out-clientName"></td>
+                                        <th class="w-[30%] print-bg-header bg-slate-200 text-slate-800 text-[10px] lg:text-xs">고객명</th>
+                                        <td class="font-bold text-slate-900 text-[10px] lg:text-xs" id="out-clientName"></td>
                                     </tr>
                                     <tr>
-                                        <th class="print-bg-header bg-header text-slate-800">행사명</th>
-                                        <td id="out-docTitle" class="font-bold text-slate-800"></td>
+                                        <th class="print-bg-header bg-slate-200 text-slate-800 text-[10px] lg:text-xs">행사명</th>
+                                        <td id="out-docTitle" class="font-bold text-slate-800 text-[10px] lg:text-xs"></td>
                                     </tr>
                                     <tr>
-                                        <th class="print-bg-header bg-header text-slate-800">여행일</th>
-                                        <td id="out-travelDate"></td>
+                                        <th class="print-bg-header bg-slate-200 text-slate-800 text-[10px] lg:text-xs">여행일</th>
+                                        <td id="out-travelDate" class="text-[10px] lg:text-xs"></td>
                                     </tr>
                                     <tr>
-                                        <th class="print-bg-header bg-header text-slate-800">여행인원</th>
-                                        <td id="out-paxStr"></td>
+                                        <th class="print-bg-header bg-slate-200 text-slate-800 text-[10px] lg:text-xs">여행인원</th>
+                                        <td id="out-paxStr" class="text-[10px] lg:text-xs"></td>
                                     </tr>
                                     <tr>
-                                        <th class="print-bg-header bg-header text-slate-800">발송일자/환율</th>
-                                        <td id="out-issueAndRate" class="text-[11px]"></td>
+                                        <th class="print-bg-header bg-slate-200 text-slate-800 text-[10px] lg:text-xs">발송일자/환율</th>
+                                        <td id="out-issueAndRate" class="text-[9px] lg:text-[11px]"></td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="w-[40%] flex justify-end items-start pt-1">
-                            <!-- 투어메이커 로고 복구 완료 -->
-                            <img src="https://blogger.googleusercontent.com/img/a/AVvXsEitI-Z-hD82keOJ1AqHw-VTZjpw2U-O5UjtV9h3zblyG0wjsVfBWe9X9o0Q_Spctrt7krkd9qXO0xKTmGJLw4gyMZrRqpshKMFttnyx6OcC8-IGz3XLUZpGQOnRqVdol8jz5HuoDLqsEifnVRhcjUJHm13Sz8JrX9aPswMNUwZPvGtJEnQjhc2PiXlo-B8" alt="TOURMAKER" class="h-12 object-contain">
+                            <img src="https://blogger.googleusercontent.com/img/a/AVvXsEitI-Z-hD82keOJ1AqHw-VTZjpw2U-O5UjtV9h3zblyG0wjsVfBWe9X9o0Q_Spctrt7krkd9qXO0xKTmGJLw4gyMZrRqpshKMFttnyx6OcC8-IGz3XLUZpGQOnRqVdol8jz5HuoDLqsEifnVRhcjUJHm13Sz8JrX9aPswMNUwZPvGtJEnQjhc2PiXlo-B8" alt="TOURMAKER" class="h-8 lg:h-12 object-contain">
                         </div>
                     </div>
 
-                    <div class="text-center mb-5">
-                        <div class="inline-block border-b-2 border-slate-900 pb-1 px-6">
-                            <h2 class="text-3xl font-extrabold text-slate-900 tracking-widest">가격 산출 내역서</h2>
+                    <div class="text-center mb-5 doc-title">
+                        <div class="inline-block border-b-2 border-slate-900 pb-1 px-4 lg:px-6">
+                            <h2 class="text-xl lg:text-3xl font-extrabold text-slate-900 tracking-widest">가격 산출 내역서</h2>
                         </div>
-                        <p class="text-slate-500 font-bold mt-1 tracking-[0.25em] text-[12px] uppercase">Calculation Details</p>
+                        <p class="text-slate-500 font-bold mt-1 tracking-[0.25em] text-[10px] lg:text-[12px] uppercase">Calculation Details</p>
                     </div>
                 </div>
 
-                <!-- 메인 견적 테이블 -->
-                <div class="flex-grow flex flex-col mb-2">
-                    <table class="w-full print-border text-xs flex-grow" id="main-table" style="height: 100%;">
-                        <thead id="main-thead">
-                            <!-- JS를 통해 통화(해외/국내) 설정에 따라 동적 생성됨 -->
-                        </thead>
+                <div id="table-area" class="flex-grow flex flex-col mb-4">
+                    <table class="w-full text-[10px] lg:text-xs flex-grow" id="main-table">
+                        <thead id="main-thead"></thead>
                         <tbody id="tbody-flight"></tbody>
                         <tbody id="tbody-local"></tbody>
                         <tbody id="tbody-domestic"></tbody>
-                        <tbody id="tbody-total">
-                            <!-- JS를 통해 동적 생성됨 -->
-                        </tbody>
+                        <tbody id="tbody-total"></tbody>
                     </table>
                 </div>
 
-                <!-- 하단 특이사항 / 안내문 (바닥에 고정되는 영역) -->
-                <div>
-                    <div class="text-[12px] text-slate-800 pt-2 pb-1">
-                        <p class="font-bold text-[13px] mb-1">1. 세금계산서 발행 관련 안내문</p>
-                        <p class="leading-relaxed text-slate-700 tracking-tight">
-                            * 본 위탁용역의 특성상 항공권, 숙박비, 현지교통비 등은 당사가 직접 제공하는 서비스가 아닌, 제 3자와의 거래를 통한 수탁 대행 처리 항목으로 분류됩니다. 따라서, 당사는 전체 계약금액 기준의 세금계산서 발행이 불가하며, 국내 과세 대상 경비 중 <span class="font-bold text-red-600 text-[13px]">알선수수료</span> 등 자체수익에 대해서만 세금계산서를 발행함을 사전 안내드립니다.
+                <div id="footer-area" class="mt-auto">
+                    <div class="text-slate-800 pt-2 pb-1 footer-notes">
+                        <p class="font-bold text-xs lg:text-[13px] mb-1">1. 세금계산서 발행 관련 안내문</p>
+                        <p class="leading-relaxed text-slate-700 tracking-tight text-[10px] lg:text-[12px]">
+                            * 본 위탁용역의 특성상 항공권, 숙박비, 현지교통비 등은 당사가 직접 제공하는 서비스가 아닌, 제 3자와의 거래를 통한 수탁 대행 처리 항목으로 분류됩니다. 따라서, 당사는 전체 계약금액 기준의 세금계산서 발행이 불가하며, 국내 과세 대상 경비 중 <span class="font-bold text-red-600">알선수수료</span> 등 자체수익에 대해서만 세금계산서를 발행함을 사전 안내드립니다.
                         </p>
                     </div>
 
                     <div class="mt-4 text-center border-t border-gray-300 pt-4">
-                        <p class="text-[12px] text-[#6c757d] mb-1 font-medium">
+                        <p class="text-[10px] lg:text-[11px] text-[#6c757d] mb-1 font-medium">
                             [System Powered by TOURMAKER] 본 산출 내역서는 <strong class="text-slate-700">투어메이커</strong>의 기획과 트래블 테크 기술 제휴로 제작되었습니다.
                         </p>
                         <a href="http://tourmaker.kr" target="_blank" rel="noopener noreferrer" 
-                           class="inline-block px-3 py-1.5 border border-[#6c757d] rounded text-[#6c757d] hover:bg-gray-100 hover:text-slate-800 transition text-[11px] font-bold no-print mt-2">
+                           class="inline-block px-3 py-1.5 border border-[#6c757d] rounded text-[#6c757d] hover:bg-gray-100 hover:text-slate-800 transition text-[10px] lg:text-[11px] font-bold no-print mt-2">
                             투어메이커 홈페이지 바로가기
                         </a>
                     </div>
@@ -279,311 +250,534 @@
         </div>
     </div>
 
-    <script>
-        // PDF에 맞춘 초기 샘플 데이터 (입력 슬롯 20개로 대폭 확장)
-        const initialLocals = [
-            { name: "호텔", desc: "(2인실) 3박요금", qty: 20, fgn: 65000, note: "조식포함" },
-            { name: "호텔", desc: "(1인실) 3박요금", qty: 0, fgn: 52000, note: "" },
-            { name: "차량비", desc: "전용차량", qty: 1, fgn: 950000, note: "통행료+주차비" },
-            { name: "식비", desc: "중식_1일차", qty: 38, fgn: 2000, note: "" },
-            { name: "식비", desc: "중식_2일차", qty: 38, fgn: 2000, note: "" },
-            { name: "식비", desc: "중식_3일차", qty: 38, fgn: 2000, note: "" },
-            { name: "식비", desc: "석식_1일차", qty: 38, fgn: 3000, note: "" },
-            { name: "식비", desc: "석식_2일차", qty: 38, fgn: 3000, note: "" },
-            { name: "식비", desc: "석식_3일차", qty: 38, fgn: 3000, note: "" },
-            { name: "관광지입장료", desc: "롯코산케이블카", qty: 38, fgn: 1300, note: "" },
-            { name: "관광지입장료", desc: "청수사", qty: 38, fgn: 600, note: "" },
-            { name: "관광지입장료", desc: "하루카스전망대", qty: 38, fgn: 2200, note: "" },
-            { name: "관광지입장료", desc: "동대사", qty: 38, fgn: 800, note: "" },
-            { name: "가이드비용", desc: "전일정", qty: 1, fgn: 240000, note: "노쇼핑/*인천공항 미팅" }
-        ];
+<script>
+// ===================================================================
+// 핵심 로직 1: 완벽하게 깨지지 않는 URL-Safe 데이터 공유
+// ===================================================================
 
-        // 20개 슬롯 자동 세팅
-        function buildLocalInputs() {
-            const container = document.getElementById('local-inputs-container');
-            let html = '';
-            for(let i=0; i<20; i++) {
-                const item = initialLocals[i] || { name:'', desc:'', qty:0, fgn:0, note:'' };
-                html += `
-                    <div class="bg-white p-2 rounded border border-gray-200 grid grid-cols-12 gap-1 items-center hover:bg-green-50 transition">
-                        <div class="col-span-3"><input type="text" id="inp-l${i}-name" class="w-full border rounded p-1 text-xs" value="${item.name}" placeholder="항목명"></div>
-                        <div class="col-span-3"><input type="text" id="inp-l${i}-desc" class="w-full border rounded p-1 text-xs" value="${item.desc}" placeholder="내용 (동일 시 병합)"></div>
-                        <div class="col-span-2"><input type="number" id="inp-l${i}-qty" class="w-full border rounded p-1 text-xs text-center" value="${item.qty}" placeholder="수량"></div>
-                        <div class="col-span-4"><input type="number" id="inp-l${i}-fgn" class="w-full border rounded p-1 text-xs text-right" value="${item.fgn}" placeholder="단가(외화)"></div>
-                        <div class="col-span-12"><input type="text" id="inp-l${i}-note" class="w-full border rounded p-1 text-xs text-gray-500" value="${item.note}" placeholder="비고 (빈칸가능)"></div>
-                    </div>
-                `;
+// 현재 화면의 데이터를 추출하여 짧은 Key 포맷의 객체로 변환
+function extractDataForUrl() {
+    const data = { h: {}, f: [], l: [], dm: [] };
+    
+    // Header Data
+    data.h.c = document.getElementById('inp-clientName').value;
+    data.h.t = document.getElementById('inp-docTitle').value;
+    data.h.d = document.getElementById('inp-travelDate').value;
+    data.h.p = document.getElementById('inp-paxStr').value;
+    data.h.i = document.getElementById('inp-issueDate').value;
+    data.h.cu = document.getElementById('inp-currency').value;
+    data.h.r = document.getElementById('inp-exRate').value;
+
+    // Flight Data (2 slots)
+    for(let i=1; i<=2; i++) {
+        data.f.push({
+            n: document.getElementById(`inp-f${i}-name`).value,
+            d: document.getElementById(`inp-f${i}-desc`).value,
+            q: document.getElementById(`inp-f${i}-qty`).value,
+            k: document.getElementById(`inp-f${i}-krw`).value,
+            nt: document.getElementById(`inp-f${i}-note`).value,
+        });
+    }
+
+    // Local Data (20 slots)
+    for(let i=0; i<20; i++) {
+        data.l.push({
+            n: document.getElementById(`inp-l${i}-name`).value,
+            d: document.getElementById(`inp-l${i}-desc`).value,
+            q: document.getElementById(`inp-l${i}-qty`).value,
+            f: document.getElementById(`inp-l${i}-fgn`).value,
+            nt: document.getElementById(`inp-l${i}-note`).value,
+        });
+    }
+
+    // Domestic Data (3 slots)
+    for(let i=1; i<=3; i++) {
+        data.dm.push({
+            n: document.getElementById(`inp-d${i}-name`).value,
+            d: document.getElementById(`inp-d${i}-desc`).value,
+            q: document.getElementById(`inp-d${i}-qty`).value,
+            k: document.getElementById(`inp-d${i}-krw`).value,
+            nt: document.getElementById(`inp-d${i}-note`).value,
+        });
+    }
+    return data;
+}
+
+// 카톡/메신저에서 절대 깨지지 않는 무결성 인코딩 로직
+function shareLink() {
+    const dataObj = extractDataForUrl();
+    const jsonStr = JSON.stringify(dataObj);
+    
+    // 1. unescape/encodeURIComponent로 한글 깨짐 방지 후 Base64 인코딩
+    const base64Str = btoa(unescape(encodeURIComponent(jsonStr)));
+    
+    // 2. Base64 내의 '+' 문자가 URL에서 공백으로 바뀌는 오류를 막기 위해 최종 encodeURIComponent 처리 (AutoDoc 오류 해결 핵심)
+    const safeUrlParam = encodeURIComponent(base64Str);
+    
+    const shareUrl = window.location.origin + window.location.pathname + '?data=' + safeUrlParam;
+
+    // 클립보드 복사
+    const tempInput = document.createElement("input");
+    tempInput.value = shareUrl;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+
+    // 토스트 알림 띄우기
+    const toast = document.getElementById('toastMessage');
+    toast.classList.remove('opacity-0', 'pointer-events-none');
+    setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none');
+    }, 3000);
+}
+
+// URL에서 데이터를 읽어와 화면에 뿌려주는 로직
+function loadDataFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const dataParam = params.get('data');
+    if (!dataParam) return false;
+
+    try {
+        // 인코딩의 역순: URL Decode -> Base64 Decode -> URI Decode -> JSON Parse
+        const base64Str = decodeURIComponent(dataParam);
+        const jsonStr = decodeURIComponent(escape(atob(base64Str)));
+        const data = JSON.parse(jsonStr);
+        applyDataToUI(data);
+        return true;
+    } catch (error) {
+        console.error("데이터 복원 중 오류 발생:", error);
+        alert("공유된 링크의 데이터가 손상되었습니다. 기본 포맷으로 시작합니다.");
+        return false;
+    }
+}
+
+// 데이터를 화면 UI(Input)에 세팅
+function applyDataToUI(data) {
+    if(!data || !data.h) return;
+    
+    document.getElementById('inp-clientName').value = data.h.c || '';
+    document.getElementById('inp-docTitle').value = data.h.t || '';
+    document.getElementById('inp-travelDate').value = data.h.d || '';
+    document.getElementById('inp-paxStr').value = data.h.p || '';
+    document.getElementById('inp-issueDate').value = data.h.i || '';
+    document.getElementById('inp-currency').value = data.h.cu || 'JPY';
+    document.getElementById('inp-exRate').value = data.h.r || '';
+
+    // 환율 인풋 표시 처리
+    const curr = data.h.cu;
+    const rateWrapper = document.getElementById('wrap-exRate');
+    if(curr === 'KRW_MAINLAND' || curr === 'KRW_JEJU') {
+        rateWrapper.style.display = 'none';
+    } else {
+        rateWrapper.style.display = 'flex';
+    }
+
+    if(data.f) {
+        for(let i=0; i<2 && i<data.f.length; i++) {
+            document.getElementById(`inp-f${i+1}-name`).value = data.f[i].n || '';
+            document.getElementById(`inp-f${i+1}-desc`).value = data.f[i].d || '';
+            document.getElementById(`inp-f${i+1}-qty`).value = data.f[i].q || '';
+            document.getElementById(`inp-f${i+1}-krw`).value = data.f[i].k || '';
+            document.getElementById(`inp-f${i+1}-note`).value = data.f[i].nt || '';
+        }
+    }
+    if(data.l) {
+        for(let i=0; i<20 && i<data.l.length; i++) {
+            document.getElementById(`inp-l${i}-name`).value = data.l[i].n || '';
+            document.getElementById(`inp-l${i}-desc`).value = data.l[i].d || '';
+            document.getElementById(`inp-l${i}-qty`).value = data.l[i].q || '';
+            document.getElementById(`inp-l${i}-fgn`).value = data.l[i].f || '';
+            document.getElementById(`inp-l${i}-note`).value = data.l[i].nt || '';
+        }
+    }
+    if(data.dm) {
+        for(let i=0; i<3 && i<data.dm.length; i++) {
+            document.getElementById(`inp-d${i+1}-name`).value = data.dm[i].n || '';
+            document.getElementById(`inp-d${i+1}-desc`).value = data.dm[i].d || '';
+            document.getElementById(`inp-d${i+1}-qty`).value = data.dm[i].q || '';
+            document.getElementById(`inp-d${i+1}-krw`).value = data.dm[i].k || '';
+            document.getElementById(`inp-d${i+1}-note`).value = data.dm[i].nt || '';
+        }
+    }
+}
+
+// ===================================================================
+// 기본 UI 구성 및 출력 로직
+// ===================================================================
+
+const defaultInitData = {
+    h: { c: "문곡중학교", t: "일본 오사카 여행", d: "2025.05.12~05.15", p: "38명기준(학생 33+ 교사5)", i: "2026.03.10", cu: "JPY", r: "9.5" },
+    f: [
+        { n: "에어로케이", d: "인천-오사카-인천", q: 38, k: 326900, nt: "그룹가 예상가" },
+        { n: "발권수수료", d: "", q: 38, k: 22000, nt: "항공 발권 대리점" }
+    ],
+    l: [
+        { n: "호텔", d: "(2인실) 3박요금", q: 20, f: 65000, nt: "조식포함" },
+        { n: "호텔", d: "(1인실) 3박요금", q: 0, f: 52000, nt: "" },
+        { n: "차량비", d: "전용차량", q: 1, f: 950000, nt: "통행료+주차비" },
+        { n: "식비", d: "중식_1일차", q: 38, f: 2000, nt: "" },
+        { n: "식비", d: "중식_2일차", q: 38, f: 2000, nt: "" },
+        { n: "식비", d: "중식_3일차", q: 38, f: 2000, nt: "" },
+        { n: "식비", d: "석식_1일차", q: 38, f: 3000, nt: "" },
+        { n: "식비", d: "석식_2일차", q: 38, f: 3000, nt: "" },
+        { n: "식비", d: "석식_3일차", q: 38, f: 3000, nt: "" },
+        { n: "관광지입장료", d: "롯코산케이블카", q: 38, f: 1300, nt: "" },
+        { n: "관광지입장료", d: "청수사", q: 38, f: 600, nt: "" },
+        { n: "관광지입장료", d: "하루카스전망대", q: 38, f: 2200, nt: "" },
+        { n: "관광지입장료", d: "동대사", q: 38, f: 800, nt: "" },
+        { n: "가이드비용", d: "전일정", q: 1, f: 240000, nt: "노쇼핑/*인천공항 미팅" }
+    ],
+    dm: [
+        { n: "여행자보험", d: "1억원 기준", q: 38, k: 5000, nt: "주민번호 필요" },
+        { n: "진행수수료", d: "운영 관리비", q: 1, k: 3900000, nt: "" },
+        { n: "공항수송", d: "공항 왕복 차량비", q: 1, k: 0, nt: "빈칸가능" }
+    ]
+};
+
+function buildInputSlots() {
+    // Flight Slots Build
+    let fHtml = '';
+    for(let i=1; i<=2; i++){
+        fHtml += `
+            <div class="bg-gray-50 p-2 rounded border border-gray-200 grid grid-cols-12 gap-2 items-center mb-2">
+                <div class="col-span-12 lg:col-span-3"><input type="text" id="inp-f${i}-name" class="w-full border rounded p-1 text-xs" placeholder="항목"></div>
+                <div class="col-span-12 lg:col-span-4"><input type="text" id="inp-f${i}-desc" class="w-full border rounded p-1 text-xs" placeholder="내용"></div>
+                <div class="col-span-5 lg:col-span-2"><input type="number" id="inp-f${i}-qty" class="w-full border rounded p-1 text-xs text-center" placeholder="수량"></div>
+                <div class="col-span-7 lg:col-span-3"><input type="number" id="inp-f${i}-krw" class="w-full border rounded p-1 text-xs text-right" placeholder="단가(₩)"></div>
+                <div class="col-span-12"><input type="text" id="inp-f${i}-note" class="w-full border rounded p-1 text-xs text-gray-500" placeholder="비고"></div>
+            </div>
+        `;
+    }
+    document.getElementById('flight-inputs-container').innerHTML = fHtml;
+
+    // Local Slots Build (20)
+    let lHtml = '';
+    for(let i=0; i<20; i++) {
+        lHtml += `
+            <div class="bg-white p-2 rounded border border-gray-200 grid grid-cols-12 gap-1 lg:gap-2 items-center hover:bg-green-50 transition">
+                <div class="col-span-12 lg:col-span-3"><input type="text" id="inp-l${i}-name" class="w-full border rounded p-1 text-xs" placeholder="항목명"></div>
+                <div class="col-span-12 lg:col-span-3"><input type="text" id="inp-l${i}-desc" class="w-full border rounded p-1 text-xs" placeholder="내용 (동일 시 병합)"></div>
+                <div class="col-span-5 lg:col-span-2"><input type="number" id="inp-l${i}-qty" class="w-full border rounded p-1 text-xs text-center" placeholder="수량"></div>
+                <div class="col-span-7 lg:col-span-4"><input type="number" id="inp-l${i}-fgn" class="w-full border rounded p-1 text-xs text-right" placeholder="단가(외화)"></div>
+                <div class="col-span-12"><input type="text" id="inp-l${i}-note" class="w-full border rounded p-1 text-xs text-gray-500" placeholder="비고 (빈칸가능)"></div>
+            </div>
+        `;
+    }
+    document.getElementById('local-inputs-container').innerHTML = lHtml;
+
+    // Domestic Slots Build (3)
+    let dHtml = '';
+    for(let i=1; i<=3; i++){
+        dHtml += `
+            <div class="bg-gray-50 p-2 rounded border border-gray-200 grid grid-cols-12 gap-2 items-center mb-2">
+                <div class="col-span-12 lg:col-span-3"><input type="text" id="inp-d${i}-name" class="w-full border rounded p-1 text-xs" placeholder="항목"></div>
+                <div class="col-span-12 lg:col-span-4"><input type="text" id="inp-d${i}-desc" class="w-full border rounded p-1 text-xs" placeholder="내용"></div>
+                <div class="col-span-5 lg:col-span-2"><input type="number" id="inp-d${i}-qty" class="w-full border rounded p-1 text-xs text-center" placeholder="수량"></div>
+                <div class="col-span-7 lg:col-span-3"><input type="number" id="inp-d${i}-krw" class="w-full border rounded p-1 text-xs text-right" placeholder="단가(₩)"></div>
+                <div class="col-span-12"><input type="text" id="inp-d${i}-note" class="w-full border rounded p-1 text-xs text-gray-500" placeholder="비고"></div>
+            </div>
+        `;
+    }
+    document.getElementById('domestic-inputs-container').innerHTML = dHtml;
+}
+
+function switchTab(tab) {
+    const input = document.getElementById('panelInput');
+    const preview = document.getElementById('panelPreview');
+    const tabInput = document.getElementById('tabInput');
+    const tabPreview = document.getElementById('tabPreview');
+    if (tab === 'input') {
+        input.classList.remove('mobile-hidden'); preview.classList.add('mobile-hidden');
+        tabInput.classList.add('active'); tabPreview.classList.remove('active');
+    } else {
+        calculateAndRender();
+        input.classList.add('mobile-hidden'); preview.classList.remove('mobile-hidden');
+        tabInput.classList.remove('active'); tabPreview.classList.add('active');
+        document.getElementById('panelPreview').scrollTop = 0;
+    }
+}
+
+function printPDF() {
+    const wrapper = document.body;
+    const allLevels = [];
+    for (let i = 1; i <= 10; i++) allLevels.push('pc-' + i);
+
+    allLevels.forEach(c => wrapper.classList.remove(c));
+    document.getElementById('table-area').style.marginBottom = '16px';
+    calculateAndRender();
+
+    requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+        const sheet = document.getElementById('print-section');
+        const A4_H = 1040; 
+        let chosenLevel = null;
+
+        if (sheet.scrollHeight <= A4_H) {
+            chosenLevel = null;
+        } else {
+            for (let i = 0; i < allLevels.length; i++) {
+                if (i > 0) wrapper.classList.remove(allLevels[i - 1]);
+                wrapper.classList.add(allLevels[i]);
+                void sheet.offsetHeight;
+                if (sheet.scrollHeight <= A4_H) { chosenLevel = allLevels[i]; break; }
             }
-            container.innerHTML = html;
+            if (!chosenLevel) chosenLevel = allLevels[allLevels.length - 1];
         }
 
-        const fmt = (num) => num === 0 || num === '' ? '' : Number(num).toLocaleString();
-        const fmtTotal = (num) => num === 0 ? '0' : Number(num).toLocaleString();
+        allLevels.forEach(c => wrapper.classList.remove(c));
+        if (chosenLevel) wrapper.classList.add(chosenLevel);
+        void sheet.offsetHeight;
 
-        function calculateAndRender() {
-            const clientName = document.getElementById('inp-clientName').value;
-            const docTitle = document.getElementById('inp-docTitle').value;
-            const travelDate = document.getElementById('inp-travelDate').value;
-            const paxStr = document.getElementById('inp-paxStr').value;
-            const issueDate = document.getElementById('inp-issueDate').value;
-            const currency = document.getElementById('inp-currency').value;
-            
-            // 통화/지역 모드 판별
-            const isMainland = currency === 'KRW_MAINLAND';
-            const isJeju = currency === 'KRW_JEJU';
-            const isKRW = isMainland || isJeju;
-            
-            let exRate = isKRW ? 1 : (Number(document.getElementById('inp-exRate').value) || 0);
+        setTimeout(() => {
+            window.print();
+            allLevels.forEach(c => wrapper.classList.remove(c));
+        }, 300);
+    });
+    });
+}
 
-            // 좌측 입력 패널 UI 동적 변경
-            document.getElementById('title-flight-area').innerText = isMainland ? '2. 교통비 영역 (원화 직접 입력)' : '2. 항공료 영역 (원화 직접 입력)';
-            
-            if (isMainland) {
-                document.getElementById('title-local-expense').innerHTML = '3. 행사비용 (원화 직접 입력)';
-            } else if (isJeju) {
-                document.getElementById('title-local-expense').innerHTML = '3. 제주(현지) 발생비용 (원화 직접 입력)';
-            } else {
-                document.getElementById('title-local-expense').innerHTML = '3. 해외현지 발생비용 (외화 입력) <span class="text-xs font-normal text-gray-500">*원화 자동 환산</span>';
-            }
-            
-            for(let i=0; i<20; i++) {
-                const fgnInput = document.getElementById(`inp-l${i}-fgn`);
-                if(fgnInput) fgnInput.placeholder = isKRW ? "단가(₩)" : "단가(외화)";
-            }
+const fmt = (num) => num === 0 || num === '' ? '' : Number(num).toLocaleString();
+const fmtTotal = (num) => num === 0 ? '0' : Number(num).toLocaleString();
 
-            // 출력표 헤더 매핑
-            document.getElementById('out-clientName').innerText = clientName;
-            document.getElementById('out-docTitle').innerText = docTitle;
-            document.getElementById('out-travelDate').innerText = travelDate;
-            document.getElementById('out-paxStr').innerText = paxStr;
-            
-            if (isKRW) {
-                document.getElementById('out-issueAndRate').innerText = `${issueDate} / 국내행사 (환율 미적용)`;
-            } else {
-                document.getElementById('out-issueAndRate').innerText = `${issueDate} / ${currency} ${exRate} 기준(송금)`;
-            }
+function getRowspan(arr, index, key) {
+    let span = 1;
+    for (let j = index + 1; j < arr.length; j++) { if (arr[j][key] === arr[index][key]) span++; else break; }
+    return span;
+}
+function getRowspanDesc(arr, index) {
+    let span = 1;
+    for (let j = index + 1; j < arr.length; j++) {
+        if (arr[j].name === arr[index].name && arr[j].desc === arr[index].desc) span++; else break;
+    }
+    return span;
+}
 
-            const currName = currency === 'JPY' ? '엔화' : (currency === 'USD' ? '달러' : (isKRW ? '원화' : '위안화'));
-            const currSym = currency === 'USD' ? '$' : (isKRW ? '₩' : '¥');
-            
-            // 테이블 Thead 동적 렌더링
-            const theadHtml = `
-                <tr class="print-bg-header bg-header text-slate-900" style="height: 1%;">
-                    <th class="${isKRW ? 'w-[10%]' : 'w-[10%]'}">구분</th>
-                    <th class="${isKRW ? 'w-[15%]' : 'w-[12%]'}">항목</th>
-                    <th class="${isKRW ? 'w-[25%]' : 'w-[20%]'}">내용</th>
-                    <th class="${isKRW ? 'w-[10%]' : 'w-[10%]'} text-[11px] leading-tight">인원/객실수<br>차량대수</th>
-                    ${!isKRW ? `<th class="w-[11%] print-bg-yellow bg-yellow-100 text-slate-900"><span class="curr-name">${currName}</span> 단가<br><span class="curr-code font-normal text-slate-600">${currency}</span></th>` : ''}
-                    <th class="${isKRW ? 'w-[15%]' : 'w-[12%]'}">원화 단가<br><span class="font-normal">KRW</span></th>
-                    <th class="${isKRW ? 'w-[15%]' : 'w-[13%]'}">총금액<br><span class="font-normal">KRW</span></th>
-                    <th class="${isKRW ? 'w-[10%]' : 'w-[12%]'}">비고</th>
-                </tr>
-            `;
-            document.getElementById('main-thead').innerHTML = theadHtml;
+function calculateAndRender() {
+    const clientName = document.getElementById('inp-clientName').value;
+    const docTitle = document.getElementById('inp-docTitle').value;
+    const travelDate = document.getElementById('inp-travelDate').value;
+    const paxStr = document.getElementById('inp-paxStr').value;
+    const issueDate = document.getElementById('inp-issueDate').value;
+    const currency = document.getElementById('inp-currency').value;
+    
+    const isMainland = currency === 'KRW_MAINLAND';
+    const isJeju = currency === 'KRW_JEJU';
+    const isKRW = isMainland || isJeju;
+    
+    let exRate = isKRW ? 1 : (Number(document.getElementById('inp-exRate').value) || 0);
 
-            let totalFlight = 0, totalLocal = 0, totalDomestic = 0;
+    document.getElementById('title-flight-area').innerText = isMainland ? '2. 교통비 영역 (원화 직접 입력)' : '2. 항공료 영역 (원화 직접 입력)';
+    if (isMainland) {
+        document.getElementById('title-local-expense').innerHTML = '<span>3. 행사비용 (원화 직접 입력)</span>';
+    } else if (isJeju) {
+        document.getElementById('title-local-expense').innerHTML = '<span>3. 제주(현지) 발생비용 (원화 직접 입력)</span>';
+    } else {
+        document.getElementById('title-local-expense').innerHTML = '<span>3. 해외현지 발생비용 (외화 입력)</span><span class="text-[10px] lg:text-xs font-normal text-gray-500">*원화 자동 환산</span>';
+    }
+    
+    for(let i=0; i<20; i++) {
+        const fgnInput = document.getElementById(`inp-l${i}-fgn`);
+        if(fgnInput) fgnInput.placeholder = isKRW ? "단가(₩)" : "단가(외화)";
+    }
 
-            // 1. 교통비 / 항공료
-            const flightHeader = isMainland ? '교통비' : '항공료';
-            const flightSubtotalText = isMainland ? '(1) 합계 교통비' : '(1) 합계항공';
-            const flights = [];
-            for(let i=1; i<=2; i++) {
-                const name = document.getElementById(`inp-f${i}-name`).value;
-                if(name.trim() !== '') {
-                    const desc = document.getElementById(`inp-f${i}-desc`).value;
-                    const qty = Number(document.getElementById(`inp-f${i}-qty`).value) || 0;
-                    const krw = Number(document.getElementById(`inp-f${i}-krw`).value) || 0;
-                    const note = document.getElementById(`inp-f${i}-note`).value;
-                    totalFlight += (krw * qty);
-                    flights.push({ name, desc, qty, krw, rowTotal: krw * qty, note });
-                }
-            }
-            
-            let htmlFlight = '';
-            for(let i=0; i<flights.length; i++) {
-                htmlFlight += `<tr>`;
-                if(i === 0) htmlFlight += `<td rowspan="${flights.length}" class="text-center font-bold print-bg-gray bg-gray-50">${flightHeader}</td>`;
-                
-                // 항목 (Name) Rowspan
-                if(i === 0 || flights[i].name !== flights[i-1].name) {
-                    let rowspan = 1;
-                    for(let j = i+1; j < flights.length; j++) { if(flights[j].name === flights[i].name) rowspan++; else break; }
-                    htmlFlight += `<td rowspan="${rowspan}" class="text-center bg-white">${flights[i].name}</td>`;
-                }
+    document.getElementById('out-clientName').innerText = clientName;
+    document.getElementById('out-docTitle').innerText = docTitle;
+    document.getElementById('out-travelDate').innerText = travelDate;
+    document.getElementById('out-paxStr').innerText = paxStr;
+    document.getElementById('out-issueAndRate').innerText = isKRW ? `${issueDate} / 국내행사 (환율 미적용)` : `${issueDate} / ${currency} ${exRate} 기준(송금)`;
 
-                // 내용 (Desc) Rowspan - Name과 Desc가 모두 같을 때만 병합
-                if(i === 0 || flights[i].name !== flights[i-1].name || flights[i].desc !== flights[i-1].desc) {
-                    let rowspan = 1;
-                    for(let j = i+1; j < flights.length; j++) { 
-                        if(flights[j].name === flights[i].name && flights[j].desc === flights[i].desc) rowspan++; else break; 
-                    }
-                    htmlFlight += `<td rowspan="${rowspan}">${flights[i].desc.replace(/\n/g, '<br>')}</td>`;
-                }
+    const currName = currency === 'JPY' ? '엔화' : (currency === 'USD' ? '달러' : (isKRW ? '원화' : '위안화'));
+    const currSym = currency === 'USD' ? '$' : (isKRW ? '₩' : '¥');
+    
+    const theadHtml = `
+        <tr class="print-bg-header bg-slate-200 text-slate-900 border-b-2 border-slate-900">
+            <th class="${isKRW ? 'w-[10%]' : 'w-[9%]'} py-1 lg:py-2">구분</th>
+            <th class="${isKRW ? 'w-[15%]' : 'w-[12%]'}">항목</th>
+            <th class="${isKRW ? 'w-[25%]' : 'w-[20%]'}">내용</th>
+            <th class="${isKRW ? 'w-[10%]' : 'w-[9%]'} text-[9px] lg:text-[11px] leading-tight font-normal text-slate-700">인원/객실<br>차량대수</th>
+            ${!isKRW ? `<th class="w-[12%] print-bg-yellow-light bg-yellow-100"><span class="font-bold">${currName}</span> 단가<br><span class="text-[9px] font-normal text-slate-600">${currency}</span></th>` : ''}
+            <th class="${isKRW ? 'w-[15%]' : 'w-[13%]'}">원화 단가<br><span class="font-normal text-[9px] lg:text-[11px] text-slate-600">KRW</span></th>
+            <th class="${isKRW ? 'w-[15%]' : 'w-[15%]'}">총금액<br><span class="font-normal text-[9px] lg:text-[11px] text-slate-600">KRW</span></th>
+            <th class="${isKRW ? 'w-[10%]' : 'w-[10%]'}">비고</th>
+        </tr>
+    `;
+    document.getElementById('main-thead').innerHTML = theadHtml;
 
-                htmlFlight += `
-                    <td class="text-center">${fmt(flights[i].qty)}</td>
-                    ${!isKRW ? `<td class="text-right print-bg-gray bg-gray-50"></td>` : ''}
-                    <td class="text-right">${fmt(flights[i].krw)}</td>
-                    <td class="text-right font-semibold">${fmtTotal(flights[i].rowTotal)}</td>
-                    <td class="text-center">${flights[i].note}</td>
-                </tr>`;
-            }
-            
-            const colspanTotal = isKRW ? 5 : 6;
-            htmlFlight += `
-                <tr class="print-bg-blue bg-blue-50 font-bold border-b-2 border-slate-900" style="height: 1%;">
-                    <td colspan="${colspanTotal}" class="text-center py-2">${flightSubtotalText}</td>
-                    <td class="text-right text-blue-800">${fmtTotal(totalFlight)}</td>
-                    <td></td>
-                </tr>`;
-            document.getElementById('tbody-flight').innerHTML = htmlFlight;
+    let totalFlight = 0, totalLocal = 0, totalDomestic = 0;
 
-            // 2. 행사비용 / 제주(현지) / 해외현지 비용
-            const localHeader = isMainland ? '행사비용' : (isJeju ? '제주(현지)<br>발생비용' : '해외현지<br>발생비용');
-            const localSubtotalText = isMainland ? '(2) 합계 - 행사비용' : (isJeju ? '(2) 합계 - 제주(현지) 발생 비용' : '(2) 합계 - 해외현지 발생 비용');
-            
-            const locals = [];
-            for(let i=0; i<20; i++) {
-                const name = document.getElementById(`inp-l${i}-name`).value;
-                if(name.trim() !== '') {
-                    const desc = document.getElementById(`inp-l${i}-desc`).value;
-                    const qty = Number(document.getElementById(`inp-l${i}-qty`).value) || 0;
-                    const fgn = Number(document.getElementById(`inp-l${i}-fgn`).value) || 0;
-                    const krw = isKRW ? fgn : Math.round(fgn * exRate);
-                    totalLocal += (krw * qty);
-                    locals.push({ name, desc, qty, fgn, krw, rowTotal: krw * qty, note: document.getElementById(`inp-l${i}-note`).value });
-                }
-            }
-
-            let htmlLocal = '';
-            for(let i=0; i<locals.length; i++) {
-                htmlLocal += `<tr>`;
-                if(i === 0) htmlLocal += `<td rowspan="${locals.length}" class="text-center font-bold print-bg-gray bg-gray-50 leading-loose">${localHeader}</td>`;
-                
-                // 항목 (Name) Rowspan
-                if(i === 0 || locals[i].name !== locals[i-1].name) {
-                    let rowspan = 1;
-                    for(let j = i+1; j < locals.length; j++) { if(locals[j].name === locals[i].name) rowspan++; else break; }
-                    htmlLocal += `<td rowspan="${rowspan}" class="text-center bg-white">${locals[i].name}</td>`;
-                }
-
-                // 내용 (Desc) Rowspan - Name과 Desc가 모두 같을 때 병합 (학생/교사 단가 구분용)
-                if(i === 0 || locals[i].name !== locals[i-1].name || locals[i].desc !== locals[i-1].desc) {
-                    let rowspan = 1;
-                    for(let j = i+1; j < locals.length; j++) { 
-                        if(locals[j].name === locals[i].name && locals[j].desc === locals[i].desc) rowspan++; else break; 
-                    }
-                    htmlLocal += `<td rowspan="${rowspan}">${locals[i].desc}</td>`;
-                }
-
-                htmlLocal += `
-                    <td class="text-center">${fmt(locals[i].qty)}</td>
-                    ${!isKRW ? `<td class="text-right print-bg-yellow-light bg-yellow-50"><span class="text-[10px] text-gray-500 float-left">${currSym}</span>${fmt(locals[i].fgn)}</td>` : ''}
-                    <td class="text-right">${fmt(locals[i].krw)}</td>
-                    <td class="text-right font-semibold">${fmtTotal(locals[i].rowTotal)}</td>
-                    <td class="text-center">${locals[i].note}</td>
-                </tr>`;
-            }
-            htmlLocal += `
-                <tr class="print-bg-blue bg-blue-50 font-bold border-b-2 border-slate-900" style="height: 1%;">
-                    <td colspan="${colspanTotal}" class="text-center py-2">${localSubtotalText}</td>
-                    <td class="text-right text-blue-800">${fmtTotal(totalLocal)}</td>
-                    <td></td>
-                </tr>`;
-            document.getElementById('tbody-local').innerHTML = htmlLocal;
-
-            // 3. 국내비용
-            const domestics = [];
-            for(let i=1; i<=3; i++) {
-                const name = document.getElementById(`inp-d${i}-name`).value;
-                if(name.trim() !== '') {
-                    const desc = document.getElementById(`inp-d${i}-desc`).value;
-                    const qty = Number(document.getElementById(`inp-d${i}-qty`).value) || 0;
-                    const krw = Number(document.getElementById(`inp-d${i}-krw`).value) || 0;
-                    totalDomestic += (krw * qty);
-                    domestics.push({ name, desc, qty, krw, rowTotal: krw * qty, note: document.getElementById(`inp-d${i}-note`).value });
-                }
-            }
-
-            let htmlDom = '';
-            for(let i=0; i<domestics.length; i++) {
-                htmlDom += `<tr>`;
-                if(i === 0) htmlDom += `<td rowspan="${domestics.length}" class="text-center font-bold print-bg-gray bg-gray-50">국내 비용</td>`;
-                
-                if(i === 0 || domestics[i].name !== domestics[i-1].name) {
-                    let rowspan = 1;
-                    for(let j = i+1; j < domestics.length; j++) { if(domestics[j].name === domestics[i].name) rowspan++; else break; }
-                    htmlDom += `<td rowspan="${rowspan}" class="text-center bg-white">${domestics[i].name}</td>`;
-                }
-
-                if(i === 0 || domestics[i].name !== domestics[i-1].name || domestics[i].desc !== domestics[i-1].desc) {
-                    let rowspan = 1;
-                    for(let j = i+1; j < domestics.length; j++) { 
-                        if(domestics[j].name === domestics[i].name && domestics[j].desc === domestics[i].desc) rowspan++; else break; 
-                    }
-                    htmlDom += `<td rowspan="${rowspan}">${domestics[i].desc}</td>`;
-                }
-
-                htmlDom += `
-                    <td class="text-center">${fmt(domestics[i].qty)}</td>
-                    ${!isKRW ? `<td class="text-right print-bg-gray bg-gray-50"></td>` : ''}
-                    <td class="text-right">${fmt(domestics[i].krw)}</td>
-                    <td class="text-right font-semibold">${fmtTotal(domestics[i].rowTotal)}</td>
-                    <td class="text-center">${domestics[i].note}</td>
-                </tr>`;
-            }
-            htmlDom += `
-                <tr class="print-bg-blue bg-blue-50 font-bold border-b-2 border-slate-900" style="height: 1%;">
-                    <td colspan="${colspanTotal}" class="text-center py-2">(3) 합계 국내 비용 합계</td>
-                    <td class="text-right text-blue-800">${fmtTotal(totalDomestic)}</td>
-                    <td></td>
-                </tr>`;
-            document.getElementById('tbody-domestic').innerHTML = htmlDom;
-
-            // 4. 총합계
-            const grandTotal = totalFlight + totalLocal + totalDomestic;
-            const noFlightTotal = totalLocal + totalDomestic;
-            const flightExcludeText = isMainland ? '(교통비제외)' : '(항공제외)';
-
-            const totalHtml = `
-                <tr class="print-bg-gray bg-gray-100 font-extrabold border-t-2 border-slate-900" style="height: 1%;">
-                    <td colspan="${colspanTotal}" class="text-center text-sm py-2">(1)+(2)+(3) 합계 금액</td>
-                    <td class="text-right text-base text-blue-800 py-2">₩<span>${fmtTotal(grandTotal)}</span></td>
-                    <td></td>
-                </tr>
-                <tr class="print-bg-gray bg-gray-100 font-extrabold border-b-2 border-slate-900" style="height: 1%;">
-                    <td colspan="${colspanTotal}" class="text-center text-sm py-2">(2)+(3) 합계 금액 <span class="text-xs font-normal text-slate-600">${flightExcludeText}</span></td>
-                    <td class="text-right text-base text-red-700 py-2">₩<span>${fmtTotal(noFlightTotal)}</span></td>
-                    <td></td>
-                </tr>
-            `;
-            document.getElementById('tbody-total').innerHTML = totalHtml;
+    const flightHeader = isMainland ? '교통비' : '항공료';
+    const flightSubtotalText = isMainland ? '(1) 합계 교통비' : '(1) 합계항공';
+    const flights = [];
+    for(let i=1; i<=2; i++) {
+        const name = document.getElementById(`inp-f${i}-name`).value;
+        if(name.trim() !== '') {
+            const desc = document.getElementById(`inp-f${i}-desc`).value;
+            const qty = Number(document.getElementById(`inp-f${i}-qty`).value) || 0;
+            const krw = Number(document.getElementById(`inp-f${i}-krw`).value) || 0;
+            totalFlight += (krw * qty);
+            flights.push({ name, desc, qty, krw, rowTotal: krw * qty, note: document.getElementById(`inp-f${i}-note`).value });
         }
+    }
+    
+    let htmlFlight = '';
+    for(let i=0; i<flights.length; i++) {
+        htmlFlight += `<tr>`;
+        if(i === 0) htmlFlight += `<td rowspan="${flights.length}" class="text-center font-bold print-bg-gray bg-gray-50">${flightHeader}</td>`;
+        if(i === 0 || flights[i].name !== flights[i-1].name) {
+            htmlFlight += `<td rowspan="${getRowspan(flights, i, 'name')}" class="text-center">${flights[i].name}</td>`;
+        }
+        if(i === 0 || flights[i].name !== flights[i-1].name || flights[i].desc !== flights[i-1].desc) {
+            htmlFlight += `<td rowspan="${getRowspanDesc(flights, i)}">${flights[i].desc.replace(/\n/g, '<br>')}</td>`;
+        }
+        htmlFlight += `
+            <td class="text-center">${fmt(flights[i].qty)}</td>
+            ${!isKRW ? `<td class="text-right print-bg-gray bg-gray-50"></td>` : ''}
+            <td class="text-right">${fmt(flights[i].krw)}</td>
+            <td class="text-right font-bold tracking-tight">${fmtTotal(flights[i].rowTotal)}</td>
+            <td class="text-center text-[10px] text-slate-600">${flights[i].note}</td>
+        </tr>`;
+    }
+    const colspanTotal = isKRW ? 5 : 6;
+    htmlFlight += `
+        <tr class="print-bg-blue bg-blue-50 font-bold border-b-2 border-slate-900">
+            <td colspan="${colspanTotal}" class="text-center py-1.5 lg:py-2 text-slate-800">${flightSubtotalText}</td>
+            <td class="text-right text-blue-800 text-[11px] lg:text-[13px]">${fmtTotal(totalFlight)}</td>
+            <td></td>
+        </tr>`;
+    document.getElementById('tbody-flight').innerHTML = htmlFlight;
 
-        window.onload = () => {
-            buildLocalInputs();
-            calculateAndRender();
-            
-            // 실시간 이벤트 감지
-            document.querySelector('.w-full.lg\\:w-\\[480px\\]').addEventListener('input', (e) => {
-                const curr = document.getElementById('inp-currency').value;
-                const rateWrapper = document.getElementById('wrap-exRate');
-                const rateInput = document.getElementById('inp-exRate');
-                
-                if(e.target.id === 'inp-currency') {
-                    if(curr === 'KRW_MAINLAND' || curr === 'KRW_JEJU') {
-                        rateWrapper.style.display = 'none'; // 국내 선택시 환율칸 숨김
-                        rateInput.value = 1; 
-                    } else {
-                        rateWrapper.style.display = 'flex'; // 해외 선택시 환율칸 노출
-                        if(curr === 'JPY' && rateInput.value > 100) rateInput.value = 9.5;
-                        else if(curr === 'USD' && rateInput.value < 100) rateInput.value = 1400;
-                        else if(curr === 'CNY' && (rateInput.value < 100 || rateInput.value > 300)) rateInput.value = 195;
-                    }
-                }
-                calculateAndRender();
-            });
-        };
-    </script>
+    const localHeader = isMainland ? '행사비용' : (isJeju ? '제주(현지)<br>발생비용' : '해외현지<br>발생비용');
+    const localSubtotalText = isMainland ? '(2) 합계 - 행사비용' : (isJeju ? '(2) 합계 - 제주 발생' : '(2) 합계 - 해외현지 발생');
+    const locals = [];
+    for(let i=0; i<20; i++) {
+        const name = document.getElementById(`inp-l${i}-name`).value;
+        if(name.trim() !== '') {
+            const desc = document.getElementById(`inp-l${i}-desc`).value;
+            const qty = Number(document.getElementById(`inp-l${i}-qty`).value) || 0;
+            const fgn = Number(document.getElementById(`inp-l${i}-fgn`).value) || 0;
+            const krw = isKRW ? fgn : Math.round(fgn * exRate);
+            totalLocal += (krw * qty);
+            locals.push({ name, desc, qty, fgn, krw, rowTotal: krw * qty, note: document.getElementById(`inp-l${i}-note`).value });
+        }
+    }
+
+    let htmlLocal = '';
+    for(let i=0; i<locals.length; i++) {
+        htmlLocal += `<tr>`;
+        if(i === 0) htmlLocal += `<td rowspan="${locals.length}" class="text-center font-bold print-bg-gray bg-gray-50 leading-relaxed">${localHeader}</td>`;
+        if(i === 0 || locals[i].name !== locals[i-1].name) {
+            htmlLocal += `<td rowspan="${getRowspan(locals, i, 'name')}" class="text-center">${locals[i].name}</td>`;
+        }
+        if(i === 0 || locals[i].name !== locals[i-1].name || locals[i].desc !== locals[i-1].desc) {
+            htmlLocal += `<td rowspan="${getRowspanDesc(locals, i)}">${locals[i].desc}</td>`;
+        }
+        htmlLocal += `
+            <td class="text-center">${fmt(locals[i].qty)}</td>
+            ${!isKRW ? `<td class="text-right print-bg-yellow-light bg-yellow-50/50"><span class="text-[9px] text-gray-400 float-left mr-1">${currSym}</span>${fmt(locals[i].fgn)}</td>` : ''}
+            <td class="text-right">${fmt(locals[i].krw)}</td>
+            <td class="text-right font-bold tracking-tight">${fmtTotal(locals[i].rowTotal)}</td>
+            <td class="text-center text-[10px] text-slate-600">${locals[i].note}</td>
+        </tr>`;
+    }
+    htmlLocal += `
+        <tr class="print-bg-blue bg-blue-50 font-bold border-b-2 border-slate-900">
+            <td colspan="${colspanTotal}" class="text-center py-1.5 lg:py-2 text-slate-800">${localSubtotalText}</td>
+            <td class="text-right text-blue-800 text-[11px] lg:text-[13px]">${fmtTotal(totalLocal)}</td>
+            <td></td>
+        </tr>`;
+    document.getElementById('tbody-local').innerHTML = htmlLocal;
+
+    const domestics = [];
+    for(let i=1; i<=3; i++) {
+        const name = document.getElementById(`inp-d${i}-name`).value;
+        if(name.trim() !== '') {
+            const desc = document.getElementById(`inp-d${i}-desc`).value;
+            const qty = Number(document.getElementById(`inp-d${i}-qty`).value) || 0;
+            const krw = Number(document.getElementById(`inp-d${i}-krw`).value) || 0;
+            totalDomestic += (krw * qty);
+            domestics.push({ name, desc, qty, krw, rowTotal: krw * qty, note: document.getElementById(`inp-d${i}-note`).value });
+        }
+    }
+
+    let htmlDom = '';
+    for(let i=0; i<domestics.length; i++) {
+        htmlDom += `<tr>`;
+        if(i === 0) htmlDom += `<td rowspan="${domestics.length}" class="text-center font-bold print-bg-gray bg-gray-50">국내 비용</td>`;
+        if(i === 0 || domestics[i].name !== domestics[i-1].name) {
+            htmlDom += `<td rowspan="${getRowspan(domestics, i, 'name')}" class="text-center">${domestics[i].name}</td>`;
+        }
+        if(i === 0 || domestics[i].name !== domestics[i-1].name || domestics[i].desc !== domestics[i-1].desc) {
+            htmlDom += `<td rowspan="${getRowspanDesc(domestics, i)}">${domestics[i].desc}</td>`;
+        }
+        htmlDom += `
+            <td class="text-center">${fmt(domestics[i].qty)}</td>
+            ${!isKRW ? `<td class="text-right print-bg-gray bg-gray-50"></td>` : ''}
+            <td class="text-right">${fmt(domestics[i].krw)}</td>
+            <td class="text-right font-bold tracking-tight">${fmtTotal(domestics[i].rowTotal)}</td>
+            <td class="text-center text-[10px] text-slate-600">${domestics[i].note}</td>
+        </tr>`;
+    }
+    htmlDom += `
+        <tr class="print-bg-blue bg-blue-50 font-bold border-b-2 border-slate-900">
+            <td colspan="${colspanTotal}" class="text-center py-1.5 lg:py-2 text-slate-800">(3) 합계 국내 비용 합계</td>
+            <td class="text-right text-blue-800 text-[11px] lg:text-[13px]">${fmtTotal(totalDomestic)}</td>
+            <td></td>
+        </tr>`;
+    document.getElementById('tbody-domestic').innerHTML = htmlDom;
+
+    const grandTotal = totalFlight + totalLocal + totalDomestic;
+    const noFlightTotal = totalLocal + totalDomestic;
+    const flightExcludeText = isMainland ? '(교통비제외)' : '(항공제외)';
+
+    const totalHtml = `
+        <tr class="print-bg-gray bg-gray-100 font-extrabold border-t-[3px] border-slate-900">
+            <td colspan="${colspanTotal}" class="text-center text-[11px] lg:text-sm py-2 lg:py-3 text-slate-900">(1)+(2)+(3) 전체 합계 금액</td>
+            <td class="text-right text-[13px] lg:text-base text-blue-800 py-2 lg:py-3 tracking-tighter">₩<span>${fmtTotal(grandTotal)}</span></td>
+            <td></td>
+        </tr>
+        <tr class="print-bg-gray bg-gray-100 font-extrabold border-b-[3px] border-slate-900">
+            <td colspan="${colspanTotal}" class="text-center text-[11px] lg:text-sm py-2 lg:py-3 text-slate-900">(2)+(3) 행사 금액 <span class="text-[9px] lg:text-xs font-normal text-slate-500 ml-1">${flightExcludeText}</span></td>
+            <td class="text-right text-[13px] lg:text-base text-red-700 py-2 lg:py-3 tracking-tighter">₩<span>${fmtTotal(noFlightTotal)}</span></td>
+            <td></td>
+        </tr>
+    `;
+    document.getElementById('tbody-total').innerHTML = totalHtml;
+}
+
+window.onload = () => {
+    // 1. 입력 슬롯 HTML을 먼저 생성
+    buildInputSlots();
+    
+    // 2. URL에 데이터가 있으면 복원, 없으면 기본 초기 데이터 세팅
+    const isLoadedFromUrl = loadDataFromUrl();
+    if (!isLoadedFromUrl) {
+        applyDataToUI(defaultInitData);
+    }
+    
+    // 3. 우측 출력 화면 렌더링
+    calculateAndRender();
+    
+    // 4. 입력창 실시간 렌더링 이벤트 등록
+    document.getElementById('panelInput').addEventListener('input', (e) => {
+        const curr = document.getElementById('inp-currency').value;
+        const rateWrapper = document.getElementById('wrap-exRate');
+        const rateInput = document.getElementById('inp-exRate');
+        
+        if(e.target.id === 'inp-currency') {
+            if(curr === 'KRW_MAINLAND' || curr === 'KRW_JEJU') {
+                rateWrapper.style.display = 'none';
+                rateInput.value = 1; 
+            } else {
+                rateWrapper.style.display = 'flex';
+                if(curr === 'JPY' && rateInput.value > 100) rateInput.value = 9.5;
+                else if(curr === 'USD' && rateInput.value < 100) rateInput.value = 1400;
+                else if(curr === 'CNY' && (rateInput.value < 100 || rateInput.value > 300)) rateInput.value = 195;
+            }
+        }
+        calculateAndRender();
+    });
+};
+</script>
 </body>
 </html>
