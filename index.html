@@ -10,6 +10,7 @@
     <meta property="og:image" content="https://blogger.googleusercontent.com/img/a/AVvXsEhPxG_ONo2BdFAGDNnn-pHIGJTrAq374YbqgwTTlyIZTP22kOWTDD_AyjKDNFPhsHg5t1Iq6zV0dL_NZIj4o97Kd0eWJYCv-NHhtIqme-Mp3htGhAdkqVv5NRU3Jc9TbdbvvVKrPslObA1oNABpgl12QtGwirC2QM5lcPCVoWm8pIbeKuZBbeDHAvpbKEQ">
     <meta property="og:type" content="website">
 
+    <!-- [필수] 실제 투어메이커 GA4 측정 ID로 변경해주세요 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -141,7 +142,6 @@
         .main-table th { text-align: center; font-weight: 700; }
         .main-table thead th { background: #e2e8f0; color: #0f172a; }
 
-        /* [핵심 수정] rowspan 시 브라우저가 행 높이를 불균형하게 배분하는 것 방지 */
         .main-table tbody tr { height: 28px; }
 
         .text-center { text-align: center; }
@@ -171,6 +171,7 @@
         .text-blue-800 { color: #1e40af; }
         .text-red-700 { color: #b91c1c; }
         .hint-text { font-size: 11px; color: #9ca3af; margin-bottom: 8px; }
+        .empty-row-text { color: #9ca3af; font-size: 10.5px; font-weight: 400; }
 
         /* ===== 모바일 ===== */
         @media (max-width: 1023px) {
@@ -228,7 +229,6 @@
         }
 
         /* ===== 인쇄용 compact 모드 - 10단계 세밀 조절 ===== */
-        /* [핵심 수정] 폰트 크기가 줄어들 때, 강제로 고정한 행 높이(height)도 같이 줄여주어 A4 1장에 완벽 수납 */
         .pc-1 .doc-header { margin-bottom: 16px; }
         .pc-1 .doc-title-area { margin-bottom: 16px; }
         .pc-1 .doc-title-area h2 { font-size: 24px; }
@@ -496,7 +496,7 @@
                     </div>
                     <div class="footer-brand">
                         <p>[System Powered by TOURMAKER] 본 산출 내역서는 <strong style="color:#334155;">투어메이커</strong>의 기획과 트래블 테크 기술 제휴로 제작되었습니다.</p>
-                        <a href="http://tourmaker.kr" target="_blank" rel="noopener noreferrer" class="no-print">투어메이커 홈페이지 바로가기</a>
+                        <a href="https://tourmaker.kr" target="_blank" rel="noopener noreferrer" class="no-print">투어메이커 홈페이지 바로가기</a>
                     </div>
                 </div>
             </div>
@@ -520,6 +520,7 @@ function printPDF() {
 
     requestAnimationFrame(() => {
     requestAnimationFrame(() => {
+        // A4_H 값은 현 운영 환경에 최적화된 경험치(1025px)입니다.
         const A4_H = 1025;
         let chosenLevel = null;
 
@@ -576,6 +577,24 @@ function switchTab(tab) {
         tabPreview.classList.add('active');
         document.getElementById('panelPreview').scrollLeft = 0;
         window.scrollTo(0, 0);
+    }
+}
+
+// ===== 환율 UI 동기화 (추가된 핵심 함수) =====
+function syncCurrencyUI() {
+    const curr = document.getElementById('inp-currency').value;
+    const rW = document.getElementById('wrap-exRate');
+    const rI = document.getElementById('inp-exRate');
+
+    if (curr === 'KRW_MAINLAND' || curr === 'KRW_JEJU') {
+        rW.style.display = 'none';
+        rI.value = 1;
+    } else {
+        rW.style.display = 'flex';
+        const val = Number(rI.value);
+        if (curr === 'JPY' && val > 100) rI.value = 9.5;
+        else if (curr === 'USD' && val < 100) rI.value = 1400;
+        else if (curr === 'CNY' && (val < 100 || val > 300)) rI.value = 195;
     }
 }
 
@@ -681,15 +700,20 @@ function calculateAndRender() {
     const fSub = isMainland?'(1) 합계 교통비':'(1) 합계항공';
     const flights=[];
     for(let i=1;i<=2;i++){const n=document.getElementById(`inp-f${i}-name`).value;if(n.trim()){const d=document.getElementById(`inp-f${i}-desc`).value,q=Number(document.getElementById(`inp-f${i}-qty`).value)||0,k=Number(document.getElementById(`inp-f${i}-krw`).value)||0,nt=document.getElementById(`inp-f${i}-note`).value;tF+=k*q;flights.push({name:n,desc:d,qty:q,krw:k,tot:k*q,note:nt});}}
+    
     let h='';
-    for(let i=0;i<flights.length;i++){
-        h+='<tr>';
-        if(i===0)h+=`<td rowspan="${flights.length}" class="text-center font-bold bg-gray-50">${fH}</td>`;
-        if(i===0||flights[i].name!==flights[i-1].name)h+=`<td rowspan="${rs(flights,i,'name')}" class="text-center">${flights[i].name}</td>`;
-        if(i===0||flights[i].name!==flights[i-1].name||flights[i].desc!==flights[i-1].desc)h+=`<td rowspan="${rs2(flights,i)}">${flights[i].desc}</td>`;
-        h+=`<td class="text-center">${fmt(flights[i].qty)}</td>`;
-        if(!isKRW)h+='<td class="text-right bg-gray-50"></td>';
-        h+=`<td class="text-right" style="white-space:nowrap">${fmt(flights[i].krw)}</td><td class="text-right font-semibold" style="white-space:nowrap">${fmtT(flights[i].tot)}</td><td class="text-center">${flights[i].note}</td></tr>`;
+    if (flights.length === 0) {
+        h += `<tr><td class="text-center font-bold bg-gray-50">${fH}</td><td colspan="${col-1}" class="text-center empty-row-text">입력된 항목이 없습니다.</td></tr>`;
+    } else {
+        for(let i=0;i<flights.length;i++){
+            h+='<tr>';
+            if(i===0)h+=`<td rowspan="${flights.length}" class="text-center font-bold bg-gray-50">${fH}</td>`;
+            if(i===0||flights[i].name!==flights[i-1].name)h+=`<td rowspan="${rs(flights,i,'name')}" class="text-center">${flights[i].name}</td>`;
+            if(i===0||flights[i].name!==flights[i-1].name||flights[i].desc!==flights[i-1].desc)h+=`<td rowspan="${rs2(flights,i)}">${flights[i].desc}</td>`;
+            h+=`<td class="text-center">${fmt(flights[i].qty)}</td>`;
+            if(!isKRW)h+='<td class="text-right bg-gray-50"></td>';
+            h+=`<td class="text-right" style="white-space:nowrap">${fmt(flights[i].krw)}</td><td class="text-right font-semibold" style="white-space:nowrap">${fmtT(flights[i].tot)}</td><td class="text-center">${flights[i].note}</td></tr>`;
+        }
     }
     h+=`<tr class="subtotal-row"><td colspan="${col}" class="text-center">${fSub}</td><td class="text-right text-blue-800" style="white-space:nowrap">${fmtT(tF)}</td><td></td></tr>`;
     document.getElementById('tbody-flight').innerHTML=h;
@@ -699,15 +723,20 @@ function calculateAndRender() {
     const lSub=isMainland?'(2) 합계 - 행사비용':(isJeju?'(2) 합계 - 제주(현지) 발생 비용':'(2) 합계 - 해외현지 발생 비용');
     const locals=[];
     for(let i=0;i<20;i++){const n=document.getElementById(`inp-l${i}-name`).value;if(n.trim()){const d=document.getElementById(`inp-l${i}-desc`).value,q=Number(document.getElementById(`inp-l${i}-qty`).value)||0,f=Number(document.getElementById(`inp-l${i}-fgn`).value)||0,k=isKRW?f:Math.round(f*exRate);tL+=k*q;locals.push({name:n,desc:d,qty:q,fgn:f,krw:k,tot:k*q,note:document.getElementById(`inp-l${i}-note`).value});}}
+    
     h='';
-    for(let i=0;i<locals.length;i++){
-        h+='<tr>';
-        if(i===0)h+=`<td rowspan="${locals.length}" class="text-center font-bold bg-gray-50">${lH}</td>`;
-        if(i===0||locals[i].name!==locals[i-1].name)h+=`<td rowspan="${rs(locals,i,'name')}" class="text-center">${locals[i].name}</td>`;
-        if(i===0||locals[i].name!==locals[i-1].name||locals[i].desc!==locals[i-1].desc)h+=`<td rowspan="${rs2(locals,i)}">${locals[i].desc}</td>`;
-        h+=`<td class="text-center">${fmt(locals[i].qty)}</td>`;
-        if(!isKRW)h+=`<td class="text-right bg-yellow-50"><span style="float:left;font-size:9px;color:#9ca3af">${cS}</span>${fmt(locals[i].fgn)}</td>`;
-        h+=`<td class="text-right" style="white-space:nowrap">${fmt(locals[i].krw)}</td><td class="text-right font-semibold" style="white-space:nowrap">${fmtT(locals[i].tot)}</td><td class="text-center">${locals[i].note}</td></tr>`;
+    if (locals.length === 0) {
+        h += `<tr><td class="text-center font-bold bg-gray-50">${lH}</td><td colspan="${col-1}" class="text-center empty-row-text">입력된 항목이 없습니다.</td></tr>`;
+    } else {
+        for(let i=0;i<locals.length;i++){
+            h+='<tr>';
+            if(i===0)h+=`<td rowspan="${locals.length}" class="text-center font-bold bg-gray-50">${lH}</td>`;
+            if(i===0||locals[i].name!==locals[i-1].name)h+=`<td rowspan="${rs(locals,i,'name')}" class="text-center">${locals[i].name}</td>`;
+            if(i===0||locals[i].name!==locals[i-1].name||locals[i].desc!==locals[i-1].desc)h+=`<td rowspan="${rs2(locals,i)}">${locals[i].desc}</td>`;
+            h+=`<td class="text-center">${fmt(locals[i].qty)}</td>`;
+            if(!isKRW)h+=`<td class="text-right bg-yellow-50"><span style="float:left;font-size:9px;color:#9ca3af">${cS}</span>${fmt(locals[i].fgn)}</td>`;
+            h+=`<td class="text-right" style="white-space:nowrap">${fmt(locals[i].krw)}</td><td class="text-right font-semibold" style="white-space:nowrap">${fmtT(locals[i].tot)}</td><td class="text-center">${locals[i].note}</td></tr>`;
+        }
     }
     h+=`<tr class="subtotal-row"><td colspan="${col}" class="text-center">${lSub}</td><td class="text-right text-blue-800" style="white-space:nowrap">${fmtT(tL)}</td><td></td></tr>`;
     document.getElementById('tbody-local').innerHTML=h;
@@ -715,15 +744,20 @@ function calculateAndRender() {
     // --- 국내비용 ---
     const doms=[];
     for(let i=1;i<=3;i++){const n=document.getElementById(`inp-d${i}-name`).value;if(n.trim()){const d=document.getElementById(`inp-d${i}-desc`).value,q=Number(document.getElementById(`inp-d${i}-qty`).value)||0,k=Number(document.getElementById(`inp-d${i}-krw`).value)||0;tD+=k*q;doms.push({name:n,desc:d,qty:q,krw:k,tot:k*q,note:document.getElementById(`inp-d${i}-note`).value});}}
+    
     h='';
-    for(let i=0;i<doms.length;i++){
-        h+='<tr>';
-        if(i===0)h+=`<td rowspan="${doms.length}" class="text-center font-bold bg-gray-50">국내 비용</td>`;
-        if(i===0||doms[i].name!==doms[i-1].name)h+=`<td rowspan="${rs(doms,i,'name')}" class="text-center">${doms[i].name}</td>`;
-        if(i===0||doms[i].name!==doms[i-1].name||doms[i].desc!==doms[i-1].desc)h+=`<td rowspan="${rs2(doms,i)}">${doms[i].desc}</td>`;
-        h+=`<td class="text-center">${fmt(doms[i].qty)}</td>`;
-        if(!isKRW)h+='<td class="text-right bg-gray-50"></td>';
-        h+=`<td class="text-right" style="white-space:nowrap">${fmt(doms[i].krw)}</td><td class="text-right font-semibold" style="white-space:nowrap">${fmtT(doms[i].tot)}</td><td class="text-center">${doms[i].note}</td></tr>`;
+    if (doms.length === 0) {
+        h += `<tr><td class="text-center font-bold bg-gray-50">국내 비용</td><td colspan="${col-1}" class="text-center empty-row-text">입력된 항목이 없습니다.</td></tr>`;
+    } else {
+        for(let i=0;i<doms.length;i++){
+            h+='<tr>';
+            if(i===0)h+=`<td rowspan="${doms.length}" class="text-center font-bold bg-gray-50">국내 비용</td>`;
+            if(i===0||doms[i].name!==doms[i-1].name)h+=`<td rowspan="${rs(doms,i,'name')}" class="text-center">${doms[i].name}</td>`;
+            if(i===0||doms[i].name!==doms[i-1].name||doms[i].desc!==doms[i-1].desc)h+=`<td rowspan="${rs2(doms,i)}">${doms[i].desc}</td>`;
+            h+=`<td class="text-center">${fmt(doms[i].qty)}</td>`;
+            if(!isKRW)h+='<td class="text-right bg-gray-50"></td>';
+            h+=`<td class="text-right" style="white-space:nowrap">${fmt(doms[i].krw)}</td><td class="text-right font-semibold" style="white-space:nowrap">${fmtT(doms[i].tot)}</td><td class="text-center">${doms[i].note}</td></tr>`;
+        }
     }
     h+=`<tr class="subtotal-row"><td colspan="${col}" class="text-center">(3) 합계 국내 비용 합계</td><td class="text-right text-blue-800" style="white-space:nowrap">${fmtT(tD)}</td><td></td></tr>`;
     document.getElementById('tbody-domestic').innerHTML=h;
@@ -736,20 +770,23 @@ function calculateAndRender() {
         <tr class="grand-row grand-row-last"><td colspan="${col}" class="text-center grand-label" style="font-size:12px">(2)+(3) 합계 금액 <span style="font-size:10px;font-weight:400;color:#64748b">${ex}</span></td><td class="text-right text-red-700 grand-amount" style="white-space:nowrap">₩${fmtT(nF)}</td><td></td></tr>`;
 }
 
-// ===== 초기화 =====
+// ===== 초기화 및 이벤트 등록 =====
 window.onload = function() {
     buildLocalInputs();
+    syncCurrencyUI();
     calculateAndRender();
 
-    document.getElementById('panelInput').addEventListener('input', function(e) {
-        const curr = document.getElementById('inp-currency').value;
-        const rW = document.getElementById('wrap-exRate');
-        const rI = document.getElementById('inp-exRate');
-        if (e.target.id === 'inp-currency') {
-            if (curr==='KRW_MAINLAND'||curr==='KRW_JEJU') { rW.style.display='none'; rI.value=1; }
-            else { rW.style.display='flex'; if(curr==='JPY'&&rI.value>100)rI.value=9.5; else if(curr==='USD'&&rI.value<100)rI.value=1400; else if(curr==='CNY'&&(rI.value<100||rI.value>300))rI.value=195; }
-        }
+    // 1. 통화 선택은 'change' 이벤트로 명확히 분리 처리
+    document.getElementById('inp-currency').addEventListener('change', function() {
+        syncCurrencyUI();
         calculateAndRender();
+    });
+
+    // 2. 그 외 텍스트/숫자 입력은 기존대로 실시간 'input' 반영
+    document.getElementById('panelInput').addEventListener('input', function(e) {
+        if (e.target.id !== 'inp-currency') {
+            calculateAndRender();
+        }
     });
 };
 </script>
