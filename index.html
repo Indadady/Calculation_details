@@ -424,7 +424,7 @@
             </div>
 
             <div class="form-group">
-                <div class="section-title orange">4. 국내 비용 (원화 직접 입력)</div>
+                <div class="section-title orange">4. 국내 발생 비용 (원화 직접 입력)</div>
                 <div class="slot-card">
                     <div class="slot-grid-flight">
                         <input type="text" id="inp-d1-name" class="slot-input" value="여행자보험" placeholder="항목">
@@ -697,7 +697,7 @@ function calculateAndRender() {
 
     // --- 항공/교통 ---
     const fH = isMainland?'교통비':'항공료';
-    const fSub = isMainland?'(1) 합계 교통비':'(1) 합계항공';
+    const fSub = isMainland?'(1) 합계 - 교통비':'(1) 합계 - 항공료';
     const flights=[];
     for(let i=1;i<=2;i++){const n=document.getElementById(`inp-f${i}-name`).value;if(n.trim()){const d=document.getElementById(`inp-f${i}-desc`).value,q=Number(document.getElementById(`inp-f${i}-qty`).value)||0,k=Number(document.getElementById(`inp-f${i}-krw`).value)||0,nt=document.getElementById(`inp-f${i}-note`).value;tF+=k*q;flights.push({name:n,desc:d,qty:q,krw:k,tot:k*q,note:nt});}}
     
@@ -720,7 +720,7 @@ function calculateAndRender() {
 
     // --- 현지비용 ---
     const lH=isMainland?'행사비용':(isJeju?'제주(현지)<br>발생비용':'해외현지<br>발생비용');
-    const lSub=isMainland?'(2) 합계 - 행사비용':(isJeju?'(2) 합계 - 제주(현지) 발생 비용':'(2) 합계 - 해외현지 발생 비용');
+    const lSub=isMainland?'(2) 합계 - 행사 비용':(isJeju?'(2) 합계 - 제주(현지) 발생 비용':'(2) 합계 - 해외현지 발생 비용');
     const locals=[];
     for(let i=0;i<20;i++){const n=document.getElementById(`inp-l${i}-name`).value;if(n.trim()){const d=document.getElementById(`inp-l${i}-desc`).value,q=Number(document.getElementById(`inp-l${i}-qty`).value)||0,f=Number(document.getElementById(`inp-l${i}-fgn`).value)||0,k=isKRW?f:Math.round(f*exRate);tL+=k*q;locals.push({name:n,desc:d,qty:q,fgn:f,krw:k,tot:k*q,note:document.getElementById(`inp-l${i}-note`).value});}}
     
@@ -747,11 +747,11 @@ function calculateAndRender() {
     
     h='';
     if (doms.length === 0) {
-        h += `<tr><td class="text-center font-bold bg-gray-50">국내 비용</td><td colspan="${col-1}" class="text-center empty-row-text">입력된 항목이 없습니다.</td></tr>`;
+        h += `<tr><td class="text-center font-bold bg-gray-50">국내 발생 비용</td><td colspan="${col-1}" class="text-center empty-row-text">입력된 항목이 없습니다.</td></tr>`;
     } else {
         for(let i=0;i<doms.length;i++){
             h+='<tr>';
-            if(i===0)h+=`<td rowspan="${doms.length}" class="text-center font-bold bg-gray-50">국내 비용</td>`;
+            if(i===0)h+=`<td rowspan="${doms.length}" class="text-center font-bold bg-gray-50">국내 발생 비용</td>`;
             if(i===0||doms[i].name!==doms[i-1].name)h+=`<td rowspan="${rs(doms,i,'name')}" class="text-center">${doms[i].name}</td>`;
             if(i===0||doms[i].name!==doms[i-1].name||doms[i].desc!==doms[i-1].desc)h+=`<td rowspan="${rs2(doms,i)}">${doms[i].desc}</td>`;
             h+=`<td class="text-center">${fmt(doms[i].qty)}</td>`;
@@ -759,15 +759,15 @@ function calculateAndRender() {
             h+=`<td class="text-right" style="white-space:nowrap">${fmt(doms[i].krw)}</td><td class="text-right font-semibold" style="white-space:nowrap">${fmtT(doms[i].tot)}</td><td class="text-center">${doms[i].note}</td></tr>`;
         }
     }
-    h+=`<tr class="subtotal-row"><td colspan="${col}" class="text-center">(3) 합계 국내 비용 합계</td><td class="text-right text-blue-800" style="white-space:nowrap">${fmtT(tD)}</td><td></td></tr>`;
+    h+=`<tr class="subtotal-row"><td colspan="${col}" class="text-center">(3) 합계 - 국내 발생 비용</td><td class="text-right text-blue-800" style="white-space:nowrap">${fmtT(tD)}</td><td></td></tr>`;
     document.getElementById('tbody-domestic').innerHTML=h;
 
     // --- 총합계 ---
     const gT=tF+tL+tD, nF=tL+tD;
-    const ex=isMainland?'(교통비제외)':'(항공제외)';
+    const ex=isMainland?'(교통비 제외)':'(항공료 제외)';
     document.getElementById('tbody-total').innerHTML=`
-        <tr class="grand-row"><td colspan="${col}" class="text-center grand-label" style="font-size:12px">(1)+(2)+(3) 합계 금액</td><td class="text-right text-blue-800 grand-amount" style="white-space:nowrap">₩${fmtT(gT)}</td><td></td></tr>
-        <tr class="grand-row grand-row-last"><td colspan="${col}" class="text-center grand-label" style="font-size:12px">(2)+(3) 합계 금액 <span style="font-size:10px;font-weight:400;color:#64748b">${ex}</span></td><td class="text-right text-red-700 grand-amount" style="white-space:nowrap">₩${fmtT(nF)}</td><td></td></tr>`;
+        <tr class="grand-row"><td colspan="${col}" class="text-center grand-label" style="font-size:12px">(1)+(2)+(3) 전체 합계 금액</td><td class="text-right text-blue-800 grand-amount" style="white-space:nowrap">₩${fmtT(gT)}</td><td></td></tr>
+        <tr class="grand-row grand-row-last"><td colspan="${col}" class="text-center grand-label" style="font-size:12px">(2)+(3) 행사 비용 합계 <span style="font-size:10px;font-weight:400;color:#64748b">${ex}</span></td><td class="text-right text-red-700 grand-amount" style="white-space:nowrap">₩${fmtT(nF)}</td><td></td></tr>`;
 }
 
 // ===== 초기화 및 이벤트 등록 =====
