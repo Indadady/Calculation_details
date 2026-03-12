@@ -118,13 +118,14 @@
                         <div><label class="block text-gray-600 mb-1">발송일자</label><input type="text" id="inp-issueDate" class="w-full border rounded p-1.5" value="2026.03.10"></div>
                         <div>
                             <label class="block text-gray-600 mb-1">통화</label>
-                            <select id="inp-currency" class="w-full border rounded p-1.5 font-bold">
+                            <select id="inp-currency" class="w-full border rounded p-1.5 font-bold text-blue-800">
                                 <option value="JPY">JPY (엔화)</option>
                                 <option value="USD">USD (달러)</option>
                                 <option value="CNY">CNY (위안화)</option>
+                                <option value="KRW">KRW (국내/제주)</option>
                             </select>
                         </div>
-                        <div class="col-span-2 flex items-center gap-2">
+                        <div class="col-span-2 flex items-center gap-2" id="wrap-exRate">
                             <label class="text-gray-600 whitespace-nowrap">적용 환율:</label>
                             <input type="number" step="0.1" id="inp-exRate" class="w-24 border rounded p-1.5 text-right font-bold text-blue-700 bg-blue-50" value="9.5">
                             <span class="text-gray-500 text-xs">기준(송금)</span>
@@ -151,10 +152,10 @@
                     </div>
                 </div>
 
-                <!-- 3. 해외현지 발생경비 -->
+                <!-- 3. 현지 발생비용 -->
                 <div class="space-y-3">
-                    <h3 class="font-bold text-green-800 border-l-4 border-green-800 pl-2 flex justify-between items-center">
-                        3. 해외현지 발생경비 (외화 입력)
+                    <h3 id="title-local-expense" class="font-bold text-green-800 border-l-4 border-green-800 pl-2 flex justify-between items-center">
+                        3. 해외현지 발생비용 (외화 입력)
                         <span class="text-xs font-normal text-gray-500">*원화 자동 환산</span>
                     </h3>
                     <p class="text-xs text-gray-500 mb-1">연속된 항목명(예: 호텔, 식비)은 출력물에서 자동으로 병합됩니다.</p>
@@ -237,39 +238,17 @@
                     </div>
                 </div>
 
-                <!-- 메인 견적 테이블 (이 영역이 A4 세로에 맞게 쫙 늘어납니다) -->
+                <!-- 메인 견적 테이블 -->
                 <div class="flex-grow flex flex-col mb-2">
-                    <!-- table에 height:100%를 주어 남는 세로 공간을 td들이 나눠서 꽉 채우게 설계 -->
                     <table class="w-full print-border text-xs flex-grow" id="main-table" style="height: 100%;">
-                        <thead>
-                            <!-- 헤더는 늘어나지 않게 높이를 타이트하게 고정 -->
-                            <tr class="print-bg-header bg-header text-slate-900" style="height: 1%;">
-                                <th class="w-[10%]">구분</th>
-                                <th class="w-[12%]">항목</th>
-                                <th class="w-[20%]">내용</th>
-                                <th class="w-[10%] text-[11px] leading-tight">인원/객실수<br>차량대수</th>
-                                <th class="w-[11%] print-bg-yellow bg-yellow-100 text-slate-900"><span class="curr-name">엔화</span> 단가<br><span class="curr-code font-normal text-slate-600">JPY</span></th>
-                                <th class="w-[12%]">원화 단가<br><span class="font-normal">KRW</span></th>
-                                <th class="w-[13%]">총금액<br><span class="font-normal">KRW</span></th>
-                                <th class="w-[12%]">비고</th>
-                            </tr>
+                        <thead id="main-thead">
+                            <!-- JS를 통해 통화(해외/국내) 설정에 따라 동적 생성됨 -->
                         </thead>
                         <tbody id="tbody-flight"></tbody>
                         <tbody id="tbody-local"></tbody>
                         <tbody id="tbody-domestic"></tbody>
-                        
-                        <!-- 그랜드 토탈 (늘어나지 않게 고정) -->
-                        <tbody>
-                            <tr class="print-bg-gray bg-gray-100 font-extrabold border-t-2 border-slate-900" style="height: 1%;">
-                                <td colspan="6" class="text-center text-sm py-2">(1)+(2)+(3) 합계 금액</td>
-                                <td class="text-right text-base text-blue-800 py-2">₩<span id="out-grandTotal"></span></td>
-                                <td></td>
-                            </tr>
-                            <tr class="print-bg-gray bg-gray-100 font-extrabold border-b-2 border-slate-900" style="height: 1%;">
-                                <td colspan="6" class="text-center text-sm py-2">(2)+(3) 합계 금액 <span class="text-xs font-normal text-slate-600">(항공제외)</span></td>
-                                <td class="text-right text-base text-red-700 py-2">₩<span id="out-noFlightTotal"></span></td>
-                                <td></td>
-                            </tr>
+                        <tbody id="tbody-total">
+                            <!-- JS를 통해 동적 생성됨 (Colspan 대응) -->
                         </tbody>
                     </table>
                 </div>
@@ -346,18 +325,53 @@
             const paxStr = document.getElementById('inp-paxStr').value;
             const issueDate = document.getElementById('inp-issueDate').value;
             const currency = document.getElementById('inp-currency').value;
-            const exRate = Number(document.getElementById('inp-exRate').value) || 0;
+            
+            // KRW(국내) 모드 체크
+            const isKRW = currency === 'KRW';
+            
+            // 국내 모드일 경우 환율은 무조건 1로 강제 처리
+            let exRate = isKRW ? 1 : (Number(document.getElementById('inp-exRate').value) || 0);
 
+            // 좌측 입력 패널 UI 동적 변경 (KRW 모드 대응)
+            document.getElementById('title-local-expense').innerHTML = isKRW 
+                ? '3. 제주(현지) 발생비용 (원화 직접 입력)' 
+                : '3. 해외현지 발생비용 (외화 입력) <span class="text-xs font-normal text-gray-500">*원화 자동 환산</span>';
+            
+            for(let i=0; i<15; i++) {
+                const fgnInput = document.getElementById(`inp-l${i}-fgn`);
+                if(fgnInput) fgnInput.placeholder = isKRW ? "단가(₩)" : "단가(외화)";
+            }
+
+            // 출력표 헤더 매핑
             document.getElementById('out-clientName').innerText = clientName;
             document.getElementById('out-docTitle').innerText = docTitle;
             document.getElementById('out-travelDate').innerText = travelDate;
             document.getElementById('out-paxStr').innerText = paxStr;
-            document.getElementById('out-issueAndRate').innerText = `${issueDate} / ${currency} ${exRate} 기준(송금)`;
+            
+            // 환율 표시줄 동적 변경
+            if (isKRW) {
+                document.getElementById('out-issueAndRate').innerText = `${issueDate} / 국내행사 (환율 미적용)`;
+            } else {
+                document.getElementById('out-issueAndRate').innerText = `${issueDate} / ${currency} ${exRate} 기준(송금)`;
+            }
 
-            const currName = currency === 'JPY' ? '엔화' : (currency === 'USD' ? '달러' : '위안화');
-            const currSym = currency === 'USD' ? '$' : '¥';
-            document.querySelectorAll('.curr-name').forEach(el => el.innerText = currName);
-            document.querySelectorAll('.curr-code').forEach(el => el.innerText = currency);
+            const currName = currency === 'JPY' ? '엔화' : (currency === 'USD' ? '달러' : (currency === 'KRW' ? '원화' : '위안화'));
+            const currSym = currency === 'USD' ? '$' : (currency === 'KRW' ? '₩' : '¥');
+            
+            // 테이블 Thead 동적 렌더링 (KRW일 경우 외화단가 열 삭제)
+            const theadHtml = `
+                <tr class="print-bg-header bg-header text-slate-900" style="height: 1%;">
+                    <th class="${isKRW ? 'w-[10%]' : 'w-[10%]'}">구분</th>
+                    <th class="${isKRW ? 'w-[15%]' : 'w-[12%]'}">항목</th>
+                    <th class="${isKRW ? 'w-[25%]' : 'w-[20%]'}">내용</th>
+                    <th class="${isKRW ? 'w-[10%]' : 'w-[10%]'} text-[11px] leading-tight">인원/객실수<br>차량대수</th>
+                    ${!isKRW ? `<th class="w-[11%] print-bg-yellow bg-yellow-100 text-slate-900"><span class="curr-name">${currName}</span> 단가<br><span class="curr-code font-normal text-slate-600">${currency}</span></th>` : ''}
+                    <th class="${isKRW ? 'w-[15%]' : 'w-[12%]'}">원화 단가<br><span class="font-normal">KRW</span></th>
+                    <th class="${isKRW ? 'w-[15%]' : 'w-[13%]'}">총금액<br><span class="font-normal">KRW</span></th>
+                    <th class="${isKRW ? 'w-[10%]' : 'w-[12%]'}">비고</th>
+                </tr>
+            `;
+            document.getElementById('main-thead').innerHTML = theadHtml;
 
             let totalFlight = 0, totalLocal = 0, totalDomestic = 0;
 
@@ -387,21 +401,24 @@
                 htmlFlight += `
                     <td>${flights[i].desc.replace(/\n/g, '<br>')}</td>
                     <td class="text-center">${fmt(flights[i].qty)}</td>
-                    <td class="text-right print-bg-gray bg-gray-50"></td>
+                    ${!isKRW ? `<td class="text-right print-bg-gray bg-gray-50"></td>` : ''}
                     <td class="text-right">${fmt(flights[i].krw)}</td>
                     <td class="text-right font-semibold">${fmtTotal(flights[i].rowTotal)}</td>
                     <td class="text-center">${flights[i].note}</td>
                 </tr>`;
             }
+            // 항공료 소계
+            const colspanTotal = isKRW ? 5 : 6;
             htmlFlight += `
                 <tr class="print-bg-blue bg-blue-50 font-bold border-b-2 border-slate-900" style="height: 1%;">
-                    <td colspan="6" class="text-center py-2">(1) 합계항공</td>
+                    <td colspan="${colspanTotal}" class="text-center py-2">(1) 합계항공</td>
                     <td class="text-right text-blue-800">${fmtTotal(totalFlight)}</td>
                     <td></td>
                 </tr>`;
             document.getElementById('tbody-flight').innerHTML = htmlFlight;
 
-            // 2. 현지경비
+            // 2. 현지경비 (용어: 해외현지 -> 제주/해외현지 발생비용 변경)
+            const localTitleName = isKRW ? '제주(현지)<br>발생비용' : '해외현지<br>발생비용';
             const locals = [];
             for(let i=0; i<15; i++) {
                 const name = document.getElementById(`inp-l${i}-name`).value;
@@ -409,7 +426,7 @@
                     const desc = document.getElementById(`inp-l${i}-desc`).value;
                     const qty = Number(document.getElementById(`inp-l${i}-qty`).value) || 0;
                     const fgn = Number(document.getElementById(`inp-l${i}-fgn`).value) || 0;
-                    const krw = Math.round(fgn * exRate);
+                    const krw = isKRW ? fgn : Math.round(fgn * exRate);
                     totalLocal += (krw * qty);
                     locals.push({ name, desc, qty, fgn, krw, rowTotal: krw * qty, note: document.getElementById(`inp-l${i}-note`).value });
                 }
@@ -418,7 +435,7 @@
             let htmlLocal = '';
             for(let i=0; i<locals.length; i++) {
                 htmlLocal += `<tr>`;
-                if(i === 0) htmlLocal += `<td rowspan="${locals.length}" class="text-center font-bold print-bg-gray bg-gray-50 leading-loose">해외현지<br>발생경비</td>`;
+                if(i === 0) htmlLocal += `<td rowspan="${locals.length}" class="text-center font-bold print-bg-gray bg-gray-50 leading-loose">${localTitleName}</td>`;
                 if(i === 0 || locals[i].name !== locals[i-1].name) {
                     let rowspan = 1;
                     for(let j = i+1; j < locals.length; j++) { if(locals[j].name === locals[i].name) rowspan++; else break; }
@@ -427,7 +444,7 @@
                 htmlLocal += `
                     <td>${locals[i].desc}</td>
                     <td class="text-center">${fmt(locals[i].qty)}</td>
-                    <td class="text-right print-bg-yellow-light bg-yellow-50"><span class="text-[10px] text-gray-500 float-left">${currSym}</span>${fmt(locals[i].fgn)}</td>
+                    ${!isKRW ? `<td class="text-right print-bg-yellow-light bg-yellow-50"><span class="text-[10px] text-gray-500 float-left">${currSym}</span>${fmt(locals[i].fgn)}</td>` : ''}
                     <td class="text-right">${fmt(locals[i].krw)}</td>
                     <td class="text-right font-semibold">${fmtTotal(locals[i].rowTotal)}</td>
                     <td class="text-center">${locals[i].note}</td>
@@ -435,7 +452,7 @@
             }
             htmlLocal += `
                 <tr class="print-bg-blue bg-blue-50 font-bold border-b-2 border-slate-900" style="height: 1%;">
-                    <td colspan="6" class="text-center py-2">(2) 합계 - 해외현지 발생 경비</td>
+                    <td colspan="${colspanTotal}" class="text-center py-2">(2) 합계 - ${isKRW ? '제주(현지)' : '해외현지'} 발생 비용</td>
                     <td class="text-right text-blue-800">${fmtTotal(totalLocal)}</td>
                     <td></td>
                 </tr>`;
@@ -466,7 +483,7 @@
                 htmlDom += `
                     <td>${domestics[i].desc}</td>
                     <td class="text-center">${fmt(domestics[i].qty)}</td>
-                    <td class="text-right print-bg-gray bg-gray-50"></td>
+                    ${!isKRW ? `<td class="text-right print-bg-gray bg-gray-50"></td>` : ''}
                     <td class="text-right">${fmt(domestics[i].krw)}</td>
                     <td class="text-right font-semibold">${fmtTotal(domestics[i].rowTotal)}</td>
                     <td class="text-center">${domestics[i].note}</td>
@@ -474,27 +491,51 @@
             }
             htmlDom += `
                 <tr class="print-bg-blue bg-blue-50 font-bold border-b-2 border-slate-900" style="height: 1%;">
-                    <td colspan="6" class="text-center py-2">(3) 합계 국내 비용 합계</td>
+                    <td colspan="${colspanTotal}" class="text-center py-2">(3) 합계 국내 비용 합계</td>
                     <td class="text-right text-blue-800">${fmtTotal(totalDomestic)}</td>
                     <td></td>
                 </tr>`;
             document.getElementById('tbody-domestic').innerHTML = htmlDom;
 
-            // 4. 합계
-            document.getElementById('out-grandTotal').innerText = fmtTotal(totalFlight + totalLocal + totalDomestic);
-            document.getElementById('out-noFlightTotal').innerText = fmtTotal(totalLocal + totalDomestic);
+            // 4. 총합계 렌더링 (Colspan 동적 대응)
+            const grandTotal = totalFlight + totalLocal + totalDomestic;
+            const noFlightTotal = totalLocal + totalDomestic;
+
+            const totalHtml = `
+                <tr class="print-bg-gray bg-gray-100 font-extrabold border-t-2 border-slate-900" style="height: 1%;">
+                    <td colspan="${colspanTotal}" class="text-center text-sm py-2">(1)+(2)+(3) 합계 금액</td>
+                    <td class="text-right text-base text-blue-800 py-2">₩<span>${fmtTotal(grandTotal)}</span></td>
+                    <td></td>
+                </tr>
+                <tr class="print-bg-gray bg-gray-100 font-extrabold border-b-2 border-slate-900" style="height: 1%;">
+                    <td colspan="${colspanTotal}" class="text-center text-sm py-2">(2)+(3) 합계 금액 <span class="text-xs font-normal text-slate-600">(항공제외)</span></td>
+                    <td class="text-right text-base text-red-700 py-2">₩<span>${fmtTotal(noFlightTotal)}</span></td>
+                    <td></td>
+                </tr>
+            `;
+            document.getElementById('tbody-total').innerHTML = totalHtml;
         }
 
         window.onload = () => {
             buildLocalInputs();
             calculateAndRender();
+            
+            // 실시간 이벤트 감지
             document.querySelector('.w-full.lg\\:w-\\[480px\\]').addEventListener('input', (e) => {
+                const curr = document.getElementById('inp-currency').value;
+                const rateWrapper = document.getElementById('wrap-exRate');
+                const rateInput = document.getElementById('inp-exRate');
+                
                 if(e.target.id === 'inp-currency') {
-                    const curr = e.target.value;
-                    const rateInput = document.getElementById('inp-exRate');
-                    if(curr === 'JPY' && rateInput.value > 100) rateInput.value = 9.5;
-                    else if(curr === 'USD' && rateInput.value < 100) rateInput.value = 1400;
-                    else if(curr === 'CNY' && (rateInput.value < 100 || rateInput.value > 300)) rateInput.value = 195;
+                    if(curr === 'KRW') {
+                        rateWrapper.style.display = 'none'; // 국내 선택시 환율칸 숨김
+                        rateInput.value = 1; 
+                    } else {
+                        rateWrapper.style.display = 'flex'; // 해외 선택시 환율칸 노출
+                        if(curr === 'JPY' && rateInput.value > 100) rateInput.value = 9.5;
+                        else if(curr === 'USD' && rateInput.value < 100) rateInput.value = 1400;
+                        else if(curr === 'CNY' && (rateInput.value < 100 || rateInput.value > 300)) rateInput.value = 195;
+                    }
                 }
                 calculateAndRender();
             });
