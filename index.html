@@ -66,16 +66,21 @@
         /* 깔끔해진 패널 디자인 */
         .panel-input {
             width: 520px; flex-shrink: 0; background: #ffffff;
-            border-right: 1px solid #e2e8f0; overflow-y: auto; padding: 24px;
-            scroll-behavior: smooth; box-shadow: 4px 0 10px rgba(0,0,0,0.02);
+            border-right: 1px solid #e2e8f0; padding: 24px;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.02);
             z-index: 10;
+            display: flex; flex-direction: column;
+        }
+        .panel-input-scroll {
+            flex: 1; overflow-y: auto; scroll-behavior: smooth;
+            padding-bottom: 80px; /* 실시간 요약바 공간 확보 */
         }
         .panel-input h2 {
             font-size: 18px; font-weight: 800; border-bottom: 2px solid #0f172a;
             padding-bottom: 10px; margin-bottom: 20px; color: #0f172a;
         }
         .panel-preview {
-            flex: 1; overflow: auto; background: #f1f5f9;
+            flex: 1; overflow: auto; background: #e2e8f0;
             display: flex; justify-content: center; align-items: flex-start; padding: 32px 16px;
         }
 
@@ -88,7 +93,7 @@
         .template-header span { font-size: 14px; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 6px; }
         .btn-clear { background: #fff; border: 1px solid #cbd5e1; color: #64748b; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .btn-clear:hover { background: #fef2f2; color: #ef4444; border-color: #fca5a5; }
-        .template-controls { display: flex; gap: 8px; }
+        .template-controls { display: flex; gap: 8px; margin-bottom: 8px; }
         .template-select { flex: 1; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 10px; font-size: 13px; outline: none; transition: 0.2s; }
         .template-select:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.1); }
         .template-search { width: 130px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 10px; font-size: 13px; outline: none; background: #fff; transition: 0.2s; }
@@ -99,6 +104,13 @@
         .btn-save:hover { background: #1d4ed8; }
         .btn-delete { background: #fff; color: #ef4444; border: 1px solid #fca5a5; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .btn-delete:hover { background: #fef2f2; border-color: #ef4444; }
+        
+        /* 백업/복구 버튼 */
+        .backup-controls { display: flex; gap: 8px; justify-content: flex-end; padding-top: 8px; border-top: 1px dashed #cbd5e1; }
+        .btn-backup { background: #fff; color: #059669; border: 1px solid #6ee7b7; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-backup:hover { background: #ecfdf5; }
+        .btn-restore { background: #fff; color: #d97706; border: 1px solid #fcd34d; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-restore:hover { background: #fffbeb; }
 
         /* ===== 경고 패널 ===== */
         .warning-panel {
@@ -118,7 +130,7 @@
 
         /* ===== 깔끔한 입력 폼 ===== */
         .form-group { margin-bottom: 28px; background: #ffffff; padding: 16px; border: 1px solid #e2e8f0; border-radius: 8px; }
-        .form-group.highlight { border-color: #93c5fd; background: #f0fdfa; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .form-group.highlight { border-color: #93c5fd; background: #eff6ff; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
         .section-title { font-size: 14px; font-weight: 800; margin-bottom: 16px; color: #0f172a; display: flex; align-items: center; gap: 8px; }
         .section-title::before { content: ''; display: block; width: 4px; height: 16px; border-radius: 2px; }
         .section-title.blue::before { background: #2563eb; }
@@ -162,7 +174,8 @@
             padding: 8px 10px; font-size: 12px; font-family: inherit; outline: none; background: #f8fafc;
         }
         .slot-input:focus { border-color: #3b82f6; background: #fff; box-shadow: 0 0 0 2px rgba(59,130,246,0.1); }
-        
+        .slot-input.amount { font-weight: 700; color: #0f172a; } /* 금액란 강조 */
+
         .btn-add-item {
             width: 100%; background: #ffffff; border: 1px dashed #cbd5e1; color: #64748b; 
             padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 700; 
@@ -170,15 +183,27 @@
         }
         .btn-add-item:hover { background: #f8fafc; border-color: #94a3b8; color: #1e293b; }
 
-        .exrate-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; padding: 12px; background: #f1f5f9; border-radius: 6px; }
-        .exrate-row label { font-size: 12px; font-weight: 700; color: #475569; white-space: nowrap; }
+        .exrate-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; padding: 12px; background: #fff; border-radius: 6px; border: 1px solid #bfdbfe; }
+        .exrate-row label { font-size: 12px; font-weight: 700; color: #1e40af; white-space: nowrap; }
         .exrate-input {
-            width: 100px; border: 1px solid #cbd5e1; border-radius: 6px;
+            width: 100px; border: 1px solid #93c5fd; border-radius: 6px;
             padding: 6px 10px; font-size: 14px; text-align: right;
-            font-weight: 800; color: #2563eb; background: #fff; font-family: inherit;
+            font-weight: 800; color: #1e40af; background: #eff6ff; font-family: inherit;
         }
 
         .hint-text { font-size: 11px; color: #64748b; margin-bottom: 10px; line-height: 1.4; }
+
+        /* ===== 실시간 요약 바 (Sticky Footer) ===== */
+        .live-summary-bar {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: #0f172a; color: #f8fafc;
+            padding: 16px 24px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+            z-index: 50;
+        }
+        .live-summary-bar .label { font-size: 13px; font-weight: 600; color: #94a3b8; }
+        .live-summary-bar .total-amount { font-size: 22px; font-weight: 900; color: #fbbf24; }
 
         /* ===== A4 출력물 공통 ===== */
         .a4-sheet {
@@ -193,7 +218,7 @@
 
         /* ===== [가격 산출내역서] 스타일 ===== */
         .doc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
-        .doc-header-left { width: 45%; } /* ★ 수정: 55% -> 45%로 줄여 우측 빈공간 없애고 타이트하게 만듦 */
+        .doc-header-left { width: 45%; }
         .doc-header-right { width: 40%; display: flex; justify-content: flex-end; padding-top: 4px; }
         .doc-header-right img { height: 55px; object-fit: contain; }
         .doc-title-area { text-align: center; margin-bottom: 24px; }
@@ -205,9 +230,7 @@
         .doc-title-area p { font-size: 11px; color: #64748b; font-weight: 700; letter-spacing: 0.25em; margin-top: 6px; text-transform: uppercase; }
 
         .info-table { width: 100%; border-collapse: collapse; }
-        /* ★ 수정: padding을 6px 10px -> 5px 8px 로 줄여 글자 주변 여백 최소화 */
         .info-table th, .info-table td { border: 1px solid #cbd5e1; padding: 5px 8px; font-size: 12px; }
-        /* ★ 수정: text-align을 left -> center 로 변경하고, width를 28%로 타이트하게 조절 */
         .info-table th { background: #f8fafc; color: #334155; font-weight: 700; text-align: center; width: 28%; border-right: 1px solid #cbd5e1; }
         .info-table td { color: #0f172a; }
 
@@ -246,7 +269,7 @@
         .simple-info-right img { height: 32px; object-fit: contain; margin-bottom: 4px; }
         
         .simple-sender-receiver { display: flex; justify-content: space-between; margin-bottom: 24px; font-size: 12px; color: #000; }
-        .sr-box { width: 48%; border-top: 2px solid #000; border-bottom: 2px solid #000; padding: 12px 0; display: flex; align-items: center; } /* 위아래 센터 정렬 추가 */
+        .sr-box { width: 48%; border-top: 2px solid #000; border-bottom: 2px solid #000; padding: 12px 0; display: flex; align-items: center; }
         .sr-label { width: 60px; text-align: center; font-weight: 800; background: #f8fafc; display: flex; align-items: center; justify-content: center; margin-right: 12px; letter-spacing: 2px; }
         .sr-content { flex: 1; line-height: 1.8; }
         .sr-content-row { display: flex; align-items: center; }
@@ -254,21 +277,24 @@
         .sr-content-row span:last-child { flex: 1; padding-left: 5px; }
         .sr-content-row.bold span:last-child { font-weight: 800; font-size: 14px; }
         
-        /* ★ 직인(도장) 이미지 처리 - PDF 오류를 원천 차단하는 Flex 마진 기법 ★ */
+        /* ★ 직인(도장) 이미지 처리 ★ */
         .stamp-overlap-container { 
+            position: relative; 
             display: inline-flex; 
             align-items: center; 
             white-space: nowrap;
         }
         .stamp-image {
-            width: 58px; height: 58px;
+            position: absolute;
+            left: 32px; /* '명' 글자에 아주 살짝 겹치도록 정밀 조정 완료된 좌표 */
+            bottom: -12px; 
+            width: 68px; height: 68px;
             object-fit: contain;
-            mix-blend-mode: multiply; /* 도장의 흰 배경을 투명하게 날리고 글씨가 비치게 유지 */
-            margin-left: -46px; /* 절대위치를 버리고 마이너스 마진으로 물리적으로 당김. PDF에서 절대 도망가지 못함 */
-            margin-top: 2px;
+            mix-blend-mode: multiply; 
             pointer-events: none;
-            opacity: 0.90; /* 너무 진하지 않은 인주 느낌 */
-            transform: rotate(-2deg);
+            opacity: 0.85; 
+            transform: rotate(-4deg); 
+            z-index: 10;
         }
 
         .simple-subject { font-size: 14px; font-weight: 800; margin-bottom: 16px; display: flex; color: #000; }
@@ -308,7 +334,7 @@
         @media (max-width: 1023px) {
             .mobile-tabs { display: flex; }
             .main-layout { flex-direction: column; height: auto; overflow: visible; }
-            .panel-input { width: 100%; border-right: none; border-bottom: 1px solid #e2e8f0; max-height: none; overflow: visible; padding: 20px; }
+            .panel-input { width: 100%; border-right: none; border-bottom: 1px solid #e2e8f0; height: 60vh; padding: 20px; }
             .panel-preview { width: 100%; padding: 20px 0; overflow-x: scroll; overflow-y: visible; height: auto; min-height: 0; display: block; -webkit-overflow-scrolling: touch; }
             .a4-sheet { min-width: 750px; width: 750px; padding: 24px; margin: 0 12px; }
             .panel-hidden { display: none !important; }
@@ -340,7 +366,6 @@
             .bg-yellow-50 { background: #fef9c3 !important; }
             .grand-row { background: #f8fafc !important; }
             
-            /* 일반 견적서 인쇄 보정 */
             .sr-label, .simple-table th { background: #f8fafc !important; }
             .st-subtotal { background: #f8fafc !important; }
             .st-grandtotal { background: #f1f5f9 !important; }
@@ -353,10 +378,10 @@
         /* 인쇄용 compact 모드 조절 코드는 상세모드 전용으로 활용 */
         .pc-1 .doc-header { margin-bottom: 16px; } .pc-1 .doc-title-area h2 { font-size: 24px; } .pc-1 .main-table th, .pc-1 .main-table td { padding: 4px 6px; font-size: 10.5px; } .pc-1 .main-table tbody tr { height: 26px; }
 
-        .panel-input::-webkit-scrollbar, .panel-preview::-webkit-scrollbar { width: 6px; }
-        .panel-input::-webkit-scrollbar-track, .panel-preview::-webkit-scrollbar-track { background: #f8fafc; }
-        .panel-input::-webkit-scrollbar-thumb, .panel-preview::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .panel-input::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .panel-input-scroll::-webkit-scrollbar, .panel-preview::-webkit-scrollbar { width: 6px; }
+        .panel-input-scroll::-webkit-scrollbar-track, .panel-preview::-webkit-scrollbar-track { background: #f8fafc; }
+        .panel-input-scroll::-webkit-scrollbar-thumb, .panel-preview::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .panel-input-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body>
@@ -379,183 +404,198 @@
     <div class="main-layout" id="mainLayout">
 
         <!-- 입력 패널 -->
-        <div class="panel-input no-print" id="panelInput">
+        <div class="panel-input no-print" id="panelInput" style="position: relative;">
             
-            <h2>문서 기본 설정 및 템플릿</h2>
+            <div class="panel-input-scroll">
+                <h2>문서 기본 설정 및 템플릿</h2>
 
-            <!-- ===== 에러 경고 패널 ===== -->
-            <div id="warning-panel" class="warning-panel hidden">
-                <div class="warning-title">⚠️ 검수 경고: 확인이 필요한 항목이 있습니다.</div>
-                <ul id="warning-list" class="warning-list"></ul>
-            </div>
+                <!-- ===== 에러 경고 패널 ===== -->
+                <div id="warning-panel" class="warning-panel hidden">
+                    <div class="warning-title">⚠️ 검수 경고: 확인이 필요한 항목이 있습니다.</div>
+                    <ul id="warning-list" class="warning-list"></ul>
+                </div>
 
-            <!-- 템플릿 관리 영역 -->
-            <div class="template-manager">
-                <div class="template-header">
-                    <span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                        견적 템플릿 보관함
-                    </span>
-                    <button onclick="clearForm()" class="btn-clear">입력 초기화</button>
-                </div>
-                <div class="template-controls">
-                    <input type="text" id="preset-search" class="template-search" placeholder="🔍 제목 검색..." oninput="filterPresets()">
-                    <select id="preset-select" class="template-select">
-                        <option value="">저장된 템플릿 선택...</option>
-                    </select>
-                </div>
-                <div style="display:flex; gap:8px; margin-top:8px;">
-                    <button onclick="loadPreset()" class="btn-load" style="flex:1">불러오기</button>
-                    <button onclick="savePreset()" class="btn-save" style="flex:1">현재 상태 저장</button>
-                    <button onclick="deletePreset()" class="btn-delete">삭제</button>
-                </div>
-            </div>
-
-            <!-- 양식 및 통화 통합 선택 -->
-            <div class="form-group highlight">
-                <div class="section-title cyan">통화 지역 선택</div>
-                <select id="inp-currency" class="form-select" onchange="toggleDocMode()" style="padding: 10px; font-size: 14px; color: #2563eb; border-color: #93c5fd;">
-                    <optgroup label="[가격 산출 내역서]">
-                        <option value="JPY">해외행사 - JPY (엔화)</option>
-                        <option value="USD" selected>해외행사 - USD (달러)</option>
-                        <option value="CNY">해외행사 - CNY (위안화)</option>
-                        <option value="KRW_JEJU">국내행사 - 제주 (KRW)</option>
-                        <option value="KRW_MAINLAND">국내행사 - 내륙 (KRW)</option>
-                    </optgroup>
-                    <optgroup label="[일반 견적서]">
-                        <option value="SIMPLE_QUOTE">일반 견적서 (원화 전용)</option>
-                    </optgroup>
-                </select>
-                
-                <div class="exrate-row" id="wrap-exRate">
-                    <label>적용 환율 :</label>
-                    <input type="number" step="0.1" id="inp-exRate" class="exrate-input" value="1500">
-                    <span style="font-size:12px;color:#64748b;">기준(송금)</span>
-                </div>
-            </div>
-
-            <!-- ========================================== -->
-            <!-- [A] 가격 산출내역서 입력 그룹 -->
-            <!-- ========================================== -->
-            <div id="detailed-input-group">
-                <!-- 1. 기본 정보 설정 -->
-                <div class="form-group">
-                    <div class="section-title blue">1. 기본 정보 설정</div>
-                    <div class="form-row cols-2">
-                        <div><label class="form-label">고객명 (기관명)</label><input type="text" id="inp-clientName" class="form-input" value="사북고등학교"></div>
-                        <div><label class="form-label">문서 제목 (행사명)</label><input type="text" id="inp-docTitle" class="form-input" value="대만 타이베이"></div>
+                <!-- 템플릿 관리 영역 -->
+                <div class="template-manager">
+                    <div class="template-header">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                            견적 템플릿 보관함
+                        </span>
+                        <button onclick="clearForm()" class="btn-clear">입력 초기화</button>
                     </div>
-                    <div class="form-row cols-1">
-                        <div><label class="form-label">여행일</label><input type="text" id="inp-travelDate" class="form-input" value="2026.05.26~05.29"></div>
+                    <div class="template-controls">
+                        <input type="text" id="preset-search" class="template-search" placeholder="🔍 제목 검색..." oninput="filterPresets()">
+                        <select id="preset-select" class="template-select">
+                            <option value="">저장된 템플릿 선택...</option>
+                        </select>
                     </div>
-                    <div class="form-row cols-1">
-                        <div><label class="form-label">여행인원 표기 (숫자 포함 시 자동계산)</label><input type="text" id="inp-paxStr" class="form-input" value="34명기준"></div>
-                    </div>
-                    <div class="form-row cols-2">
-                        <div><label class="form-label">발송일자</label><input type="text" id="inp-issueDate" class="form-input" value="2026.03.13"></div>
-                    </div>
-                </div>
-
-                <!-- 2. 항공료 영역 -->
-                <div class="form-group">
-                    <div class="section-title dark" id="title-flight-area">2. 항공료 영역 (원화 직접 입력)</div>
-                    <div id="flight-inputs-container"></div>
-                    <button class="btn-add-item" onclick="addFlightRow()">+ 항공비 항목 추가</button>
-                </div>
-
-                <!-- 3. 현지 발생비용 영역 -->
-                <div class="form-group">
-                    <div class="section-title green" id="title-local-expense">
-                        3. 해외현지 발생비용 (외화 입력)
-                    </div>
-                    <p class="hint-text">연속된 항목명+내용이 같으면 출력물에서 셀이 자동 병합됩니다.</p>
-                    <div id="local-inputs-container"></div>
-                    <button class="btn-add-item" onclick="addLocalRow()">+ 현지 발생비용 항목 추가</button>
-                </div>
-
-                <!-- 4. 국내 발생비용 영역 -->
-                <div class="form-group">
-                    <div class="section-title orange">4. 국내 발생 비용 (원화 직접 입력)</div>
-                    <div id="domestic-inputs-container"></div>
-                    <button class="btn-add-item" onclick="addDomesticRow()">+ 국내 발생비용 항목 추가</button>
-                </div>
-            </div>
-
-            <!-- ========================================== -->
-            <!-- [B] 일반 견적서 입력 그룹 -->
-            <!-- ========================================== -->
-            <div id="simple-input-group">
-                <div class="form-group">
-                    <div class="section-title dark">1. 견적서 기본 정보</div>
-                    <div class="form-row cols-2">
-                        <div><label class="form-label">출발일 코드 (Date of Departure)</label><input type="text" id="inp-sim-dep" class="form-input" value="TM_260526"></div>
-                        <div><label class="form-label">발행일 (Invoice Date)</label><input type="text" id="inp-sim-inv" class="form-input" value="2026년 03월 13일"></div>
-                    </div>
-                    <div class="form-row cols-1">
-                        <div><label class="form-label">내용 (Subject)</label><input type="text" id="inp-sim-subject" class="form-input" value="260526_사북고등학교 대만 타이베이 연수"></div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="section-title blue">2. 수신 / 발신 정보</div>
-                    <div class="form-row cols-1">
-                        <div><label class="form-label">수신처 기관명</label><input type="text" id="inp-sim-toName" class="form-input" value="사북고등학교"></div>
-                        <div><label class="form-label">수신처 주소</label><input type="text" id="inp-sim-toAddr" class="form-input" value="강원도 정선군 사북읍"></div>
-                        <div><label class="form-label">수신 담당자명</label><input type="text" id="inp-sim-toPerson" class="form-input" value="담당 선생님"></div>
-                    </div>
-                    <div style="margin-top:12px; padding:12px; background:#f8fafc; border-radius:6px; font-size:12px; color:#475569; border:1px dashed #cbd5e1;">
-                        💡 발신자 정보(투어메이커 주소, 연락처, 대표자 이재명 및 <strong>법인전자직인</strong>)는 양식에 고정되어 자동 출력됩니다.
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="section-title green">3. 견적 항목 (원화 총액 기준)</div>
-                    <p class="hint-text">일반 견적서 양식은 항목을 복잡하게 나누지 않고 핵심만 입력합니다.</p>
-                    <div id="simple-items-container"></div>
-                    <button class="btn-add-item" onclick="addSimpleRow()">+ 견적 항목 추가</button>
-                </div>
-
-                <div class="form-group">
-                    <div class="section-title orange">4. 하단 부가 정보 및 세무 설정</div>
-                    <div class="form-row cols-2">
-                        <div><label class="form-label">입금 기한 (By Due)</label><input type="text" id="inp-sim-due" class="form-input" value="행사 출발 전 완납"></div>
+                    <div style="display:flex; gap:8px; margin-top:8px;">
+                        <button onclick="loadPreset()" class="btn-load" style="flex:1">불러오기</button>
+                        <button onclick="savePreset()" class="btn-save" style="flex:1">현재 상태 저장</button>
+                        <button onclick="deletePreset()" class="btn-delete">삭제</button>
                     </div>
                     
-                    <div class="form-row cols-1" style="background: #fff1f2; padding: 12px; border: 1px dashed #fca5a5; border-radius: 6px; margin-top: 8px;">
-                        <div><label class="form-label" style="color: #be123c;">부가세 (VAT) 표시</label>
-                            <select id="inp-sim-vat" class="form-select" style="border-color: #fca5a5;" onchange="toggleVatManual()">
-                                <option value="auto" selected>소계의 10% 자동 계산 (기본)</option>
-                                <option value="manual">부분 과세 (알선수수료/일부항목 등 직접입력)</option>
-                                <option value="0">부가세 불포함</option>
-                            </select>
-                            <input type="number" id="inp-sim-vat-manual" class="form-input" style="display:none; border-color: #fca5a5; margin-top: 8px;" placeholder="청구할 부가세 금액(원) 직접 입력">
+                    <!-- ★ 데이터 백업/복구 영역 추가 ★ -->
+                    <div class="backup-controls">
+                        <input type="file" id="import-file" accept=".json" style="display:none;" onchange="importData(event)">
+                        <button onclick="document.getElementById('import-file').click()" class="btn-restore" title="PC에 백업된 파일 업로드">📂 데이터 복구(업로드)</button>
+                        <button onclick="exportData()" class="btn-backup" title="저장된 모든 템플릿을 PC에 다운로드">💾 데이터 백업(다운로드)</button>
+                    </div>
+                </div>
+
+                <!-- 양식 및 통화 통합 선택 -->
+                <div class="form-group highlight">
+                    <div class="section-title cyan">통화 지역 선택</div>
+                    <select id="inp-currency" class="form-select" onchange="toggleDocMode()" style="padding: 10px; font-size: 14px; color: #2563eb; border-color: #93c5fd;">
+                        <optgroup label="[가격 산출 내역서]">
+                            <option value="JPY">해외행사 - JPY (엔화)</option>
+                            <option value="USD" selected>해외행사 - USD (달러)</option>
+                            <option value="CNY">해외행사 - CNY (위안화)</option>
+                            <option value="KRW_JEJU">국내행사 - 제주 (KRW)</option>
+                            <option value="KRW_MAINLAND">국내행사 - 내륙 (KRW)</option>
+                        </optgroup>
+                        <optgroup label="[일반 견적서]">
+                            <option value="SIMPLE_QUOTE">일반 견적서 (원화 전용)</option>
+                        </optgroup>
+                    </select>
+                    
+                    <div class="exrate-row" id="wrap-exRate">
+                        <label>적용 환율 :</label>
+                        <input type="text" id="inp-exRate" class="exrate-input amount" value="1,500" oninput="formatCurrency(this)">
+                        <span style="font-size:12px;color:#64748b;">기준(송금)</span>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- [A] 가격 산출내역서 입력 그룹 -->
+                <!-- ========================================== -->
+                <div id="detailed-input-group">
+                    <!-- 1. 기본 정보 설정 -->
+                    <div class="form-group">
+                        <div class="section-title blue">1. 기본 정보 설정</div>
+                        <div class="form-row cols-2">
+                            <div><label class="form-label">고객명 (기관명)</label><input type="text" id="inp-clientName" class="form-input" value="사북고등학교"></div>
+                            <div><label class="form-label">문서 제목 (행사명)</label><input type="text" id="inp-docTitle" class="form-input" value="대만 타이베이"></div>
                         </div>
-                        <div style="margin-top: 8px;"><label class="form-label" style="color: #be123c;">기타비용 (세무 리스크 보전)</label>
-                            <select id="inp-sim-extraFee" class="form-select" style="border-color: #fca5a5;">
-                                <option value="0" selected>청구 안 함</option>
-                                <option value="auto_50">산출된 부가세의 50% 추가 청구</option>
-                            </select>
+                        <div class="form-row cols-1">
+                            <div><label class="form-label">여행일</label><input type="text" id="inp-travelDate" class="form-input" value="2026.05.26~05.29"></div>
+                        </div>
+                        <div class="form-row cols-1">
+                            <div><label class="form-label">여행인원 표기 (숫자 포함 시 자동계산)</label><input type="text" id="inp-paxStr" class="form-input" value="34명기준"></div>
+                        </div>
+                        <div class="form-row cols-2">
+                            <div><label class="form-label">발송일자</label><input type="text" id="inp-issueDate" class="form-input" value="2026.03.13"></div>
                         </div>
                     </div>
 
-                    <div class="form-row cols-1" style="margin-top:12px;">
-                        <div><label class="form-label">특이사항 안내문 (세금계산서 종합과세 관련 안내)</label>
-                            <textarea id="inp-sim-taxNote" class="form-input" style="height:45px; resize:vertical; font-weight: 600; color: #b91c1c;">※ 전체 행사비용 세금계산서 발행 시, 당사 수익이 아닌 수탁경비(항공/숙박 등)까지 매출로 과대 계상되어 발생하는 세금 증가분을 보전하기 위해 소정의 기타비용이 추가 청구됨을 양해 부탁드립니다.</textarea>
+                    <!-- 2. 항공료 영역 -->
+                    <div class="form-group">
+                        <div class="section-title dark" id="title-flight-area">2. 항공료 영역 (원화 직접 입력)</div>
+                        <div id="flight-inputs-container"></div>
+                        <button class="btn-add-item" onclick="addFlightRow()">+ 항공비 항목 추가</button>
+                    </div>
+
+                    <!-- 3. 현지 발생비용 영역 -->
+                    <div class="form-group">
+                        <div class="section-title green" id="title-local-expense">
+                            3. 해외현지 발생비용 (외화 입력)
+                        </div>
+                        <p class="hint-text">연속된 항목명+내용이 같으면 출력물에서 셀이 자동 병합됩니다.</p>
+                        <div id="local-inputs-container"></div>
+                        <button class="btn-add-item" onclick="addLocalRow()">+ 현지 발생비용 항목 추가</button>
+                    </div>
+
+                    <!-- 4. 국내 발생비용 영역 -->
+                    <div class="form-group">
+                        <div class="section-title orange">4. 국내 발생 비용 (원화 직접 입력)</div>
+                        <div id="domestic-inputs-container"></div>
+                        <button class="btn-add-item" onclick="addDomesticRow()">+ 국내 발생비용 항목 추가</button>
+                    </div>
+                </div>
+
+                <!-- ========================================== -->
+                <!-- [B] 일반 견적서 입력 그룹 -->
+                <!-- ========================================== -->
+                <div id="simple-input-group">
+                    <div class="form-group">
+                        <div class="section-title dark">1. 견적서 기본 정보</div>
+                        <div class="form-row cols-2">
+                            <div><label class="form-label">출발일 코드 (Date of Departure)</label><input type="text" id="inp-sim-dep" class="form-input" value="TM_260526"></div>
+                            <div><label class="form-label">발행일 (Invoice Date)</label><input type="text" id="inp-sim-inv" class="form-input" value="2026년 03월 13일"></div>
+                        </div>
+                        <div class="form-row cols-1">
+                            <div><label class="form-label">내용 (Subject)</label><input type="text" id="inp-sim-subject" class="form-input" value="260526_사북고등학교 대만 타이베이 연수"></div>
                         </div>
                     </div>
 
-                    <div class="form-row cols-1" style="margin-top:12px;">
-                        <div><label class="form-label">포함사항 (Inclusions)</label>
-                            <textarea id="inp-sim-inc" class="form-input" style="height:60px; resize:vertical;">항공료, 항공TAX, 호텔(2인1실), 차량, 식사, 입장료, 기사/가이드 팁, 2억원여행자보험료</textarea>
+                    <div class="form-group">
+                        <div class="section-title blue">2. 수신 / 발신 정보</div>
+                        <div class="form-row cols-1">
+                            <div><label class="form-label">수신처 기관명</label><input type="text" id="inp-sim-toName" class="form-input" value="사북고등학교"></div>
+                            <div><label class="form-label">수신처 주소</label><input type="text" id="inp-sim-toAddr" class="form-input" value="강원도 정선군 사북읍"></div>
+                            <div><label class="form-label">수신 담당자명</label><input type="text" id="inp-sim-toPerson" class="form-input" value="담당 선생님"></div>
                         </div>
-                        <div><label class="form-label">불포함사항 (Exclusions)</label>
-                            <input type="text" id="inp-sim-exc" class="form-input" value="싱글차지, 기타 개인비용 등">
+                        <div style="margin-top:12px; padding:12px; background:#f8fafc; border-radius:6px; font-size:12px; color:#475569; border:1px dashed #cbd5e1;">
+                            💡 발신자 정보(투어메이커 주소, 연락처, 대표자 이재명 및 <strong>법인전자직인</strong>)는 양식에 고정되어 자동 출력됩니다.
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="section-title green">3. 견적 항목 (원화 총액 기준)</div>
+                        <p class="hint-text">일반 견적서 양식은 항목을 복잡하게 나누지 않고 핵심만 입력합니다.</p>
+                        <div id="simple-items-container"></div>
+                        <button class="btn-add-item" onclick="addSimpleRow()">+ 견적 항목 추가</button>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="section-title orange">4. 하단 부가 정보 및 세무 설정</div>
+                        <div class="form-row cols-2">
+                            <div><label class="form-label">입금 기한 (By Due)</label><input type="text" id="inp-sim-due" class="form-input" value="행사 출발 전 완납"></div>
+                        </div>
+                        
+                        <div class="form-row cols-1" style="background: #fff1f2; padding: 12px; border: 1px dashed #fca5a5; border-radius: 6px; margin-top: 8px;">
+                            <div><label class="form-label" style="color: #be123c;">부가세 (VAT) 표시</label>
+                                <select id="inp-sim-vat" class="form-select" style="border-color: #fca5a5;" onchange="toggleVatManual()">
+                                    <option value="auto" selected>소계의 10% 자동 계산 (기본)</option>
+                                    <option value="manual">부분 과세 (알선수수료/일부항목 등 직접입력)</option>
+                                    <option value="0">부가세 불포함</option>
+                                </select>
+                                <input type="text" id="inp-sim-vat-manual" class="form-input amount" style="display:none; border-color: #fca5a5; margin-top: 8px;" placeholder="청구할 부가세 금액(원) 직접 입력" oninput="formatCurrency(this)">
+                            </div>
+                            <div style="margin-top: 8px;"><label class="form-label" style="color: #be123c;">기타비용 (세무 리스크 보전)</label>
+                                <select id="inp-sim-extraFee" class="form-select" style="border-color: #fca5a5;">
+                                    <option value="0" selected>청구 안 함</option>
+                                    <option value="auto_50">산출된 부가세의 50% 추가 청구</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row cols-1" style="margin-top:12px;">
+                            <div><label class="form-label">특이사항 안내문 (세금계산서 종합과세 관련 안내)</label>
+                                <textarea id="inp-sim-taxNote" class="form-input" style="height:45px; resize:vertical; font-weight: 600; color: #b91c1c;">※ 전체 행사비용 세금계산서 발행 시, 당사 수익이 아닌 수탁경비(항공/숙박 등)까지 매출로 과대 계상되어 발생하는 세금 증가분을 보전하기 위해 소정의 기타비용이 추가 청구됨을 양해 부탁드립니다.</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-row cols-1" style="margin-top:12px;">
+                            <div><label class="form-label">포함사항 (Inclusions)</label>
+                                <textarea id="inp-sim-inc" class="form-input" style="height:60px; resize:vertical;">항공료, 항공TAX, 호텔(2인1실), 차량, 식사, 입장료, 기사/가이드 팁, 2억원여행자보험료</textarea>
+                            </div>
+                            <div><label class="form-label">불포함사항 (Exclusions)</label>
+                                <input type="text" id="inp-sim-exc" class="form-input" value="싱글차지, 기타 개인비용 등">
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div> <!-- // scroll area -->
+            
+            <!-- ★ 실시간 총액 요약바 (Sticky Footer) ★ -->
+            <div class="live-summary-bar no-print">
+                <span class="label">총 견적 금액 (KRW)</span>
+                <span class="total-amount" id="live-total-amount">0</span>
             </div>
 
-        </div>
+        </div> <!-- // panel-input -->
 
         <!-- 미리보기 패널 -->
         <div class="panel-preview" id="panelPreview">
@@ -708,7 +748,7 @@
 
 <script>
 // ===================================================================
-// 유틸리티 및 보안 처리
+// 유틸리티 및 데이터 포맷팅
 // ===================================================================
 
 function escAttr(str = '') {
@@ -725,8 +765,68 @@ function scrollToRow(rowId) {
     }
 }
 
+/* ★ 추가: 숫자 입력 시 자동 콤마(,) 변환 함수 ★ */
+function formatCurrency(input) {
+    let val = input.value.replace(/[^0-9.]/g, ''); // 숫자와 소수점만 허용
+    if (val) {
+        // 소수점이 있는 환율 등을 고려
+        const parts = val.split('.');
+        parts[0] = Number(parts[0]).toLocaleString('ko-KR');
+        input.value = parts.join('.');
+    } else {
+        input.value = '';
+    }
+    calculateAndRender();
+    scheduleValidation();
+}
+
+function parseCurrency(str) {
+    return Number(String(str).replace(/,/g, '')) || 0;
+}
+
 // ===================================================================
-// 문서 양식 모드 전환 로직 (통화 선택 드롭다운 통합)
+// 데이터 백업 및 복원 (JSON)
+// ===================================================================
+
+function exportData() {
+    const data = localStorage.getItem('tourmaker_presets');
+    if (!data || data === '{}') {
+        alert('백업할 데이터가 없습니다. 먼저 템플릿을 저장해주세요.');
+        return;
+    }
+    const blob = new Blob([data], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `tourmaker_presets_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function importData(event) {
+    const file = event.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const json = JSON.parse(e.target.result);
+            // 기존 데이터와 병합(Merge)
+            const currentData = JSON.parse(localStorage.getItem('tourmaker_presets') || '{}');
+            const mergedData = { ...currentData, ...json };
+            localStorage.setItem('tourmaker_presets', JSON.stringify(mergedData));
+            updatePresetDropdown();
+            alert('데이터가 성공적으로 복원(병합)되었습니다.');
+        } catch(err) {
+            alert('잘못된 백업 파일 형식입니다.');
+        }
+    };
+    reader.readAsText(file);
+    // 동일 파일 재업로드 시 이벤트 트리거를 위해 value 초기화
+    event.target.value = '';
+}
+
+// ===================================================================
+// 문서 양식 모드 전환 로직
 // ===================================================================
 
 function toggleDocMode() {
@@ -746,9 +846,7 @@ function toggleDocMode() {
         sIn.style.display = 'block'; sOut.style.display = 'block';
     }
 
-    syncCurrencyUI(); // 환율 입력칸 제어 포함
-
-    // 모드 전환 시 무조건 재렌더링 및 에러 갱신
+    syncCurrencyUI();
     calculateAndRender();
     scheduleValidation();
 }
@@ -757,7 +855,6 @@ function syncCurrencyUI() {
     const curr = document.getElementById('inp-currency').value;
     const rW = document.getElementById('wrap-exRate');
     
-    // 일반 견적서 또는 국내행사일 경우 환율 숨김
     if (curr === 'KRW_MAINLAND' || curr === 'KRW_JEJU' || curr === 'SIMPLE_QUOTE') {
         rW.style.display = 'none';
     } else {
@@ -802,15 +899,13 @@ function validateRows() {
     const currencyVal = document.getElementById('inp-currency').value;
     const mode = currencyVal === 'SIMPLE_QUOTE' ? 'simple' : 'detailed';
     
-    // 에러 UI 초기화
     document.querySelectorAll('.error-border').forEach(el => el.classList.remove('error-border'));
     document.querySelectorAll('.error-row-container').forEach(el => el.classList.remove('error-row-container'));
 
-    // --- [가격 산출내역서] 검증 ---
     if (mode === 'detailed') {
         const basePax = extractBasePax();
         const exRateInput = document.getElementById('inp-exRate');
-        const exRate = Number(exRateInput.value) || 0;
+        const exRate = parseCurrency(exRateInput.value);
 
         if (currencyVal === 'JPY' && (exRate < 5 || exRate > 20)) {
             warnings.push({ msg: `환율 경고: JPY 환율(${exRate})이 일반적인 범위를 벗어났습니다.`, targetId: 'wrap-exRate' });
@@ -849,7 +944,7 @@ function validateRows() {
             const priceStr = priceEl?.value.trim() || '';
             const note = noteEl?.value.trim() || '';
             const qty = Number(qtyStr) || 0;
-            const price = Number(priceStr) || 0;
+            const price = parseCurrency(priceStr);
 
             const isAnyFilled = name || desc || qtyStr || priceStr || note;
             if (!isAnyFilled) return; 
@@ -890,9 +985,7 @@ function validateRows() {
             }
             if (rowHasError) rowEl.classList.add('error-row-container');
         });
-    } 
-    // --- [일반 견적서] 검증 ---
-    else if (mode === 'simple') {
+    } else if (mode === 'simple') {
         document.querySelectorAll('.simple-item').forEach((rowEl, index) => {
             let rowHasError = false;
             const rowId = `row-sim-${index}`;
@@ -906,7 +999,7 @@ function validateRows() {
             const qtyStr = qtyEl?.value.trim() || '';
             const priceStr = priceEl?.value.trim() || '';
             
-            if (!name && !qtyStr && !priceStr) return; // 빈칸 무시
+            if (!name && !qtyStr && !priceStr) return;
 
             if (name && (qtyStr === '' || priceStr === '')) {
                 warnings.push({ msg: `일반 견적 [${name}] 항목: 수량이나 단가가 누락되었습니다.`, targetId: rowId });
@@ -982,7 +1075,6 @@ function printPDF() {
 
     requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-        // Compact 로직은 가격 산출내역서 일때만 적용
         if(document.getElementById('inp-currency').value !== 'SIMPLE_QUOTE') {
             const A4_H = 1025;
             let chosenLevel = null;
@@ -1045,10 +1137,8 @@ function switchTab(tab) {
     }
 }
 
-
 // ===================================================================
-// 동적 입력 필드 생성 로직 (상세 & 단순) 
-// -> 사북고 대만 타이베이 PDF 파일 데이터 기반으로 초기값 세팅 완료
+// 동적 입력 필드 생성 (사북고 대만 타이베이 디폴트 템플릿 연동)
 // ===================================================================
 
 const initFlights = [
@@ -1077,7 +1167,6 @@ const initDomestics = [
     { name: "진행수수료", desc: "운영 관리비", qty: 1, krw: 4500000, note: "인솔자 동행" },
     { name: "공항수송", desc: "공항 왕복 차량비", qty: 1, krw: 2200000, note: "대형버스 기준" }
 ];
-
 const initSimples = [
     { name: "항공료", desc: "대한항공 왕복 및 발권수수료", qty: 34, krw: 459500 },
     { name: "현지행사", desc: "대만 타이베이 단독행사", qty: 34, krw: 801705 },
@@ -1086,6 +1175,7 @@ const initSimples = [
 
 function addFlightRow(data = {name:'', desc:'', qty:'', krw:'', note:''}, skipRender = false) {
     const container = document.getElementById('flight-inputs-container');
+    const krwFmt = data.krw ? Number(data.krw).toLocaleString('ko-KR') : '';
     const html = `
         <div class="slot-card flight-item">
             <div class="slot-card-header">
@@ -1095,7 +1185,7 @@ function addFlightRow(data = {name:'', desc:'', qty:'', krw:'', note:''}, skipRe
                 <input type="text" class="slot-input f-name" value="${escAttr(data.name)}" placeholder="항목">
                 <input type="text" class="slot-input f-desc" value="${escAttr(data.desc)}" placeholder="내용">
                 <input type="number" class="slot-input f-qty" style="text-align:center" value="${escAttr(data.qty)}" placeholder="수량">
-                <input type="number" class="slot-input f-krw" style="text-align:right" value="${escAttr(data.krw)}" placeholder="단가(₩)">
+                <input type="text" class="slot-input f-krw amount" style="text-align:right" value="${krwFmt}" placeholder="단가(₩)" oninput="formatCurrency(this)">
             </div>
             <input type="text" class="slot-input f-note" style="width:100%" value="${escAttr(data.note)}" placeholder="비고">
         </div>`;
@@ -1105,6 +1195,7 @@ function addFlightRow(data = {name:'', desc:'', qty:'', krw:'', note:''}, skipRe
 
 function addLocalRow(data = {name:'', desc:'', qty:'', fgn:'', note:''}, skipRender = false) {
     const container = document.getElementById('local-inputs-container');
+    const fgnFmt = data.fgn ? Number(data.fgn).toLocaleString('ko-KR') : '';
     const html = `
         <div class="slot-card local-item">
             <div class="slot-card-header">
@@ -1114,7 +1205,7 @@ function addLocalRow(data = {name:'', desc:'', qty:'', fgn:'', note:''}, skipRen
                 <input type="text" class="slot-input l-name" value="${escAttr(data.name)}" placeholder="항목명">
                 <input type="text" class="slot-input l-desc" value="${escAttr(data.desc)}" placeholder="내용(병합)">
                 <input type="number" class="slot-input l-qty" style="text-align:center" value="${escAttr(data.qty)}" placeholder="수량">
-                <input type="number" class="slot-input l-fgn" style="text-align:right" value="${escAttr(data.fgn)}" placeholder="단가(외화)">
+                <input type="text" class="slot-input l-fgn amount" style="text-align:right" value="${fgnFmt}" placeholder="단가(외화)" oninput="formatCurrency(this)">
             </div>
             <input type="text" class="slot-input l-note" style="width:100%" value="${escAttr(data.note)}" placeholder="비고(빈칸가능)">
         </div>`;
@@ -1125,6 +1216,7 @@ function addLocalRow(data = {name:'', desc:'', qty:'', fgn:'', note:''}, skipRen
 
 function addDomesticRow(data = {name:'', desc:'', qty:'', krw:'', note:''}, skipRender = false) {
     const container = document.getElementById('domestic-inputs-container');
+    const krwFmt = data.krw ? Number(data.krw).toLocaleString('ko-KR') : '';
     const html = `
         <div class="slot-card domestic-item">
             <div class="slot-card-header">
@@ -1134,7 +1226,7 @@ function addDomesticRow(data = {name:'', desc:'', qty:'', krw:'', note:''}, skip
                 <input type="text" class="slot-input d-name" value="${escAttr(data.name)}" placeholder="항목">
                 <input type="text" class="slot-input d-desc" value="${escAttr(data.desc)}" placeholder="내용">
                 <input type="number" class="slot-input d-qty" style="text-align:center" value="${escAttr(data.qty)}" placeholder="수량">
-                <input type="number" class="slot-input d-krw" style="text-align:right" value="${escAttr(data.krw)}" placeholder="단가(₩)">
+                <input type="text" class="slot-input d-krw amount" style="text-align:right" value="${krwFmt}" placeholder="단가(₩)" oninput="formatCurrency(this)">
             </div>
             <input type="text" class="slot-input d-note" style="width:100%" value="${escAttr(data.note)}" placeholder="비고">
         </div>`;
@@ -1144,6 +1236,7 @@ function addDomesticRow(data = {name:'', desc:'', qty:'', krw:'', note:''}, skip
 
 function addSimpleRow(data = {name:'', desc:'', qty:'', krw:''}, skipRender = false) {
     const container = document.getElementById('simple-items-container');
+    const krwFmt = data.krw ? Number(data.krw).toLocaleString('ko-KR') : '';
     const html = `
         <div class="slot-card simple-item">
             <div class="slot-card-header">
@@ -1152,7 +1245,7 @@ function addSimpleRow(data = {name:'', desc:'', qty:'', krw:''}, skipRender = fa
             <div class="slot-grid-simple">
                 <input type="text" class="slot-input s-name" value="${escAttr(data.name)}" placeholder="Item (항목)">
                 <input type="text" class="slot-input s-desc" value="${escAttr(data.desc)}" placeholder="Description (내용)">
-                <input type="number" class="slot-input s-krw" style="text-align:right" value="${escAttr(data.krw)}" placeholder="Unit cost (단가)">
+                <input type="text" class="slot-input s-krw amount" style="text-align:right" value="${krwFmt}" placeholder="Unit cost (단가)" oninput="formatCurrency(this)">
                 <input type="number" class="slot-input s-qty" style="text-align:center" value="${escAttr(data.qty)}" placeholder="Quantity">
             </div>
         </div>`;
@@ -1177,29 +1270,25 @@ function buildInitialInputs() {
 // ===================================================================
 function getFormData() {
     return {
-        currency: document.getElementById('inp-currency').value, // 이것이 docMode를 결정함
-        
-        // 상세 모드 데이터
+        currency: document.getElementById('inp-currency').value,
         clientName: document.getElementById('inp-clientName').value,
         docTitle: document.getElementById('inp-docTitle').value,
         travelDate: document.getElementById('inp-travelDate').value,
         paxStr: document.getElementById('inp-paxStr').value,
         issueDate: document.getElementById('inp-issueDate').value,
-        exRate: document.getElementById('inp-exRate').value,
+        exRate: parseCurrency(document.getElementById('inp-exRate').value), // 콤마 제거 저장
         flights: Array.from(document.querySelectorAll('.flight-item')).map(el => ({
             name: el.querySelector('.f-name').value, desc: el.querySelector('.f-desc').value,
-            qty: el.querySelector('.f-qty').value, krw: el.querySelector('.f-krw').value, note: el.querySelector('.f-note').value
+            qty: el.querySelector('.f-qty').value, krw: parseCurrency(el.querySelector('.f-krw').value), note: el.querySelector('.f-note').value
         })),
         locals: Array.from(document.querySelectorAll('.local-item')).map(el => ({
             name: el.querySelector('.l-name').value, desc: el.querySelector('.l-desc').value,
-            qty: el.querySelector('.l-qty').value, fgn: el.querySelector('.l-fgn').value, note: el.querySelector('.l-note').value
+            qty: el.querySelector('.l-qty').value, fgn: parseCurrency(el.querySelector('.l-fgn').value), note: el.querySelector('.l-note').value
         })),
         domestics: Array.from(document.querySelectorAll('.domestic-item')).map(el => ({
             name: el.querySelector('.d-name').value, desc: el.querySelector('.d-desc').value,
-            qty: el.querySelector('.d-qty').value, krw: el.querySelector('.d-krw').value, note: el.querySelector('.d-note').value
+            qty: el.querySelector('.d-qty').value, krw: parseCurrency(el.querySelector('.d-krw').value), note: el.querySelector('.d-note').value
         })),
-
-        // 일반(단순) 모드 데이터
         simDep: document.getElementById('inp-sim-dep').value,
         simInv: document.getElementById('inp-sim-inv').value,
         simSubject: document.getElementById('inp-sim-subject').value,
@@ -1208,35 +1297,33 @@ function getFormData() {
         simToPerson: document.getElementById('inp-sim-toPerson').value,
         simDue: document.getElementById('inp-sim-due').value,
         simVat: document.getElementById('inp-sim-vat').value,
-        simVatManual: document.getElementById('inp-sim-vat-manual').value, // 매뉴얼 부가세값 추가
+        simVatManual: parseCurrency(document.getElementById('inp-sim-vat-manual').value),
         simExtraFee: document.getElementById('inp-sim-extraFee').value,
         simTaxNote: document.getElementById('inp-sim-taxNote').value,
         simInc: document.getElementById('inp-sim-inc').value,
         simExc: document.getElementById('inp-sim-exc').value,
         simples: Array.from(document.querySelectorAll('.simple-item')).map(el => ({
             name: el.querySelector('.s-name').value, desc: el.querySelector('.s-desc').value,
-            qty: el.querySelector('.s-qty').value, krw: el.querySelector('.s-krw').value
+            qty: el.querySelector('.s-qty').value, krw: parseCurrency(el.querySelector('.s-krw').value)
         }))
     };
 }
 
 function setFormData(data) {
-    // 구버전 저장 데이터를 위한 하위호환 처리
     if (data.docMode === 'simple' && (!data.currency || data.currency !== 'SIMPLE_QUOTE')) {
         document.getElementById('inp-currency').value = 'SIMPLE_QUOTE';
     } else {
-        document.getElementById('inp-currency').value = data.currency || data['inp-currency'] || 'JPY';
+        document.getElementById('inp-currency').value = data.currency || data['inp-currency'] || 'USD';
     }
     
-    toggleDocMode(); // UI 전환 반영
+    toggleDocMode();
 
-    // 상세 데이터
     document.getElementById('inp-clientName').value = data.clientName || data['inp-clientName'] || '';
     document.getElementById('inp-docTitle').value = data.docTitle || data['inp-docTitle'] || '';
     document.getElementById('inp-travelDate').value = data.travelDate || data['inp-travelDate'] || '';
     document.getElementById('inp-paxStr').value = data.paxStr || data['inp-paxStr'] || '';
     document.getElementById('inp-issueDate').value = data.issueDate || data['inp-issueDate'] || '';
-    document.getElementById('inp-exRate').value = data.exRate || data['inp-exRate'] || '1500';
+    document.getElementById('inp-exRate').value = data.exRate ? Number(data.exRate).toLocaleString('ko-KR') : '1,500';
 
     document.getElementById('flight-inputs-container').innerHTML = '';
     document.getElementById('local-inputs-container').innerHTML = '';
@@ -1245,7 +1332,6 @@ function setFormData(data) {
     if (data.locals) data.locals.forEach(item => addLocalRow(item, true));
     if (data.domestics) data.domestics.forEach(item => addDomesticRow(item, true));
 
-    // 일반 데이터
     document.getElementById('inp-sim-dep').value = data.simDep || '';
     document.getElementById('inp-sim-inv').value = data.simInv || '';
     document.getElementById('inp-sim-subject').value = data.simSubject || '';
@@ -1253,23 +1339,18 @@ function setFormData(data) {
     document.getElementById('inp-sim-toAddr').value = data.simToAddr || '';
     document.getElementById('inp-sim-toPerson').value = data.simToPerson || '';
     document.getElementById('inp-sim-due').value = data.simDue || '';
-    document.getElementById('inp-sim-vat').value = data.simVat || 'auto'; // 디폴트 auto로 하위호환
-    document.getElementById('inp-sim-vat-manual').value = data.simVatManual || '';
-    toggleVatManual(); // UI 동기화
+    document.getElementById('inp-sim-vat').value = data.simVat || 'auto'; 
+    document.getElementById('inp-sim-vat-manual').value = data.simVatManual ? Number(data.simVatManual).toLocaleString('ko-KR') : '';
+    toggleVatManual(); 
     
     document.getElementById('inp-sim-extraFee').value = data.simExtraFee || '0';
-    
-    // 특이사항 문구가 저장되어 있다면 불러오고, 없다면 기본값 유지
-    if (data.simTaxNote !== undefined) {
-        document.getElementById('inp-sim-taxNote').value = data.simTaxNote;
-    }
-    
+    if (data.simTaxNote !== undefined) document.getElementById('inp-sim-taxNote').value = data.simTaxNote;
     document.getElementById('inp-sim-inc').value = data.simInc || '';
     document.getElementById('inp-sim-exc').value = data.simExc || '';
 
     document.getElementById('simple-items-container').innerHTML = '';
     if (data.simples) data.simples.forEach(item => addSimpleRow(item, true));
-    else initSimples.forEach(d => addSimpleRow(d, true)); // 기본값 적용
+    else initSimples.forEach(d => addSimpleRow(d, true));
 }
 
 function updatePresetDropdown(filterText = '') {
@@ -1368,7 +1449,7 @@ function renderDetailed() {
     const isMainland = currency === 'KRW_MAINLAND';
     const isJeju = currency === 'KRW_JEJU';
     const isKRW = isMainland || isJeju;
-    let exRate = isKRW ? 1 : (Number(document.getElementById('inp-exRate').value) || 0);
+    let exRate = isKRW ? 1 : (parseCurrency(document.getElementById('inp-exRate').value) || 0);
 
     document.getElementById('title-flight-area').innerText = isMainland ? '2. 교통비 영역 (원화 직접 입력)' : '2. 항공료 영역 (원화 직접 입력)';
     const le = document.getElementById('title-local-expense');
@@ -1405,7 +1486,9 @@ function renderDetailed() {
     document.querySelectorAll('.flight-item').forEach(el => {
         const n = el.querySelector('.f-name').value;
         if(n.trim()){
-            const d = el.querySelector('.f-desc').value, q = Number(el.querySelector('.f-qty').value)||0, k = Number(el.querySelector('.f-krw').value)||0;
+            const d = el.querySelector('.f-desc').value;
+            const q = Number(el.querySelector('.f-qty').value)||0;
+            const k = parseCurrency(el.querySelector('.f-krw').value)||0;
             tF += k*q; flights.push({name:n, desc:d, qty:q, krw:k, tot:k*q, note:el.querySelector('.f-note').value});
         }
     });
@@ -1432,7 +1515,9 @@ function renderDetailed() {
     document.querySelectorAll('.local-item').forEach(el => {
         const n = el.querySelector('.l-name').value;
         if(n.trim()){
-            const d = el.querySelector('.l-desc').value, q = Number(el.querySelector('.l-qty').value)||0, f = Number(el.querySelector('.l-fgn').value)||0;
+            const d = el.querySelector('.l-desc').value;
+            const q = Number(el.querySelector('.l-qty').value)||0;
+            const f = parseCurrency(el.querySelector('.l-fgn').value)||0;
             const k = isKRW ? f : Math.round(f*exRate);
             tL += k*q; locals.push({name:n, desc:d, qty:q, fgn:f, krw:k, tot:k*q, note:el.querySelector('.l-note').value});
         }
@@ -1458,7 +1543,9 @@ function renderDetailed() {
     document.querySelectorAll('.domestic-item').forEach(el => {
         const n = el.querySelector('.d-name').value;
         if(n.trim()){
-            const d = el.querySelector('.d-desc').value, q = Number(el.querySelector('.d-qty').value)||0, k = Number(el.querySelector('.d-krw').value)||0;
+            const d = el.querySelector('.d-desc').value;
+            const q = Number(el.querySelector('.d-qty').value)||0;
+            const k = parseCurrency(el.querySelector('.d-krw').value)||0;
             tD += k*q; doms.push({name:n, desc:d, qty:q, krw:k, tot:k*q, note:el.querySelector('.d-note').value});
         }
     });
@@ -1484,6 +1571,9 @@ function renderDetailed() {
     document.getElementById('tbody-total').innerHTML=`
         <tr class="grand-row"><td colspan="${col}" class="text-center grand-label" style="font-size:12px">(1)+(2)+(3) 전체 합계 금액</td><td class="text-right text-blue-800 grand-amount">₩${fmtT(gT)}</td><td></td></tr>
         <tr class="grand-row grand-row-last"><td colspan="${col}" class="text-center grand-label" style="font-size:12px">(2)+(3) 행사 비용 합계 <span style="font-size:10px;font-weight:400;color:#64748b">${ex}</span></td><td class="text-right text-red-700 grand-amount">₩${fmtT(nF)}</td><td></td></tr>`;
+
+    // 실시간 요약바 업데이트
+    document.getElementById('live-total-amount').textContent = '₩ ' + fmtT(gT);
 }
 
 // --- [B] 일반 견적서 렌더링 ---
@@ -1498,7 +1588,6 @@ function renderSimple() {
 
     document.getElementById('out-sim-due').textContent = document.getElementById('inp-sim-due').value;
 
-    // 포함/불포함 줄바꿈 처리
     const incText = document.getElementById('inp-sim-inc').value.replace(/\n/g, '<br>');
     const excText = document.getElementById('inp-sim-exc').value.replace(/\n/g, '<br>');
     document.getElementById('out-sim-inc').innerHTML = incText; 
@@ -1511,14 +1600,13 @@ function renderSimple() {
         if(n.trim()){
             const d = el.querySelector('.s-desc').value;
             const q = Number(el.querySelector('.s-qty').value)||0;
-            const k = Number(el.querySelector('.s-krw').value)||0;
+            const k = parseCurrency(el.querySelector('.s-krw').value)||0;
             subTotal += (k * q);
             simples.push({ name: n, desc: d, qty: q, krw: k, tot: k * q });
         }
     });
 
     let h = '';
-    // 최소 5줄을 채우기 위한 빈 줄 로직
     const minRows = 5;
     for(let i=0; i<Math.max(simples.length, minRows); i++){
         if(i < simples.length) {
@@ -1534,23 +1622,21 @@ function renderSimple() {
         }
     }
 
-    // 소계
     h += `<tr class="st-subtotal">
         <td colspan="4">Sub Total (KRW)</td>
         <td>${fmtT(subTotal)}</td>
     </tr>`;
 
-    // ★ 부가세 처리 (선택사항에 따라 값이 결정되며 표에는 항상 노출됨) ★
     const vatOpt = document.getElementById('inp-sim-vat').value;
     let vatVal = 0;
-    let vatLabel = "부가세 불포함"; // 요청사항 반영
+    let vatLabel = "부가세 불포함"; 
     
     if (vatOpt === 'auto') {
         vatVal = Math.floor(subTotal * 0.1);
         vatLabel = "부가세 (10%)";
     } else if (vatOpt === 'manual') {
-        vatVal = Number(document.getElementById('inp-sim-vat-manual').value) || 0;
-        vatLabel = "부가세 (부분 과세)"; // 일부 금액만 부가세 청구 시 표시
+        vatVal = parseCurrency(document.getElementById('inp-sim-vat-manual').value) || 0;
+        vatLabel = "부가세 (부분 과세)";
     }
 
     h += `<tr>
@@ -1561,10 +1647,8 @@ function renderSimple() {
         <td class="text-right">${fmt(vatVal)}</td>
     </tr>`;
 
-    // 기타비용 (세무 리스크 보전) 처리
     const extraFeeOpt = document.getElementById('inp-sim-extraFee').value;
     let extraVal = 0;
-    // 부가세가 발생했을 때만 50% 추가 
     if (extraFeeOpt === 'auto_50' && vatVal > 0) {
         extraVal = Math.floor(vatVal * 0.5);
         h += `<tr>
@@ -1576,7 +1660,6 @@ function renderSimple() {
         </tr>`;
     }
 
-    // 총계
     const grandTotal = subTotal + vatVal + extraVal;
     h += `<tr class="st-grandtotal">
         <td colspan="4">Grand Total (KRW)</td>
@@ -1585,18 +1668,19 @@ function renderSimple() {
 
     document.getElementById('tbody-simple').innerHTML = h;
 
-    // 특이사항 출력 로직
     const taxNoteText = document.getElementById('inp-sim-taxNote').value.trim();
     const wrapTaxNote = document.getElementById('wrap-sim-taxNote');
     const outTaxNote = document.getElementById('out-sim-taxNote');
 
-    // 특이사항 문구가 기입되어 있고, 부가세나 기타비용 옵션이 활성화된 경우에만 노출
     if (taxNoteText && (vatOpt === 'auto' || vatOpt === 'manual' || extraFeeOpt === 'auto_50')) {
         wrapTaxNote.style.display = 'flex';
         outTaxNote.innerHTML = taxNoteText.replace(/\n/g, '<br>');
     } else {
         wrapTaxNote.style.display = 'none';
     }
+
+    // 실시간 요약바 업데이트
+    document.getElementById('live-total-amount').textContent = '₩ ' + fmtT(grandTotal);
 }
 
 
@@ -1604,15 +1688,16 @@ function renderSimple() {
 document.addEventListener('DOMContentLoaded', function() {
     buildInitialInputs(); 
     updatePresetDropdown();
-    
-    // 초기 모드 세팅 (currency select 기준)
     toggleDocMode();
 });
 
 document.getElementById('panelInput').addEventListener('input', function(e) {
     if (e.target.id !== 'inp-currency' && e.target.id !== 'preset-search') {
-        calculateAndRender();
-        scheduleValidation();
+        // formatCurrency에서 이미 calculateAndRender를 호출하므로 중복 방지
+        if (!e.target.classList.contains('amount')) {
+            calculateAndRender();
+            scheduleValidation();
+        }
     }
 });
 </script>
