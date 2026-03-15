@@ -334,7 +334,29 @@
         @media (max-width: 1023px) {
             .mobile-tabs { display: flex; }
             .main-layout { flex-direction: column; height: auto; overflow: visible; }
-            .panel-input { width: 100%; border-right: none; border-bottom: 1px solid #e2e8f0; height: 60vh; padding: 20px; }
+            
+            /* 모바일에서는 패널 자체가 스크롤되도록 변경 */
+            .panel-input { 
+                width: 100%; border-right: none; border-bottom: 1px solid #e2e8f0; 
+                height: calc(100vh - 110px); /* 화면 전체를 넓게 쓰도록 확장 */
+                padding: 20px; 
+                display: block; 
+                overflow-y: auto; 
+            }
+            .panel-input-scroll { 
+                overflow-y: visible; 
+                padding-bottom: 0; 
+            }
+            
+            /* 모바일에서 요약바 하단 고정 해제 (입력폼 맨 아래에 자연스럽게 배치) */
+            .live-summary-bar {
+                position: relative;
+                bottom: auto; left: auto; right: auto;
+                margin-top: 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            }
+
             .panel-preview { width: 100%; padding: 20px 0; overflow-x: scroll; overflow-y: visible; height: auto; min-height: 0; display: block; -webkit-overflow-scrolling: touch; }
             .a4-sheet { min-width: 750px; width: 750px; padding: 24px; margin: 0 12px; }
             .panel-hidden { display: none !important; }
@@ -346,7 +368,7 @@
             .top-header { padding: 12px; }
             .top-header img { height: 26px; }
             .top-header h1 { font-size: 13px; }
-            .panel-input { padding: 16px; }
+            .panel-input { padding: 16px; height: calc(100vh - 100px); }
             .a4-sheet { min-width: 680px; width: 680px; padding: 20px; }
         }
 
