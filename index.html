@@ -193,7 +193,7 @@
 
         /* ===== [가격 산출내역서] 스타일 ===== */
         .doc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
-        .doc-header-left { width: 55%; }
+        .doc-header-left { width: 45%; } /* ★ 수정: 55% -> 45%로 줄여 우측 빈공간 없애고 타이트하게 만듦 */
         .doc-header-right { width: 40%; display: flex; justify-content: flex-end; padding-top: 4px; }
         .doc-header-right img { height: 55px; object-fit: contain; }
         .doc-title-area { text-align: center; margin-bottom: 24px; }
@@ -205,8 +205,10 @@
         .doc-title-area p { font-size: 11px; color: #64748b; font-weight: 700; letter-spacing: 0.25em; margin-top: 6px; text-transform: uppercase; }
 
         .info-table { width: 100%; border-collapse: collapse; }
-        .info-table th, .info-table td { border: 1px solid #cbd5e1; padding: 6px 10px; font-size: 12px; }
-        .info-table th { background: #f8fafc; color: #334155; font-weight: 700; text-align: left; width: 30%; border-right: 1px solid #cbd5e1; }
+        /* ★ 수정: padding을 6px 10px -> 5px 8px 로 줄여 글자 주변 여백 최소화 */
+        .info-table th, .info-table td { border: 1px solid #cbd5e1; padding: 5px 8px; font-size: 12px; }
+        /* ★ 수정: text-align을 left -> center 로 변경하고, width를 28%로 타이트하게 조절 */
+        .info-table th { background: #f8fafc; color: #334155; font-weight: 700; text-align: center; width: 28%; border-right: 1px solid #cbd5e1; }
         .info-table td { color: #0f172a; }
 
         .main-table { width: 100%; border-collapse: collapse; table-layout: fixed; border-top: 2px solid #0f172a; border-bottom: 2px solid #0f172a; }
@@ -415,7 +417,6 @@
                 <select id="inp-currency" class="form-select" onchange="toggleDocMode()" style="padding: 10px; font-size: 14px; color: #2563eb; border-color: #93c5fd;">
                     <optgroup label="[가격 산출 내역서]">
                         <option value="JPY">해외행사 - JPY (엔화)</option>
-                        <!-- 사북고등학교 PDF 기본값에 맞춰 USD를 디폴트로 설정 -->
                         <option value="USD" selected>해외행사 - USD (달러)</option>
                         <option value="CNY">해외행사 - CNY (위안화)</option>
                         <option value="KRW_JEJU">국내행사 - 제주 (KRW)</option>
@@ -441,7 +442,6 @@
                 <div class="form-group">
                     <div class="section-title blue">1. 기본 정보 설정</div>
                     <div class="form-row cols-2">
-                        <!-- PDF 기본값 적용 -->
                         <div><label class="form-label">고객명 (기관명)</label><input type="text" id="inp-clientName" class="form-input" value="사북고등학교"></div>
                         <div><label class="form-label">문서 제목 (행사명)</label><input type="text" id="inp-docTitle" class="form-input" value="대만 타이베이"></div>
                     </div>
@@ -612,7 +612,6 @@
                         <h1>견 적 서</h1>
                     </div>
 
-                    <!-- ★ 로고가 우측 상단으로 이동하여 밸런스 확보 ★ -->
                     <div class="simple-info-grid">
                         <div class="simple-info-left">
                             <div><span>Date of Departure</span>: <span id="out-sim-dep"></span></div>
@@ -630,7 +629,6 @@
                             <div class="sr-content">
                                 <div class="sr-content-row"><span>:</span><span id="out-sim-toName"></span></div>
                                 <div class="sr-content-row"><span>:</span><span id="out-sim-toAddr"></span></div>
-                                <!-- 빈 줄을 없애고 마진으로 간격을 주어 발신 칸과 높이(3줄)를 완벽히 일치시킴 -->
                                 <div class="sr-content-row bold" style="margin-top: 10px;"><span>:</span><span id="out-sim-toPerson"></span></div>
                             </div>
                         </div>
@@ -642,7 +640,6 @@
                                 <div class="sr-content-row"><span>:</span><span>033-562-2551</span></div>
                                 <div class="sr-content-row bold" style="margin-top: 10px;">
                                     <span>:</span>
-                                    <!-- ★ 직인(도장) 이미지가 이름 위로 겹치게 보정된 래퍼 (Flex 적용) ★ -->
                                     <span class="stamp-overlap-container">
                                         이 재 명 (인)
                                         <img class="stamp-image" src="https://blogger.googleusercontent.com/img/a/AVvXsEiweUsH71be_Y3skDUBOVzZE0M4HnXmgllJq7c1JgatYy5eROHYdkvE9rMIcqVl0DQ2ypgr8fkZSQclgQjWOk8yZA5wiF326Ldf4KTrfd_YEsD2zZjyqsRLS65uv50SLZcLFqIvwZly49lEN3sheIMq4HV_VWLs1irf4o8g3-ajXCA7CaOlSvpKCT4Q2XA=w200-h200" alt="직인">
