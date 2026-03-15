@@ -750,6 +750,20 @@
 // 유틸리티 및 데이터 포맷팅
 // ===================================================================
 
+function getFormattedDate(type) {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    if (type === 'korean') return `${y}년 ${m}월 ${d}일`;
+    return `${y}.${m}.${d}`;
+}
+
+function setTodayDates() {
+    document.getElementById('inp-issueDate').value = getFormattedDate('dot');
+    document.getElementById('inp-sim-inv').value = getFormattedDate('korean');
+}
+
 function escAttr(str = '') {
     return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
@@ -1416,6 +1430,7 @@ function clearForm() {
     document.getElementById('domestic-inputs-container').innerHTML = '';
     document.getElementById('simple-items-container').innerHTML = '';
     addFlightRow({}, true); addLocalRow({}, true); addDomesticRow({}, true); addSimpleRow({}, true);
+    setTodayDates(); // 초기화 시 오늘 날짜로 다시 세팅
     calculateAndRender(); renderWarnings();
 }
 
@@ -1681,6 +1696,7 @@ function renderSimple() {
 
 // ===== 초기화 및 이벤트 등록 =====
 document.addEventListener('DOMContentLoaded', function() {
+    setTodayDates(); // 페이지 로드 시 오늘 날짜 자동 세팅
     buildInitialInputs(); 
     updatePresetDropdown();
     toggleDocMode();
