@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>고객 제출용 가격 산출 내역서 - TOURMAKER (사북고 대만)</title>
+    <title>고객 제출용 가격 산출 내역서 - TOURMAKER</title>
 
     <meta property="og:title" content="투어메이커 가격 산출 내역서">
     <meta property="og:description" content="고객 제출용 공식 행사비 산출 내역서 (국내/해외 통합)">
@@ -470,8 +470,8 @@
                     <div class="section-title cyan">통화 지역 선택</div>
                     <select id="inp-currency" class="form-select" onchange="toggleDocMode()" style="padding: 10px; font-size: 14px; color: #2563eb; border-color: #93c5fd;">
                         <optgroup label="[가격 산출 내역서]">
-                            <option value="JPY">해외행사 - JPY (엔화)</option>
-                            <option value="USD" selected>해외행사 - USD (달러)</option>
+                            <option value="JPY" selected>해외행사 - JPY (엔화)</option>
+                            <option value="USD">해외행사 - USD (달러)</option>
                             <option value="CNY">해외행사 - CNY (위안화)</option>
                             <option value="KRW_JEJU">국내행사 - 제주 (KRW)</option>
                             <option value="KRW_MAINLAND">국내행사 - 내륙 (KRW)</option>
@@ -483,7 +483,7 @@
                     
                     <div class="exrate-row" id="wrap-exRate">
                         <label>적용 환율 :</label>
-                        <input type="text" id="inp-exRate" class="exrate-input amount" value="1,500" oninput="formatCurrency(this)">
+                        <input type="text" id="inp-exRate" class="exrate-input amount" value="9.5" oninput="formatCurrency(this)">
                         <span style="font-size:12px;color:#64748b;">기준(송금)</span>
                     </div>
                 </div>
@@ -496,17 +496,17 @@
                     <div class="form-group">
                         <div class="section-title blue">1. 기본 정보 설정</div>
                         <div class="form-row cols-2">
-                            <div><label class="form-label">고객명 (기관명)</label><input type="text" id="inp-clientName" class="form-input" value="사북고등학교"></div>
-                            <div><label class="form-label">문서 제목 (행사명)</label><input type="text" id="inp-docTitle" class="form-input" value="대만 타이베이"></div>
+                            <div><label class="form-label">고객명 (기관명)</label><input type="text" id="inp-clientName" class="form-input" value="사북중학교"></div>
+                            <div><label class="form-label">문서 제목 (행사명)</label><input type="text" id="inp-docTitle" class="form-input" value="일본 오사카 여행"></div>
                         </div>
                         <div class="form-row cols-1">
-                            <div><label class="form-label">여행일</label><input type="text" id="inp-travelDate" class="form-input" value="2026.05.26~05.29"></div>
+                            <div><label class="form-label">여행일</label><input type="text" id="inp-travelDate" class="form-input" value="2026.05.19~05.22"></div>
                         </div>
                         <div class="form-row cols-1">
-                            <div><label class="form-label">여행인원 표기 (숫자 포함 시 자동계산)</label><input type="text" id="inp-paxStr" class="form-input" value="34명기준"></div>
+                            <div><label class="form-label">여행인원 표기 (숫자 포함 시 자동계산)</label><input type="text" id="inp-paxStr" class="form-input" value="59명기준(학생 54+ 교사5)"></div>
                         </div>
                         <div class="form-row cols-2">
-                            <div><label class="form-label">발송일자</label><input type="text" id="inp-issueDate" class="form-input" value="2026.03.13"></div>
+                            <div><label class="form-label">발송일자</label><input type="text" id="inp-issueDate" class="form-input" value="2026.03.16"></div>
                         </div>
                     </div>
 
@@ -533,6 +533,15 @@
                         <div id="domestic-inputs-container"></div>
                         <button class="btn-add-item" onclick="addDomesticRow()">+ 국내 발생비용 항목 추가</button>
                     </div>
+
+                    <!-- 5. 하단 특이사항 (NEW!) -->
+                    <div class="form-group">
+                        <div class="section-title dark">5. 하단 특이사항 (선택사항)</div>
+                        <p class="hint-text" style="margin-bottom: 8px;">표 가장 하단에 강조되어 출력됩니다. (예: 여성기업 수의계약 조건 안내 등)</p>
+                        <div class="form-row cols-1">
+                            <textarea id="inp-det-specialNote" class="form-input" style="height:60px; resize:vertical; font-weight:600; color:#b91c1c;" placeholder="필요 시 기안 및 계약용 특이사항을 자유롭게 입력하세요. (비워두면 출력되지 않습니다.)"></textarea>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- ========================================== -->
@@ -542,18 +551,18 @@
                     <div class="form-group">
                         <div class="section-title dark">1. 견적서 기본 정보</div>
                         <div class="form-row cols-2">
-                            <div><label class="form-label">출발일 코드 (Date of Departure)</label><input type="text" id="inp-sim-dep" class="form-input" value="TM_260526"></div>
-                            <div><label class="form-label">발행일 (Invoice Date)</label><input type="text" id="inp-sim-inv" class="form-input" value="2026년 03월 13일"></div>
+                            <div><label class="form-label">출발일 코드 (Date of Departure)</label><input type="text" id="inp-sim-dep" class="form-input" value="TM_260519"></div>
+                            <div><label class="form-label">발행일 (Invoice Date)</label><input type="text" id="inp-sim-inv" class="form-input" value="2026년 03월 16일"></div>
                         </div>
                         <div class="form-row cols-1">
-                            <div><label class="form-label">내용 (Subject)</label><input type="text" id="inp-sim-subject" class="form-input" value="260526_사북고등학교 대만 타이베이 연수"></div>
+                            <div><label class="form-label">내용 (Subject)</label><input type="text" id="inp-sim-subject" class="form-input" value="260519_사북중학교 일본 오사카 연수"></div>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <div class="section-title blue">2. 수신 / 발신 정보</div>
                         <div class="form-row cols-1">
-                            <div><label class="form-label">수신처 기관명</label><input type="text" id="inp-sim-toName" class="form-input" value="사북고등학교"></div>
+                            <div><label class="form-label">수신처 기관명</label><input type="text" id="inp-sim-toName" class="form-input" value="사북중학교"></div>
                             <div><label class="form-label">수신처 주소</label><input type="text" id="inp-sim-toAddr" class="form-input" value="강원도 정선군 사북읍"></div>
                             <div><label class="form-label">수신 담당자명</label><input type="text" id="inp-sim-toPerson" class="form-input" value="담당 선생님"></div>
                         </div>
@@ -1169,39 +1178,35 @@ function switchTab(tab) {
 }
 
 // ===================================================================
-// 동적 입력 필드 생성 (사북고 대만 타이베이 디폴트 템플릿 연동)
+// 동적 입력 필드 생성 (사북중 오사카 디폴트 세팅 반영)
 // ===================================================================
 
 const initFlights = [
-    { name: "항공료", desc: "대한항공 인천-타이페이", qty: 34, krw: 449500, note: "그룹가 예상가" },
-    { name: "항공료", desc: "발권수수료", qty: 34, krw: 10000, note: "항공 발권 대리점" }
+    { name: "항공료", desc: "에어로케이 청주-오사카-청주", qty: 59, krw: 294600, note: "그룹가 예상가" },
+    { name: "항공료", desc: "발권수수료", qty: 59, krw: 22000, note: "항공 발권 대리점" }
 ];
 const initLocals = [
-    { name: "호텔", desc: "(2인실) 3박요금", qty: 17, fgn: 490, note: "조식포함" },
-    { name: "식비", desc: "중식_1일차", qty: 34, fgn: 12, note: "우육면" },
-    { name: "식비", desc: "중식_2일차", qty: 34, fgn: 18, note: "하이옌현지식" },
-    { name: "식비", desc: "중식_3일차", qty: 34, fgn: 12, note: "현지식" },
-    { name: "식비", desc: "석식_1일차", qty: 34, fgn: 12, note: "샤브샤브" },
-    { name: "식비", desc: "석식_2일차", qty: 34, fgn: 18, note: "몽골리안BBQ" },
-    { name: "식비", desc: "석식_3일차", qty: 34, fgn: 25, note: "삼겹살무제한" },
-    { name: "현지차량료", desc: "45인승", qty: 1, fgn: 3300, note: "통행료+주차비" },
-    { name: "관광지입장료", desc: "고궁", qty: 34, fgn: 15, note: "" },
-    { name: "관광지입장료", desc: "101타워", qty: 34, fgn: 20, note: "" },
-    { name: "관광지입장료", desc: "홍모성", qty: 34, fgn: 3, note: "" },
-    { name: "관광지입장료", desc: "야류", qty: 34, fgn: 5, note: "" },
-    { name: "관광지입장료", desc: "스펀 4인1개", qty: 34, fgn: 3, note: "" },
-    { name: "관광지입장료", desc: "곽원익 펑리수 DIY", qty: 34, fgn: 20, note: "" },
-    { name: "가이드비용", desc: "현지가이드", qty: 1, fgn: 1000, note: "현지가이드" }
+    { name: "호텔", desc: "(2인실) 3박요금", qty: 29, fgn: 66500, note: "조식포함" },
+    { name: "호텔", desc: "(1인실) 3박요금", qty: 1, fgn: 53200, note: "조식포함" },
+    { name: "차량비", desc: "전용차량 2대", qty: 2, fgn: 670000, note: "통행료+주차비 포함" },
+    { name: "식비", desc: "중식_2일차", qty: 59, fgn: 2000, note: "현지식" },
+    { name: "식비", desc: "중식_3일차", qty: 59, fgn: 2000, note: "현지식" },
+    { name: "식비", desc: "석식_1일차", qty: 59, fgn: 3000, note: "현지식" },
+    { name: "식비", desc: "석식_2일차", qty: 59, fgn: 3000, note: "현지식" },
+    { name: "식비", desc: "석식_3일차", qty: 59, fgn: 3000, note: "현지식" },
+    { name: "관광지입장료", desc: "청수사", qty: 59, fgn: 500, note: "" },
+    { name: "관광지입장료", desc: "유니버셜", qty: 59, fgn: 8000, note: "" },
+    { name: "가이드비용", desc: "전일정 동행(2명)", qty: 2, fgn: 165000, note: "노쇼핑/청주미팅" }
 ];
 const initDomestics = [
-    { name: "여행자보험", desc: "1억원 기준", qty: 34, krw: 10000, note: "주민번호 필요, 예상가" },
-    { name: "진행수수료", desc: "운영 관리비", qty: 1, krw: 4500000, note: "인솔자 동행" },
-    { name: "공항수송", desc: "공항 왕복 차량비", qty: 1, krw: 2200000, note: "대형버스 기준" }
+    { name: "여행자보험", desc: "1억원 기준", qty: 59, krw: 3000, note: "주민번호 필요" },
+    { name: "공항수송", desc: "공항 왕복 차량료(대형버스)", qty: 2, krw: 1600000, note: "산아리네트웍스" },
+    { name: "알선수수료", desc: "운영 관리비", qty: 1, krw: 3050000, note: "" }
 ];
 const initSimples = [
-    { name: "항공료", desc: "대한항공 왕복 및 발권수수료", qty: 34, krw: 459500 },
-    { name: "현지행사", desc: "대만 타이베이 단독행사", qty: 34, krw: 801705 },
-    { name: "국내진행", desc: "여행자보험, 공항수송, 진행수수료 등", qty: 1, krw: 7040000 }
+    { name: "항공료", desc: "청주-오사카 왕복 (발권수수료 포함)", qty: 59, krw: 316600 },
+    { name: "현지행사", desc: "호텔, 식사, 입장료, 가이드 등 행사일체", qty: 59, krw: 792235 },
+    { name: "국내진행", desc: "여행자보험, 공항수송, 운영관리비", qty: 1, krw: 6427000 }
 ];
 
 function addFlightRow(data = {name:'', desc:'', qty:'', krw:'', note:''}, skipRender = false) {
@@ -1294,10 +1299,13 @@ function buildInitialInputs() {
     initLocals.forEach(d => addLocalRow(d, true));
     initDomestics.forEach(d => addDomesticRow(d, true));
     initSimples.forEach(d => addSimpleRow(d, true));
+    
+    // 기본 특이사항 세팅
+    document.getElementById('inp-det-specialNote').value = "※ 항공료 및 공항수송차량비 별도 계약\n※ 행사 잔여 금액 49,968,900원으로 5천만원 이하 여성기업 수의계약 진행";
 }
 
 // ===================================================================
-// 저장 / 불러오기 (통화 기반 모드 포함)
+// 저장 / 불러오기 (통화 기반 모드 및 특이사항 포함)
 // ===================================================================
 function getFormData() {
     return {
@@ -1308,6 +1316,7 @@ function getFormData() {
         paxStr: document.getElementById('inp-paxStr').value,
         issueDate: document.getElementById('inp-issueDate').value,
         exRate: parseCurrency(document.getElementById('inp-exRate').value),
+        detSpecialNote: document.getElementById('inp-det-specialNote').value,
         flights: Array.from(document.querySelectorAll('.flight-item')).map(el => ({
             name: el.querySelector('.f-name').value, desc: el.querySelector('.f-desc').value,
             qty: el.querySelector('.f-qty').value, krw: parseCurrency(el.querySelector('.f-krw').value), note: el.querySelector('.f-note').value
@@ -1344,7 +1353,7 @@ function setFormData(data) {
     if (data.docMode === 'simple' && (!data.currency || data.currency !== 'SIMPLE_QUOTE')) {
         document.getElementById('inp-currency').value = 'SIMPLE_QUOTE';
     } else {
-        document.getElementById('inp-currency').value = data.currency || data['inp-currency'] || 'USD';
+        document.getElementById('inp-currency').value = data.currency || data['inp-currency'] || 'JPY';
     }
     
     toggleDocMode();
@@ -1354,7 +1363,8 @@ function setFormData(data) {
     document.getElementById('inp-travelDate').value = data.travelDate || data['inp-travelDate'] || '';
     document.getElementById('inp-paxStr').value = data.paxStr || data['inp-paxStr'] || '';
     document.getElementById('inp-issueDate').value = data.issueDate || data['inp-issueDate'] || '';
-    document.getElementById('inp-exRate').value = data.exRate ? Number(data.exRate).toLocaleString('ko-KR') : '1,500';
+    document.getElementById('inp-exRate').value = data.exRate ? Number(data.exRate).toLocaleString('ko-KR') : '9.5';
+    document.getElementById('inp-det-specialNote').value = data.detSpecialNote || '';
 
     document.getElementById('flight-inputs-container').innerHTML = '';
     document.getElementById('local-inputs-container').innerHTML = '';
@@ -1447,6 +1457,7 @@ function clearForm() {
     if(!confirm('모든 데이터가 삭제되고 초기화됩니다.')) return;
     document.querySelectorAll('input[type="text"]').forEach(el => el.value = '');
     document.querySelectorAll('input[type="number"]').forEach(el => el.value = '');
+    document.getElementById('inp-det-specialNote').value = ''; // 특이사항 초기화
     document.getElementById('flight-inputs-container').innerHTML = '';
     document.getElementById('local-inputs-container').innerHTML = '';
     document.getElementById('domestic-inputs-container').innerHTML = '';
@@ -1600,9 +1611,18 @@ function renderDetailed() {
 
     const gT=tF+tL+tD, nF=tL+tD;
     const ex=isMainland?'(교통비 제외)':'(항공료 제외)';
-    document.getElementById('tbody-total').innerHTML=`
+    
+    const specialNote = document.getElementById('inp-det-specialNote').value.trim();
+    
+    let totalHtml = `
         <tr class="grand-row"><td colspan="${col}" class="text-center grand-label" style="font-size:12px">(1)+(2)+(3) 전체 합계 금액</td><td class="text-right text-blue-800 grand-amount">₩${fmtT(gT)}</td><td></td></tr>
-        <tr class="grand-row grand-row-last"><td colspan="${col}" class="text-center grand-label" style="font-size:12px">(2)+(3) 행사 비용 합계 <span style="font-size:10px;font-weight:400;color:#64748b">${ex}</span></td><td class="text-right text-red-700 grand-amount">₩${fmtT(nF)}</td><td></td></tr>`;
+        <tr class="grand-row ${specialNote ? '' : 'grand-row-last'}"><td colspan="${col}" class="text-center grand-label" style="font-size:12px">(2)+(3) 행사 비용 합계 <span style="font-size:10px;font-weight:400;color:#64748b">${ex}</span></td><td class="text-right text-red-700 grand-amount">₩${fmtT(nF)}</td><td></td></tr>`;
+        
+    if (specialNote) {
+        totalHtml += `<tr class="grand-row grand-row-last"><td class="text-center font-bold bg-yellow-50" style="color:#b91c1c;">특이사항</td><td colspan="${col+1}" style="font-weight:700; color:#b91c1c; padding:10px; line-height:1.5;">${specialNote.replace(/\n/g, '<br>')}</td></tr>`;
+    }
+
+    document.getElementById('tbody-total').innerHTML=totalHtml;
 
     // 실시간 요약바 업데이트
     document.getElementById('live-total-amount').textContent = '₩ ' + fmtT(gT);
