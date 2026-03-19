@@ -582,6 +582,19 @@
 
                     <div class="form-group">
                         <div class="section-title orange">4. 하단 부가 정보 및 세무 설정</div>
+                        
+                        <!-- ★ 추가된 입금 계좌 정보 영역 ★ -->
+                        <div style="background: #f1f5f9; padding: 12px; border: 1px dashed #94a3b8; border-radius: 6px; margin-bottom: 16px;">
+                            <label class="form-label" style="color: #0f172a; margin-bottom: 12px; font-size: 13px;">입금 계좌 설정 (법인 외 행사 시 변경 가능)</label>
+                            <div class="form-row cols-2" style="margin-bottom: 8px;">
+                                <div><label class="form-label">은행명 (Bank)</label><input type="text" id="inp-sim-bankName" class="form-input" value="신협"></div>
+                                <div><label class="form-label">소유자 (Holder Name)</label><input type="text" id="inp-sim-bankHolder" class="form-input" value="주식회사 투어메이커"></div>
+                            </div>
+                            <div class="form-row cols-1" style="margin-bottom: 0;">
+                                <div><label class="form-label">계좌번호 (Bank Account)</label><input type="text" id="inp-sim-bankNum" class="form-input" value="131-022-382094"></div>
+                            </div>
+                        </div>
+
                         <div class="form-row cols-2">
                             <div><label class="form-label">입금 기한 (By Due)</label><input type="text" id="inp-sim-due" class="form-input" value="행사 출발 전 완납"></div>
                         </div>
@@ -743,9 +756,10 @@
 
                     <div class="simple-footer-bank">
                         <p style="margin-bottom:10px;">입금 계좌 정보 (Make All check payable to ;)</p>
-                        <p><span class="label">은행 (Bank)</span><span class="colon">:</span><span class="val">신협</span></p>
-                        <p><span class="label">계좌번호 (Bank Account)</span><span class="colon">:</span><span class="val">131-022-382094</span></p>
-                        <p><span class="label">소유자 (Holder Name)</span><span class="colon">:</span><span class="val">주식회사 투어메이커</span></p>
+                        <!-- ★ 동적 렌더링 될 계좌 정보 ID 할당 ★ -->
+                        <p><span class="label">은행 (Bank)</span><span class="colon">:</span><span class="val" id="out-sim-bankName"></span></p>
+                        <p><span class="label">계좌번호 (Bank Account)</span><span class="colon">:</span><span class="val" id="out-sim-bankNum"></span></p>
+                        <p><span class="label">소유자 (Holder Name)</span><span class="colon">:</span><span class="val" id="out-sim-bankHolder"></span></p>
                         <p style="margin-top:4px;"><span class="label">입금 기한 (By Due)</span><span class="colon">:</span><span class="val highlight-bg" id="out-sim-due"></span></p>
                     </div>
 
@@ -1331,12 +1345,19 @@ function getFormData() {
             name: el.querySelector('.d-name').value, desc: el.querySelector('.d-desc').value,
             qty: el.querySelector('.d-qty').value, krw: parseCurrency(el.querySelector('.d-krw').value), note: el.querySelector('.d-note').value
         })),
+        
         simDep: document.getElementById('inp-sim-dep').value,
         simInv: document.getElementById('inp-sim-inv').value,
         simSubject: document.getElementById('inp-sim-subject').value,
         simToName: document.getElementById('inp-sim-toName').value,
         simToAddr: document.getElementById('inp-sim-toAddr').value,
         simToPerson: document.getElementById('inp-sim-toPerson').value,
+        
+        // 추가된 계좌 정보 필드 저장
+        simBankName: document.getElementById('inp-sim-bankName').value,
+        simBankNum: document.getElementById('inp-sim-bankNum').value,
+        simBankHolder: document.getElementById('inp-sim-bankHolder').value,
+        
         simDue: document.getElementById('inp-sim-due').value,
         simVat: document.getElementById('inp-sim-vat').value,
         simVatManual: parseCurrency(document.getElementById('inp-sim-vat-manual').value),
@@ -1381,6 +1402,12 @@ function setFormData(data) {
     document.getElementById('inp-sim-toName').value = data.simToName || '';
     document.getElementById('inp-sim-toAddr').value = data.simToAddr || '';
     document.getElementById('inp-sim-toPerson').value = data.simToPerson || '';
+    
+    // 추가된 계좌 정보 불러오기 (없으면 기본값 투어메이커 세팅)
+    document.getElementById('inp-sim-bankName').value = data.simBankName || '신협';
+    document.getElementById('inp-sim-bankNum').value = data.simBankNum || '131-022-382094';
+    document.getElementById('inp-sim-bankHolder').value = data.simBankHolder || '주식회사 투어메이커';
+
     document.getElementById('inp-sim-due').value = data.simDue || '';
     document.getElementById('inp-sim-vat').value = data.simVat || 'auto'; 
     document.getElementById('inp-sim-vat-manual').value = data.simVatManual ? Number(data.simVatManual).toLocaleString('ko-KR') : '';
@@ -1464,6 +1491,12 @@ function clearForm() {
     document.getElementById('local-inputs-container').innerHTML = '';
     document.getElementById('domestic-inputs-container').innerHTML = '';
     document.getElementById('simple-items-container').innerHTML = '';
+    
+    // 폼 클리어 시 은행정보는 투어메이커 기본으로 다시 세팅
+    document.getElementById('inp-sim-bankName').value = '신협';
+    document.getElementById('inp-sim-bankNum').value = '131-022-382094';
+    document.getElementById('inp-sim-bankHolder').value = '주식회사 투어메이커';
+
     addFlightRow({}, true); addLocalRow({}, true); addDomesticRow({}, true); addSimpleRow({}, true);
     setTodayDates(); // 초기화 시 오늘 날짜로 다시 세팅
     calculateAndRender(); renderWarnings();
@@ -1639,6 +1672,11 @@ function renderSimple() {
     document.getElementById('out-sim-toName').textContent = document.getElementById('inp-sim-toName').value;
     document.getElementById('out-sim-toAddr').textContent = document.getElementById('inp-sim-toAddr').value;
     document.getElementById('out-sim-toPerson').textContent = document.getElementById('inp-sim-toPerson').value;
+
+    // ★ 계좌 정보 동적 출력 업데이트 ★
+    document.getElementById('out-sim-bankName').textContent = document.getElementById('inp-sim-bankName').value;
+    document.getElementById('out-sim-bankNum').textContent = document.getElementById('inp-sim-bankNum').value;
+    document.getElementById('out-sim-bankHolder').textContent = document.getElementById('inp-sim-bankHolder').value;
 
     document.getElementById('out-sim-due').textContent = document.getElementById('inp-sim-due').value;
 
