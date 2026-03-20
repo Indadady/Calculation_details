@@ -617,8 +617,10 @@
                         </div>
 
                         <div class="form-row cols-1" style="margin-top:12px;">
-                            <div><label class="form-label">특이사항 안내문 (세금계산서 종합과세 관련 안내)</label>
-                                <textarea id="inp-sim-taxNote" class="form-input" style="height:45px; resize:vertical; font-weight: 600; color: #b91c1c;">※ 전체 행사비용 세금계산서 발행 시, 당사 수익이 아닌 수탁경비(항공/숙박 등)까지 매출로 과대 계상되어 발생하는 세금 증가분을 보전하기 위해 소정의 기타비용이 추가 청구됨을 양해 부탁드립니다.</textarea>
+                            <div>
+                                <!-- 라벨 변경됨 -->
+                                <label class="form-label">특이사항 안내문 (예약 조건, 항공 정보, 세무 안내 등 자유 기재)</label>
+                                <textarea id="inp-sim-taxNote" class="form-input" style="height:80px; resize:vertical; font-weight: 600; color: #b91c1c;">※ 전체 행사비용 세금계산서 발행 시, 당사 수익이 아닌 수탁경비(항공/숙박 등)까지 매출로 과대 계상되어 발생하는 세금 증가분을 보전하기 위해 소정의 기타비용이 추가 청구됨을 양해 부탁드립니다.</textarea>
                             </div>
                         </div>
 
@@ -772,7 +774,7 @@
                             <div class="sfn-label">불포함사항</div><div class="sfn-colon">:</div>
                             <div class="sfn-content" id="out-sim-exc"></div>
                         </div>
-                        <!-- 특이사항 (세금계산서 보전 등) 노출 영역 -->
+                        <!-- 특이사항 노출 영역 (조건 변경) -->
                         <div class="sfn-row" id="wrap-sim-taxNote" style="display:none; margin-top:8px; color:#b91c1c;">
                             <div class="sfn-label">특이사항</div><div class="sfn-colon">:</div>
                             <div class="sfn-content" id="out-sim-taxNote" style="font-weight:700; line-height: 1.4;"></div>
@@ -1764,7 +1766,8 @@ function renderSimple() {
     const wrapTaxNote = document.getElementById('wrap-sim-taxNote');
     const outTaxNote = document.getElementById('out-sim-taxNote');
 
-    if (taxNoteText && (vatOpt === 'auto' || vatOpt === 'manual' || extraFeeOpt === 'auto_50')) {
+    // 💡 조건 변경: 부가세 옵션에 상관없이 텍스트만 있으면 무조건 출력
+    if (taxNoteText) {
         wrapTaxNote.style.display = 'flex';
         outTaxNote.innerHTML = taxNoteText.replace(/\n/g, '<br>');
     } else {
