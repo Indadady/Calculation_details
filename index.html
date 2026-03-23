@@ -73,15 +73,22 @@
     .form-label { display:block; font-size:12px; font-weight:600; color:#475569; margin-bottom:6px; }
     .form-input, .form-select { width:100%; border:1px solid #cbd5e1; border-radius:6px; padding:8px 12px; font-size:13px; font-family:inherit; outline:none; transition:.2s; color:#1e293b; background:#fff; }
     .form-select { font-weight:700; color:#0f172a; cursor:pointer; }
-    .slot-card { background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:12px; margin-bottom:10px; position:relative; transition:all .2s; box-shadow:0 1px 2px rgba(0,0,0,.02); }
-    .slot-card:hover { border-color:#94a3b8; box-shadow:0 2px 4px rgba(0,0,0,.05); }
-    .slot-card-header { display:flex; justify-content:flex-end; margin-bottom:6px; }
+    
+    /* 드래그 앤 드롭 전용 스타일 */
+    .slot-card { background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:12px; margin-bottom:10px; position:relative; transition:box-shadow .2s, border-color .2s; box-shadow:0 1px 2px rgba(0,0,0,.02); cursor:grab; }
+    .slot-card:active { cursor:grabbing; }
+    .slot-card:hover { border-color:#94a3b8; box-shadow:0 4px 6px rgba(0,0,0,.05); }
+    .slot-card.dragging { opacity:0.6; background:#f8fafc; border:2px dashed #3b82f6; cursor:grabbing; box-shadow:0 10px 15px rgba(0,0,0,.1); z-index:50; }
+    .slot-card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding-bottom:6px; border-bottom:1px dashed #e2e8f0; }
+    .drag-handle { color:#94a3b8; font-size:12px; font-weight:700; display:flex; align-items:center; gap:4px; transition:.2s; user-select:none; }
+    .slot-card:hover .drag-handle { color:#475569; }
     .btn-delete-row { background:none; border:none; color:#94a3b8; font-size:16px; cursor:pointer; padding:0 4px; line-height:1; border-radius:4px; transition:.2s; }
     .btn-delete-row:hover { color:#ef4444; background:#fee2e2; }
+    
     .slot-grid { display:grid; grid-template-columns:3fr 3fr 2fr 4fr; gap:8px; margin-bottom:8px; }
     .slot-grid-flight { display:grid; grid-template-columns:3fr 4fr 2fr 3fr; gap:8px; margin-bottom:8px; }
     .slot-grid-simple { display:grid; grid-template-columns:3fr 4fr 3fr 2fr; gap:8px; margin-bottom:8px; }
-    .slot-input { width:100%; border:1px solid #e2e8f0; border-radius:6px; padding:8px 10px; font-size:12px; font-family:inherit; outline:none; background:#f8fafc; }
+    .slot-input { width:100%; border:1px solid #e2e8f0; border-radius:6px; padding:8px 10px; font-size:12px; font-family:inherit; outline:none; background:#f8fafc; cursor:text; }
     .slot-input.amount { font-weight:700; color:#0f172a; text-align:right; }
     .btn-add-item { width:100%; background:#fff; border:1px dashed #cbd5e1; color:#64748b; padding:10px; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; transition:all .2s; margin-top:4px; }
     .btn-add-item:hover { background:#f8fafc; border-color:#94a3b8; color:#1e293b; }
@@ -201,7 +208,7 @@
       <div class="template-manager">
         <div class="template-header">
           <span>견적 템플릿 보관함</span>
-          <button type="button" class="btn-clear" id="btn-clear-form">입력 초기화</button>
+          <button type="button" class="btn-clear" id="btn-clear-form">입력 초기화(새문서)</button>
         </div>
         <div class="template-controls">
           <input type="text" id="preset-search" class="template-search" placeholder="🔍 제목 검색...">
@@ -256,7 +263,7 @@
         </div>
         <div class="form-group">
           <div class="section-title green" id="title-local-expense">3. 해외현지 발생비용 (외화 입력)</div>
-          <p class="hint-text">연속된 항목명+내용이 같으면 출력물에서 셀이 자동 병합됩니다.</p>
+          <p class="hint-text">카드를 드래그 앤 드롭하여 순서를 변경할 수 있습니다. 연속된 항목명+내용이 같으면 표에서 자동 병합됩니다.</p>
           <div id="local-inputs-container"></div>
           <button type="button" class="btn-add-item" id="btn-add-local">+ 현지 발생비용 항목 추가</button>
         </div>
@@ -280,7 +287,9 @@
             <div><label class="form-label">출발일 코드 (Date of Departure)</label><input type="text" id="inp-sim-dep" class="form-input" value="TM_260519"></div>
             <div><label class="form-label">발행일 (Invoice Date)</label><input type="text" id="inp-sim-inv" class="form-input" value="2026년 03월 16일"></div>
           </div>
-          <div class="form-row cols-1"><div><label class="form-label">내용 (Subject)</label><input type="text" id="inp-sim-subject" class="form-input" value="260519_사북중학교 일본 오사카 연수"></div></div>
+          <div class="form-row cols-1">
+            <div><label class="form-label">내용 (Subject)</label><input type="text" id="inp-sim-subject" class="form-input" value="260519_사북중학교 일본 오사카 연수"></div>
+          </div>
         </div>
         <div class="form-group">
           <div class="section-title blue">2. 수신 / 발신 정보</div>
@@ -293,7 +302,7 @@
         </div>
         <div class="form-group">
           <div class="section-title green">3. 견적 항목 (원화 총액 기준)</div>
-          <p class="hint-text">일반 견적서 양식은 항목을 복잡하게 나누지 않고 핵심만 입력합니다.</p>
+          <p class="hint-text">일반 견적서 양식은 항목을 복잡하게 나누지 않고 핵심만 입력합니다. (카드를 드래그하여 순서 변경 가능)</p>
           <div id="simple-items-container"></div>
           <button type="button" class="btn-add-item" id="btn-add-simple">+ 견적 항목 추가</button>
         </div>
@@ -456,7 +465,6 @@
     { name: '국내진행', desc: '여행자보험, 공항수송, 운영관리비', qty: 1, krw: 6427000 }
   ];
   
-  // 보안 및 포맷팅 처리
   function escAttr(str='') { return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function parseCurrency(str) { return Number(String(str || '').replace(/,/g, '')) || 0; }
   function fmt(n) { return (n === 0 || n === '') ? '' : Number(n).toLocaleString('ko-KR'); } 
@@ -475,10 +483,12 @@
     const d = String(now.getDate()).padStart(2, '0');
     return type === 'korean' ? `${y}년 ${m}월 ${d}일` : `${y}.${m}.${d}`;
   }
+
   function setTodayDates() {
     $('#inp-issueDate').value = getFormattedDate('dot');
     $('#inp-sim-inv').value = getFormattedDate('korean');
   }
+
   function createCardHTML(type, data={}) {
     const map = {
       flight: { rootClass: 'flight-item', gridClass: 'slot-grid-flight', amountKey: 'krw', placeholders: ['항목','내용','수량','단가(₩)','비고'], fields: [['name','f-name'],['desc','f-desc'],['qty','f-qty'],['krw','f-krw'],['note','f-note']] },
@@ -488,7 +498,11 @@
     };
     const conf = map[type];
     const amountVal = conf.amountKey ? fmt(data[conf.amountKey]) : '';
-    const inputs = conf.fields.map(([key, cls], idx) => {
+    
+    // ★ V8.1 업데이트: 그리드 안에 들어갈 4개의 입력칸만 먼저 잘라냅니다. (중복 출력 방지)
+    const gridFields = type === 'simple' ? conf.fields : conf.fields.slice(0, 4);
+
+    const inputs = gridFields.map(([key, cls], idx) => {
       const value = key === conf.amountKey ? amountVal : (data[key] ?? '');
       const isQty = key === 'qty';
       const isAmount = key === conf.amountKey;
@@ -496,8 +510,17 @@
       const style = isQty ? 'text-align:center' : (isAmount ? 'text-align:right' : '');
       return `<input type="${inputType}" class="slot-input ${cls}${isAmount ? ' amount' : ''}" ${style ? `style="${style}"` : ''} value="${escAttr(value)}" placeholder="${conf.placeholders[idx]}">`;
     }).join('');
-    const noteField = type === 'simple' ? '' : `\n<input type="text" class="slot-input ${conf.fields[4][1]}" style="width:100%" value="${escAttr(data.note || '')}" placeholder="${conf.placeholders[4]}">`;
-    return `<div class="slot-card ${conf.rootClass}"><div class="slot-card-header"><button type="button" class="btn-delete-row js-delete-row">✕</button></div><div class="${conf.gridClass}">${inputs}</div>${noteField}</div>`;
+    
+    // ★ V8.1 업데이트: 비고란(5번째 항목)은 그리드 하단에 100% 꽉 차는 긴 칸으로 1번만 생성합니다.
+    const noteField = type === 'simple' ? '' : `\n<input type="text" class="slot-input ${conf.fields[4][1]}" style="width:100%; margin-top:4px; background-color:#fff;" value="${escAttr(data.note || '')}" placeholder="📝 ${conf.placeholders[4]}">`;
+    
+    return `<div class="slot-card ${conf.rootClass}" draggable="true">
+              <div class="slot-card-header">
+                <span class="drag-handle" title="이곳을 클릭하고 드래그하여 순서를 변경하세요">⠿ 순서 이동</span>
+                <button type="button" class="btn-delete-row js-delete-row" title="항목 삭제">✕</button>
+              </div>
+              <div class="${conf.gridClass}">${inputs}</div>${noteField}
+            </div>`;
   }
   function addRow(type, data={}, skipRender=false) {
     const targets = { flight:'#flight-inputs-container', local:'#local-inputs-container', domestic:'#domestic-inputs-container', simple:'#simple-items-container' };
@@ -594,7 +617,8 @@
   }
   function getFormData() {
     return {
-      currency: $('#inp-currency').value, clientName: $('#inp-clientName').value, docTitle: $('#inp-docTitle').value, travelDate: $('#inp-travelDate').value, paxStr: $('#inp-paxStr').value, issueDate: $('#inp-issueDate').value, exRate: parseCurrency($('#inp-exRate').value), detSpecialNote: $('#inp-det-specialNote').value,
+      currency: $('#inp-currency').value, 
+      clientName: $('#inp-clientName').value, docTitle: $('#inp-docTitle').value, travelDate: $('#inp-travelDate').value, paxStr: $('#inp-paxStr').value, issueDate: $('#inp-issueDate').value, exRate: parseCurrency($('#inp-exRate').value), detSpecialNote: $('#inp-det-specialNote').value,
       flights: getRowData('flight'), locals: getRowData('local'), domestics: getRowData('domestic'),
       simDep: $('#inp-sim-dep').value, simInv: $('#inp-sim-inv').value, simSubject: $('#inp-sim-subject').value, simToName: $('#inp-sim-toName').value, simToAddr: $('#inp-sim-toAddr').value, simToPerson: $('#inp-sim-toPerson').value, simBankName: $('#inp-sim-bankName').value, simBankNum: $('#inp-sim-bankNum').value, simBankHolder: $('#inp-sim-bankHolder').value, simDue: $('#inp-sim-due').value, simVat: $('#inp-sim-vat').value, simVatManual: parseCurrency($('#inp-sim-vat-manual').value), simExtraFee: $('#inp-sim-extraFee').value, simTaxNote: $('#inp-sim-taxNote').value, simInc: $('#inp-sim-inc').value, simExc: $('#inp-sim-exc').value, simples: getRowData('simple')
     };
@@ -631,7 +655,7 @@
     reader.readAsText(file); event.target.value = '';
   }
   function clearForm() {
-    if (!confirm('모든 데이터가 삭제되고 초기화됩니다.')) return;
+    if (!confirm('모든 데이터를 지우고 새 문서를 작성하시겠습니까?')) return;
     $$('input[type="text"], textarea').forEach(el => { if (el.id !== 'inp-sim-bankName' && el.id !== 'inp-sim-bankNum' && el.id !== 'inp-sim-bankHolder') el.value = ''; });
     $$('input[type="number"]').forEach(el => el.value = '');
     $('#flight-inputs-container').innerHTML = ''; $('#local-inputs-container').innerHTML = ''; $('#domestic-inputs-container').innerHTML = ''; $('#simple-items-container').innerHTML = '';
@@ -651,6 +675,7 @@
     $('#title-flight-area').innerText = isMainland ? '2. 교통비 영역 (원화 직접 입력)' : '2. 항공료 영역 (원화 직접 입력)';
     const localTitle = $('#title-local-expense');
     if (isMainland) localTitle.innerHTML = '3. 행사비용 (원화 직접 입력)'; else if (isJeju) localTitle.innerHTML = '3. 제주(현지) 발생비용 (원화 직접 입력)'; else localTitle.innerHTML = '3. 해외현지 발생비용 (외화 입력) <span style="font-size:12px;font-weight:400;color:#64748b;margin-left:8px;">*원화 자동 환산</span>';
+    
     $('#out-clientName').textContent = $('#inp-clientName').value; $('#out-docTitle').textContent = $('#inp-docTitle').value; $('#out-travelDate').textContent = $('#inp-travelDate').value; $('#out-paxStr').textContent = $('#inp-paxStr').value;
     $('#out-issueAndRate').textContent = isKRW ? `${$('#inp-issueDate').value} / 국내행사 (환율 미적용)` : `${$('#inp-issueDate').value} / ${currency} ${exRate} 기준(송금)`;
     const cN = currency === 'JPY' ? '엔화' : (currency === 'USD' ? '달러' : (isKRW ? '원화' : '위안화')); const cS = currency === 'USD' ? '$' : (isKRW ? '₩' : (currency === 'JPY' ? '¥' : '¥')); const col = isKRW ? 5 : 6;
@@ -767,7 +792,6 @@
     } else { window.print(); }
   }
 
-  // ★ V7 무결성 마스터: 외화 모드 시 원화단가 수정 금지 로직 추가 ★
   function downloadInteractiveHTML() {
     calculateAndRender();
     const warnings = validateRows();
@@ -793,7 +817,6 @@
     
     clone.querySelectorAll('.export-krw').forEach(el => { 
         const group = el.dataset.group || '';
-        // V7: 외화 모드일 때 '해외현지 발생비용(local)'의 원화 단가는 자동 계산되므로 완벽히 잠금 처리
         const isReadonly = (isForeign && group === 'local');
         const readonlyAttr = isReadonly ? 'readonly tabindex="-1" title="자동 환산 항목 (외화 단가 수정 시 자동 변경)"' : '';
         
@@ -820,7 +843,6 @@
     
     const sheetHtml = clone.outerHTML;
     
-    // V7 CSS 업데이트: readonly(잠김) 처리된 칸은 마우스를 올려도(hover) 파란색 테두리가 생기지 않도록 :not([readonly]) 추가 적용
     const styles = `body{background:#f1f5f9;display:flex;flex-direction:column;align-items:center;padding:40px 20px;font-family:'Pretendard','Malgun Gothic',sans-serif;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}.a4-sheet{background:#fff;width:100%;max-width:850px;padding:40px;box-shadow:0 10px 40px rgba(0,0,0,.1);border-radius:4px;margin-bottom:40px;position:relative}table{width:100%;border-collapse:collapse}th,td{border:1px solid #cbd5e1;padding:6px 8px;font-size:12px}th{background:#f8fafc;font-weight:bold;text-align:center;color:#0f172a}.text-center{text-align:center}.text-right{text-align:right}.font-bold{font-weight:bold}.bg-gray-50{background:#f8fafc}.bg-yellow-50{background:#fef9c3}.subtotal-row td{background:#f1f5f9;font-weight:bold;border-bottom:2px solid #cbd5e1}.grand-row td{background:#f8fafc;font-weight:bold;border-top:2px solid #0f172a}.doc-title-area{text-align:center;margin-bottom:24px}.doc-title-area h2{font-size:28px;border-bottom:3px solid #0f172a;display:inline-block;padding-bottom:6px;margin:0}.doc-title-area p{font-size:11px;color:#64748b;font-weight:700;letter-spacing:.25em;margin-top:6px;text-transform:uppercase}.doc-header{display:flex;justify-content:space-between;margin-bottom:24px}.doc-header-left{width:45%}.doc-header-right{width:40%;text-align:right}.doc-header-right img{height:28px}.info-table th{width:28%}.footer-notes{font-size:11px;color:#475569;padding-top:12px}.footer-notes p.title{font-size:12px;font-weight:700;margin-bottom:6px;color:#1e293b}.simple-header{text-align:center;margin-bottom:30px;margin-top:10px}.simple-header h1{font-size:36px;border-bottom:2px solid #000;display:inline-block;padding-bottom:10px;margin:0;letter-spacing:.8em;padding-left:.8em}.simple-info-grid{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;font-size:12px}.simple-info-left span{display:inline-block;width:130px;font-weight:600}.simple-info-right img{height:18px}.simple-sender-receiver{display:flex;justify-content:space-between;margin-bottom:24px;font-size:12px}.sr-box{width:48%;border-top:2px solid #000;border-bottom:2px solid #000;padding:12px 0;display:flex}.sr-label{width:60px;text-align:center;font-weight:800;background:#f8fafc;display:flex;align-items:center;justify-content:center;margin-right:12px;letter-spacing:2px}.sr-content{flex:1;line-height:1.8}.sr-content-row{display:flex;align-items:center}.sr-content-row span:first-child{width:15px;text-align:center}.sr-content-row span:last-child{flex:1;padding-left:5px}.sr-content-row.bold span:last-child{font-weight:800;font-size:14px}.stamp-overlap-container{position:relative;display:inline-flex;align-items:center;white-space:nowrap}.stamp-image{position:absolute;left:48px;bottom:-18px;width:68px;height:68px;object-fit:contain;mix-blend-mode:multiply;pointer-events:none;opacity:.85;transform:rotate(-4deg);z-index:10}.simple-subject{font-size:14px;font-weight:800;margin-bottom:16px;display:flex;color:#000}.simple-subject-label{width:120px;text-align:center;letter-spacing:2px}.simple-table{border:2px solid #000;margin-bottom:24px;color:#000}.simple-table th,.simple-table td{border:1px solid #000;padding:10px;font-size:12px}.simple-table th{background:#f8fafc;text-align:center;font-weight:800}.simple-table tbody tr{height:32px}.st-subtotal{text-align:right;font-weight:800;background:#f8fafc}.st-grandtotal{text-align:right;font-weight:900;font-size:15px;background:#f1f5f9}.simple-footer-bank{font-size:12px;line-height:1.8;margin-bottom:30px;color:#000}.simple-footer-bank p{margin:0;display:flex}.simple-footer-bank p span.label{display:inline-block;width:190px;font-weight:600}.simple-footer-bank p span.colon{display:inline-block;width:20px}.simple-footer-bank p span.val{font-weight:800}.highlight-bg{background-color:#fef08a;display:inline-block;padding:0 12px;min-width:200px;border-radius:2px}.simple-footer-notes{font-size:12px;line-height:1.6;display:flex;flex-direction:column;gap:10px;color:#000}.sfn-row{display:flex}.sfn-label{width:110px;text-align:center;font-weight:800}.sfn-colon{width:20px;text-align:center}.sfn-content{flex:1}.sfn-graybox{background:#e2e8f0;height:30px;width:100%;margin-top:24px;border-radius:4px}.footer-brand{text-align:center;margin-top:24px;border-top:1px solid #e2e8f0;padding-top:16px}.footer-brand p{font-size:11px;color:#64748b}.footer-brand a{display:inline-block;margin-top:8px;padding:6px 16px;border:1px solid #cbd5e1;border-radius:6px;color:#475569;text-decoration:none;font-size:11px;font-weight:700;transition:.2s}.footer-brand a:hover{background:#f1f5f9;color:#0f172a;border-color:#94a3b8}.pc-1 .doc-header{margin-bottom:16px}.pc-1 .doc-title-area h2{font-size:24px}.pc-1 .main-table th,.pc-1 .main-table td{padding:4px 6px;font-size:10.5px}.pc-1 .main-table tbody tr{height:26px}.panel-input-scroll::-webkit-scrollbar,.panel-preview::-webkit-scrollbar{width:6px}.panel-input-scroll::-webkit-scrollbar-track,.panel-preview::-webkit-scrollbar-track{background:#f8fafc}.panel-input-scroll::-webkit-scrollbar-thumb,.panel-preview::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}.panel-hidden{display:none !important}@media (max-width:1023px){.mobile-tabs{display:flex}.main-layout{flex-direction:column;height:auto;overflow:visible}.panel-input{width:100%;border-right:none;border-bottom:1px solid #e2e8f0;height:calc(100vh - 110px);padding:20px;display:block;overflow-y:auto}.panel-input-scroll{overflow-y:visible;padding-bottom:0}.live-summary-bar{position:relative;margin-top:20px;border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,.1)}.panel-preview{width:100%;padding:20px 0;overflow-x:scroll;overflow-y:visible;height:auto;min-height:0;display:block;-webkit-overflow-scrolling:touch}.a4-sheet{min-width:750px;width:750px;padding:24px;margin:0 12px}.slot-grid,.slot-grid-flight,.slot-grid-simple,.form-row.cols-2{grid-template-columns:1fr}}@media (max-width:480px){.top-header{padding:12px}.top-header img{height:26px}.top-header h1{font-size:13px}.panel-input{padding:16px;height:calc(100vh - 100px)}.a4-sheet{min-width:680px;width:680px;padding:20px}}@media print{*{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}body{background:#fff !important;margin:0 !important;padding:0 !important}.no-print,.top-header,.mobile-tabs,.panel-input{display:none !important}.main-layout{display:block !important;height:auto !important;overflow:visible !important}.panel-preview{background:#fff !important;padding:0 !important;overflow:visible !important;display:flex !important;justify-content:center !important;height:auto !important}.a4-sheet{box-shadow:none !important;max-width:100% !important;width:100% !important;min-width:0 !important;padding:5mm 8mm !important;margin:0 auto !important}.footer-brand a{display:none !important}@page{size:A4 portrait;margin:8mm}}.c-qty,.c-krw,.c-fgn{width:100%;border:1px solid transparent;background:transparent;font-family:inherit;font-size:inherit;color:inherit;font-weight:inherit;outline:none;transition:.2s;box-sizing:border-box}.c-tot{width:100%;border:none;background:transparent;font-family:inherit;font-size:inherit;color:inherit;font-weight:inherit;outline:none;text-align:right}.c-qty{text-align:center}.c-krw,.c-fgn{text-align:right}.c-qty:not([readonly]):hover,.c-krw:not([readonly]):hover,.c-fgn:not([readonly]):hover,.c-qty:not([readonly]):focus,.c-krw:not([readonly]):focus,.c-fgn:not([readonly]):focus{background:#e0f2fe;border:1px solid #93c5fd;border-radius:4px;box-shadow:inset 0 0 0 1px #93c5fd}input[readonly]{cursor:default}.editable-text{outline:none;border-radius:4px;transition:background .2s,box-shadow .2s;cursor:text;min-height:16px}.editable-text:hover,.editable-text:focus{background:#e0f2fe;box-shadow:inset 0 0 0 1px #93c5fd}.top-bar{background:#1e293b;color:#fff;width:100%;max-width:850px;padding:16px 24px;border-radius:8px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 6px rgba(0,0,0,.1)}.btn-print{background:#10b981;color:#fff;border:none;padding:10px 20px;border-radius:6px;font-weight:bold;cursor:pointer;font-size:14px}`;
     
     const exRate = parseCurrency($('#inp-exRate').value) || 1;
@@ -930,6 +952,55 @@
     a.href = url; a.download = fileName; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
   }
 
+  function initDragAndDrop() {
+    const containers = ['#flight-inputs-container', '#local-inputs-container', '#domestic-inputs-container', '#simple-items-container'];
+    
+    containers.forEach(selector => {
+      const container = $(selector);
+      
+      container.addEventListener('dragstart', e => {
+        const card = e.target.closest('.slot-card');
+        if(card) card.classList.add('dragging');
+      });
+      
+      container.addEventListener('dragend', e => {
+        const card = e.target.closest('.slot-card');
+        if(card) {
+          card.classList.remove('dragging');
+          calculateAndRender();
+          scheduleValidation();
+        }
+      });
+      
+      container.addEventListener('dragover', e => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(container, e.clientY);
+        const draggable = $('.dragging');
+        if(draggable) {
+          if (afterElement == null) {
+            container.appendChild(draggable);
+          } else {
+            container.insertBefore(draggable, afterElement);
+          }
+        }
+      });
+    });
+  }
+
+  function getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll('.slot-card:not(.dragging)')];
+    
+    return draggableElements.reduce((closest, child) => {
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+      if (offset < 0 && offset > closest.offset) {
+        return { offset: offset, element: child };
+      } else {
+        return closest;
+      }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+  }
+
   function bindEvents() {
     document.addEventListener('input', e => {
       if (e.target.classList.contains('amount')) e.target.value = formatCurrencyValue(e.target.value);
@@ -960,8 +1031,16 @@
     $('#tabInput').addEventListener('click', () => switchTab('input'));
     $('#tabPreview').addEventListener('click', () => switchTab('preview'));
   }
+
   document.addEventListener('DOMContentLoaded', () => {
-    setTodayDates(); buildInitialInputs(); bindEvents(); updatePresetDropdown(); toggleDocMode(); calculateAndRender(); scheduleValidation();
+    setTodayDates(); 
+    buildInitialInputs(); 
+    bindEvents(); 
+    initDragAndDrop(); 
+    updatePresetDropdown(); 
+    toggleDocMode(); 
+    calculateAndRender(); 
+    scheduleValidation();
   });
 })();
 </script>
