@@ -729,7 +729,10 @@
     
     const specialNote = escAttr($('#inp-det-specialNote').value.trim()); 
     const ex = isMainland ? '(교통비 제외)' : '(항공료 제외)';
-    let totalHtml = `<tr class="grand-row"><td colspan="${col}" class="text-center grand-label" style="font-size:12px">(1)+(2)+(3) 전체 합계 금액</td><td class="text-right grand-amount" id="grand-1">₩${fmtT(grandTotal)}</td><td></td></tr><tr class="grand-row ${specialNote ? '' : 'grand-row-last'}"><td colspan="${col}" class="text-center grand-label" style="font-size:12px">(2)+(3) 행사 비용 합계 <span style="font-size:10px;font-weight:400;color:#64748b">${ex}</span></td><td class="text-right grand-amount" id="grand-2" style="color:#b91c1c">₩${fmtT(eventOnly)}</td><td></td></tr>`;
+    
+    /* [업데이트 내역] : (1)+(2)+(3) 전체 합계 금액 텍스트와 금액에 빨간색( #b91c1c )을 적용하고, (2)+(3) 행사 비용 합계는 검은색으로 변경했습니다. */
+    let totalHtml = `<tr class="grand-row"><td colspan="${col}" class="text-center grand-label" style="font-size:12px; color:#b91c1c;">(1)+(2)+(3) 전체 합계 금액</td><td class="text-right grand-amount" id="grand-1" style="color:#b91c1c;">₩${fmtT(grandTotal)}</td><td></td></tr><tr class="grand-row ${specialNote ? '' : 'grand-row-last'}"><td colspan="${col}" class="text-center grand-label" style="font-size:12px">(2)+(3) 행사 비용 합계 <span style="font-size:10px;font-weight:400;color:#64748b">${ex}</span></td><td class="text-right grand-amount" id="grand-2">₩${fmtT(eventOnly)}</td><td></td></tr>`;
+    
     if (specialNote) totalHtml += `<tr class="grand-row grand-row-last"><td class="text-center font-bold bg-yellow-50 export-text" style="color:#b91c1c;">특이사항</td><td colspan="${col + 1}" style="font-weight:700; color:#b91c1c; padding:10px; line-height:1.5;" class="export-text">${specialNote.replace(/\n/g, '<br>')}</td></tr>`;
     $('#tbody-total').innerHTML = totalHtml; $('#live-total-amount').textContent = `₩ ${fmtT(grandTotal)}`;
   }
