@@ -466,16 +466,27 @@
   ];
   
   function escAttr(str='') { return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  function parseCurrency(str) { return Number(String(str || '').replace(/,/g, '')) || 0; }
+  
+  // [업데이트] 기납금 차감을 위한 마이너스(-) 입력 허용
+  function parseCurrency(str) { 
+    const val = String(str || '').replace(/,/g, '').trim();
+    if (val === '-' || val === '') return 0;
+    return Number(val) || 0; 
+  }
   function fmt(n) { return (n === 0 || n === '') ? '' : Number(n).toLocaleString('ko-KR'); } 
   function fmtT(n) { return Number(n || 0).toLocaleString('ko-KR'); }
+  
+  // [업데이트] 기납금 차감을 위한 마이너스(-) 기호 보존 로직
   function formatCurrencyValue(val) {
-    const sanitized = String(val ?? '').replace(/[^0-9.]/g, '');
-    if (!sanitized) return '';
+    const str = String(val ?? '');
+    const isNegative = str.trim().startsWith('-');
+    const sanitized = str.replace(/[^0-9.]/g, '');
+    if (!sanitized) return isNegative ? '-' : '';
     const parts = sanitized.split('.');
     parts[0] = Number(parts[0] || 0).toLocaleString('ko-KR');
-    return parts.join('.');
+    return (isNegative ? '-' : '') + parts.join('.');
   }
+  
   function getFormattedDate(type) {
     const now = new Date();
     const y = now.getFullYear();
@@ -499,7 +510,6 @@
     const conf = map[type];
     const amountVal = conf.amountKey ? fmt(data[conf.amountKey]) : '';
     
-    // ★ V8.1 업데이트: 그리드 안에 들어갈 4개의 입력칸만 먼저 잘라냅니다. (중복 출력 방지)
     const gridFields = type === 'simple' ? conf.fields : conf.fields.slice(0, 4);
 
     const inputs = gridFields.map(([key, cls], idx) => {
@@ -511,7 +521,6 @@
       return `<input type="${inputType}" class="slot-input ${cls}${isAmount ? ' amount' : ''}" ${style ? `style="${style}"` : ''} value="${escAttr(value)}" placeholder="${conf.placeholders[idx]}">`;
     }).join('');
     
-    // ★ V8.1 업데이트: 비고란(5번째 항목)은 그리드 하단에 100% 꽉 차는 긴 칸으로 1번만 생성합니다.
     const noteField = type === 'simple' ? '' : `\n<input type="text" class="slot-input ${conf.fields[4][1]}" style="width:100%; margin-top:4px; background-color:#fff;" value="${escAttr(data.note || '')}" placeholder="📝 ${conf.placeholders[4]}">`;
     
     return `<div class="slot-card ${conf.rootClass}" draggable="true">
@@ -730,7 +739,6 @@
     const specialNote = escAttr($('#inp-det-specialNote').value.trim()); 
     const ex = isMainland ? '(교통비 제외)' : '(항공료 제외)';
     
-    /* [업데이트 내역] : (1)+(2)+(3) 전체 합계 금액 텍스트와 금액에 빨간색( #b91c1c )을 적용하고, (2)+(3) 행사 비용 합계는 검은색으로 변경했습니다. */
     let totalHtml = `<tr class="grand-row"><td colspan="${col}" class="text-center grand-label" style="font-size:12px; color:#b91c1c;">(1)+(2)+(3) 전체 합계 금액</td><td class="text-right grand-amount" id="grand-1" style="color:#b91c1c;">₩${fmtT(grandTotal)}</td><td></td></tr><tr class="grand-row ${specialNote ? '' : 'grand-row-last'}"><td colspan="${col}" class="text-center grand-label" style="font-size:12px">(2)+(3) 행사 비용 합계 <span style="font-size:10px;font-weight:400;color:#64748b">${ex}</span></td><td class="text-right grand-amount" id="grand-2">₩${fmtT(eventOnly)}</td><td></td></tr>`;
     
     if (specialNote) totalHtml += `<tr class="grand-row grand-row-last"><td class="text-center font-bold bg-yellow-50 export-text" style="color:#b91c1c;">특이사항</td><td colspan="${col + 1}" style="font-weight:700; color:#b91c1c; padding:10px; line-height:1.5;" class="export-text">${specialNote.replace(/\n/g, '<br>')}</td></tr>`;
@@ -859,6 +867,7 @@
         topBarSubText = `적용 환율: ${exRate}`;
     }
 
+    // [업데이트] 내보낸 문서 내부 로직에도 마이너스(-) 입력 예외 처리 추가
     const scriptLogic = `
       const EX_RATE = ${isForeign ? exRate : 1};
       const VAT_TYPE = '${vatType}';
@@ -866,8 +875,9 @@
 
       function parse(v){ return Number(String(v).replace(/[^0-9.-]/g,''))||0; }
       function formatCurrency(v){
+          const str = String(v).trim();
+          if(str === '' || str === '-') return str;
           const n = parse(v);
-          if(String(v).trim() === '') return '';
           return n.toLocaleString('ko-KR');
       }
 
