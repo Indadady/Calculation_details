@@ -317,6 +317,16 @@
             <div class="form-row cols-1" style="margin-bottom:0;"><div><label class="form-label">계좌번호 (Bank Account)</label><input type="text" id="inp-sim-bankNum" class="form-input" value="131-022-382094"></div></div>
           </div>
           <div class="form-row cols-2"><div><label class="form-label">입금 기한 (By Due)</label><input type="text" id="inp-sim-due" class="form-input" value="행사 출발 전 완납"></div></div>
+          
+          <!-- 기납금 입력란 신설 -->
+          <div class="form-row cols-1" style="background:#eff6ff; padding:12px; border:1px dashed #3b82f6; border-radius:6px; margin-top:8px;">
+            <div>
+              <label class="form-label" style="color:#1d4ed8; font-size:13px;">💰 기납금 (선입금/계약금) 차감액</label>
+              <input type="text" id="inp-sim-deposit" class="form-input amount" style="border-color:#93c5fd; font-weight:800; color:#1d4ed8;" placeholder="받으신 금액을 양수로 입력하세요 (미입력 시 출력 안됨)">
+              <p style="font-size:11px; color:#3b82f6; margin-top:6px; margin-bottom:0; line-height:1.4;">입력된 금액은 견적서 하단에 파란색 큰 글씨로 명시되며, 총 견적금액에서 차감되어 <strong>최종 청구 잔금</strong>이 자동 산출됩니다.</p>
+            </div>
+          </div>
+
           <div class="form-row cols-1" style="background:#fff1f2; padding:12px; border:1px dashed #fca5a5; border-radius:6px; margin-top:8px;">
             <div>
               <label class="form-label" style="color:#be123c;">부가세 (VAT) 표시</label>
@@ -467,7 +477,6 @@
   
   function escAttr(str='') { return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   
-  // [업데이트] 기납금 차감을 위한 마이너스(-) 입력 허용
   function parseCurrency(str) { 
     const val = String(str || '').replace(/,/g, '').trim();
     if (val === '-' || val === '') return 0;
@@ -476,7 +485,6 @@
   function fmt(n) { return (n === 0 || n === '') ? '' : Number(n).toLocaleString('ko-KR'); } 
   function fmtT(n) { return Number(n || 0).toLocaleString('ko-KR'); }
   
-  // [업데이트] 기납금 차감을 위한 마이너스(-) 기호 보존 로직
   function formatCurrencyValue(val) {
     const str = String(val ?? '');
     const isNegative = str.trim().startsWith('-');
@@ -629,7 +637,9 @@
       currency: $('#inp-currency').value, 
       clientName: $('#inp-clientName').value, docTitle: $('#inp-docTitle').value, travelDate: $('#inp-travelDate').value, paxStr: $('#inp-paxStr').value, issueDate: $('#inp-issueDate').value, exRate: parseCurrency($('#inp-exRate').value), detSpecialNote: $('#inp-det-specialNote').value,
       flights: getRowData('flight'), locals: getRowData('local'), domestics: getRowData('domestic'),
-      simDep: $('#inp-sim-dep').value, simInv: $('#inp-sim-inv').value, simSubject: $('#inp-sim-subject').value, simToName: $('#inp-sim-toName').value, simToAddr: $('#inp-sim-toAddr').value, simToPerson: $('#inp-sim-toPerson').value, simBankName: $('#inp-sim-bankName').value, simBankNum: $('#inp-sim-bankNum').value, simBankHolder: $('#inp-sim-bankHolder').value, simDue: $('#inp-sim-due').value, simVat: $('#inp-sim-vat').value, simVatManual: parseCurrency($('#inp-sim-vat-manual').value), simExtraFee: $('#inp-sim-extraFee').value, simTaxNote: $('#inp-sim-taxNote').value, simInc: $('#inp-sim-inc').value, simExc: $('#inp-sim-exc').value, simples: getRowData('simple')
+      simDep: $('#inp-sim-dep').value, simInv: $('#inp-sim-inv').value, simSubject: $('#inp-sim-subject').value, simToName: $('#inp-sim-toName').value, simToAddr: $('#inp-sim-toAddr').value, simToPerson: $('#inp-sim-toPerson').value, simBankName: $('#inp-sim-bankName').value, simBankNum: $('#inp-sim-bankNum').value, simBankHolder: $('#inp-sim-bankHolder').value, simDue: $('#inp-sim-due').value, simVat: $('#inp-sim-vat').value, simVatManual: parseCurrency($('#inp-sim-vat-manual').value), simExtraFee: $('#inp-sim-extraFee').value, simTaxNote: $('#inp-sim-taxNote').value, simInc: $('#inp-sim-inc').value, simExc: $('#inp-sim-exc').value, 
+      simples: getRowData('simple'),
+      simDeposit: parseCurrency($('#inp-sim-deposit').value) // 새로 추가된 기납금 필드
     };
   }
   function setFormData(data) {
@@ -638,6 +648,7 @@
     $('#flight-inputs-container').innerHTML = ''; $('#local-inputs-container').innerHTML = ''; $('#domestic-inputs-container').innerHTML = ''; $('#simple-items-container').innerHTML = '';
     (data.flights || []).forEach(item => addRow('flight', item, true)); (data.locals || []).forEach(item => addRow('local', item, true)); (data.domestics || []).forEach(item => addRow('domestic', item, true));
     $('#inp-sim-dep').value = data.simDep || ''; $('#inp-sim-inv').value = data.simInv || getFormattedDate('korean'); $('#inp-sim-subject').value = data.simSubject || ''; $('#inp-sim-toName').value = data.simToName || ''; $('#inp-sim-toAddr').value = data.simToAddr || ''; $('#inp-sim-toPerson').value = data.simToPerson || ''; $('#inp-sim-bankName').value = data.simBankName || '신협'; $('#inp-sim-bankNum').value = data.simBankNum || '131-022-382094'; $('#inp-sim-bankHolder').value = data.simBankHolder || '주식회사 투어메이커'; $('#inp-sim-due').value = data.simDue || ''; $('#inp-sim-vat').value = data.simVat || 'auto'; $('#inp-sim-vat-manual').value = data.simVatManual ? fmt(data.simVatManual) : ''; $('#inp-sim-extraFee').value = data.simExtraFee || '0'; $('#inp-sim-taxNote').value = data.simTaxNote ?? ''; $('#inp-sim-inc').value = data.simInc || ''; $('#inp-sim-exc').value = data.simExc || '';
+    $('#inp-sim-deposit').value = data.simDeposit ? fmt(data.simDeposit) : ''; // 새로 추가된 기납금
     (data.simples || []).forEach(item => addRow('simple', item, true));
     toggleVatManual(); syncCurrencyUI(); calculateAndRender(); renderWarnings();
   }
@@ -673,6 +684,7 @@
     $('#inp-currency').value = 'JPY';
     $('#inp-sim-vat').value = 'auto';
     $('#inp-sim-extraFee').value = '0';
+    $('#inp-sim-deposit').value = '';
     
     addRow('flight', {}, true); addRow('local', {}, true); addRow('domestic', {}, true); addRow('simple', {}, true);
     setTodayDates(); calculateAndRender(); renderWarnings(); toggleDocMode();
@@ -744,6 +756,7 @@
     if (specialNote) totalHtml += `<tr class="grand-row grand-row-last"><td class="text-center font-bold bg-yellow-50 export-text" style="color:#b91c1c;">특이사항</td><td colspan="${col + 1}" style="font-weight:700; color:#b91c1c; padding:10px; line-height:1.5;" class="export-text">${specialNote.replace(/\n/g, '<br>')}</td></tr>`;
     $('#tbody-total').innerHTML = totalHtml; $('#live-total-amount').textContent = `₩ ${fmtT(grandTotal)}`;
   }
+  
   function renderSimple() {
     $('#out-sim-dep').textContent = $('#inp-sim-dep').value; $('#out-sim-inv').textContent = $('#inp-sim-inv').value; $('#out-sim-subject').textContent = $('#inp-sim-subject').value; $('#out-sim-toName').textContent = $('#inp-sim-toName').value; $('#out-sim-toAddr').textContent = $('#inp-sim-toAddr').value; $('#out-sim-toPerson').textContent = $('#inp-sim-toPerson').value; $('#out-sim-bankName').textContent = $('#inp-sim-bankName').value; $('#out-sim-bankNum').textContent = $('#inp-sim-bankNum').value; $('#out-sim-bankHolder').textContent = $('#inp-sim-bankHolder').value; $('#out-sim-due').textContent = $('#inp-sim-due').value; 
     
@@ -757,29 +770,47 @@
       else h += '<tr><td class="export-text"></td><td class="export-text"></td><td></td><td></td><td></td></tr>';
     }
     h += `<tr class="st-subtotal"><td colspan="4">Sub Total (KRW)</td><td><span id="st-sub">${fmtT(subTotal)}</span></td></tr>`;
+    
     const vatOpt = $('#inp-sim-vat').value; let vatVal = 0; let vatLabel = '부가세 불포함';
     if (vatOpt === 'auto') { vatVal = Math.floor(subTotal * 0.1); vatLabel = '부가세 (10%)'; } else if (vatOpt === 'manual') { vatVal = parseCurrency($('#inp-sim-vat-manual').value) || 0; vatLabel = '부가세 (부분 과세)'; }
     h += `<tr><td class="text-center export-text">부가세</td><td class="text-center export-text">${vatLabel}</td><td class="text-right">${fmt(vatVal)}</td><td class="text-center">1</td><td class="text-right export-tot" id="st-vat">${fmt(vatVal)}</td></tr>`;
+    
     let extraVal = 0;
     if ($('#inp-sim-extraFee').value === 'auto_50' && vatVal > 0) {
       extraVal = Math.floor(vatVal * 0.5);
       h += `<tr><td class="text-center export-text" style="color:#b91c1c; font-weight:bold;">기타비용</td><td class="text-center export-text" style="color:#b91c1c;">종합과세에 따른 세금 보전분</td><td class="text-right" style="color:#b91c1c;">${fmt(extraVal)}</td><td class="text-center" style="color:#b91c1c;">1</td><td class="text-right export-tot" id="st-extra" style="color:#b91c1c; font-weight:bold;">${fmt(extraVal)}</td></tr>`;
     }
+    
     const grandTotal = subTotal + vatVal + extraVal;
-    h += `<tr class="st-grandtotal"><td colspan="4">Grand Total (KRW)</td><td><span id="st-grand">${fmtT(grandTotal)}</span></td></tr>`;
+    
+    // 기납금 산출 및 표시 로직
+    const deposit = parseCurrency($('#inp-sim-deposit').value) || 0;
+    
+    if (deposit > 0) {
+      h += `<tr class="st-grandtotal"><td colspan="4">Total Amount (총 견적 금액)</td><td><span id="st-grand">${fmtT(grandTotal)}</span></td></tr>`;
+      h += `<tr><td colspan="4" class="text-right" style="font-weight:900; color:#2563eb; font-size:14px; background:#eff6ff;">(-) 기납금 / 예약금 (Deposit Paid)</td><td class="text-right" style="background:#eff6ff;"><span class="export-deposit" style="color:#2563eb; font-weight:900; font-size:16px;">- ${fmtT(deposit)}</span></td></tr>`;
+      h += `<tr><td colspan="4" class="text-right" style="font-weight:900; color:#e11d48; font-size:15px; background:#fff1f2;">(=) 최종 청구 잔금 (Balance Due)</td><td class="text-right" style="background:#fff1f2;"><span id="st-balance" style="color:#e11d48; font-weight:900; font-size:18px;">${fmtT(grandTotal - deposit)}</span></td></tr>`;
+      $('#live-total-amount').textContent = `잔금 ₩ ${fmtT(grandTotal - deposit)}`;
+    } else {
+      h += `<tr class="st-grandtotal"><td colspan="4">Grand Total (KRW)</td><td><span id="st-grand">${fmtT(grandTotal)}</span></td></tr>`;
+      $('#live-total-amount').textContent = `₩ ${fmtT(grandTotal)}`;
+    }
+    
     $('#tbody-simple').innerHTML = h; 
     
     const taxNoteText = escAttr($('#inp-sim-taxNote').value.trim()); 
     $('#wrap-sim-taxNote').style.display = taxNoteText ? 'flex' : 'none'; 
     $('#out-sim-taxNote').innerHTML = taxNoteText.replace(/\n/g, '<br>'); 
-    $('#live-total-amount').textContent = `₩ ${fmtT(grandTotal)}`;
   }
+  
   function calculateAndRender() { ($('#inp-currency').value === 'SIMPLE_QUOTE') ? renderSimple() : renderDetailed(); }
+  
   function switchTab(tab) {
     const input = $('#panelInput'); const preview = $('#panelPreview');
     if (tab === 'input') { input.classList.remove('panel-hidden'); preview.classList.add('panel-hidden'); $('#tabInput').classList.add('active'); $('#tabPreview').classList.remove('active'); } 
     else { calculateAndRender(); input.classList.add('panel-hidden'); preview.classList.remove('panel-hidden'); $('#tabInput').classList.remove('active'); $('#tabPreview').classList.add('active'); $('#panelPreview').scrollLeft = 0; window.scrollTo(0,0); }
   }
+  
   function printPDF() {
     const warnings = renderWarnings();
     if (warnings.length) {
@@ -842,6 +873,13 @@
         el.classList.remove('export-tot'); 
     });
     
+    // 내보낸 HTML 내에서도 기납금 편집이 가능하도록 인풋 요소로 변환
+    clone.querySelectorAll('.export-deposit').forEach(el => { 
+        const valOnly = el.textContent.replace(/[^0-9]/g, '');
+        el.innerHTML = `<input type="text" class="c-deposit" value="${fmt(valOnly)}" style="width:100%; text-align:right; font-weight:900; font-size:16px; color:#2563eb; background:transparent; border:none; outline:none;" placeholder="입금액 변경">`; 
+        el.classList.remove('export-deposit'); 
+    });
+    
     clone.querySelectorAll('.export-fgn').forEach(el => { 
         el.outerHTML = `<input type="text" class="c-fgn" value="${el.textContent}" style="width:calc(100% - 14px);background:transparent;border:1px solid transparent;font-family:inherit;font-size:inherit;text-align:right;outline:none;transition:.2s;box-sizing:border-box;">`; 
     });
@@ -867,7 +905,6 @@
         topBarSubText = `적용 환율: ${exRate}`;
     }
 
-    // [업데이트] 내보낸 문서 내부 로직에도 마이너스(-) 입력 예외 처리 추가
     const scriptLogic = `
       const EX_RATE = ${isForeign ? exRate : 1};
       const VAT_TYPE = '${vatType}';
@@ -894,6 +931,8 @@
                 }
             }
             recalcAll();
+        } else if (t.classList.contains('c-deposit')) {
+            recalcAll();
         }
       });
 
@@ -913,7 +952,7 @@
              }
              recalcAll();
              t.value = formatCurrency(t.value);
-         } else if(t.classList.contains('c-krw') || t.classList.contains('c-qty')) {
+         } else if(t.classList.contains('c-krw') || t.classList.contains('c-qty') || t.classList.contains('c-deposit')) {
              if(t.value) t.value = formatCurrency(t.value);
          }
       });
@@ -950,9 +989,18 @@
                 if(extraEl.tagName === 'INPUT') extraEl.value = formatCurrency(extraVal);
                 else extraEl.textContent = formatCurrency(extraVal);
             }
-
+            
+            const grandTotal = subTotal + vatVal + extraVal;
             const stGrand = document.getElementById('st-grand');
-            if(stGrand) stGrand.textContent = formatCurrency(subTotal + vatVal + extraVal);
+            if(stGrand) stGrand.textContent = formatCurrency(grandTotal);
+
+            // 기납금 및 잔금 재계산
+            const depositEl = document.querySelector('.c-deposit');
+            if (depositEl) {
+                let depositVal = parse(depositEl.value);
+                const stBalance = document.getElementById('st-balance');
+                if (stBalance) stBalance.textContent = formatCurrency(grandTotal - depositVal);
+            }
         }
       }
     `;
