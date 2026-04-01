@@ -176,13 +176,13 @@
       html, body { width: 100% !important; background:#fff !important; margin:0 !important; padding:0 !important; }
       .no-print, .top-header, .mobile-tabs, .panel-input { display:none !important; }
       .main-layout { display:block !important; height:auto !important; overflow:visible !important; }
-      .panel-preview { background:#fff !important; padding:0 !important; overflow:visible !important; display:block !important; height:auto !important; width: 100% !important; margin: 0 auto !important; }
-      .a4-sheet { box-shadow:none !important; max-width:100% !important; width:100% !important; min-width:0 !important; padding:0 !important; margin:0 auto !important; border:none !important; overflow: hidden !important; page-break-inside: avoid; }
+      .panel-preview { background:#fff !important; padding:0 !important; overflow:visible !important; display:block !important; height:auto !important; width: 100% !important; margin: 0 !important; }
+      .a4-sheet { box-shadow:none !important; max-width:100% !important; width:100% !important; min-width:0 !important; padding:0 !important; margin:0 !important; border:none !important; overflow: hidden !important; page-break-inside: avoid; }
       .main-table, .info-table, .simple-table { table-layout: fixed !important; width: 100% !important; word-break: break-all !important; overflow: hidden !important; }
       .main-table th, .main-table td, .simple-table th, .simple-table td { overflow: hidden !important; text-overflow: ellipsis !important; white-space: normal !important; word-break: break-all !important; }
       .footer-brand a { display:none !important; }
       .stamp-image { position: absolute !important; left: 48px !important; bottom: -18px !important; }
-      @page { size:A4 portrait; margin:15mm auto; }
+      @page { size:A4 portrait; margin:15mm; }
     }
   </style>
 </head>
@@ -930,10 +930,10 @@
         html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; display: block !important; width: 100% !important; }
         .no-print, .top-bar { display: none !important; }
         /* 인쇄 시 패딩 충돌을 방지하고 물리적 여백에 맞게 리셋 */
-        .a4-sheet { box-shadow: none !important; max-width: 100% !important; width: 100% !important; padding: 0 !important; margin: 0 auto !important; border:none !important; overflow: hidden !important; page-break-inside: avoid; }
+        .a4-sheet { box-shadow: none !important; max-width: 100% !important; width: 100% !important; padding: 0 !important; margin: 0 !important; border:none !important; overflow: hidden !important; page-break-inside: avoid; }
         table { table-layout: fixed !important; width: 100% !important; word-break: break-all !important; overflow: hidden !important; }
         th, td { overflow: hidden !important; text-overflow: ellipsis !important; white-space: normal !important; word-break: break-all !important; }
-        @page { size: A4 portrait; margin: 15mm auto; }
+        @page { size: A4 portrait; margin: 15mm; }
       }
     `;
     
