@@ -6,7 +6,7 @@
   <title>고객 제출용 가격 산출 내역서 - TOURMAKER</title>
   <meta property="og:title" content="투어메이커 가격 산출 내역서">
   <meta property="og:description" content="고객 제출용 공식 행사비 산출 내역서 (국내/해외 통합)">
-  <meta property="og:image" content="https://blogger.googleusercontent.com/img/a/AVvXsEitI-Z-hD82keOJ1AqHw-VTZjpw2U-O5UjtV9h3zblyG0wjsVfBWe9X9o0Q_Spctrt7krkd9qXO0xKTmGJLw4gyMZrRqpshKMFttnyx6OcC8-IGz3XLUZpGQOnRqVdol8jz5HuoDLqsEifnVRhcjUJHm13Sz8JrX9aPswMNUwZPvGtJEnQjhc2PiXlo-B8">
+  <meta property="og:image" content="https://blogger.googleusercontent.com/img/a/AVvXsEjQVWjqNlaxb98AP-qG4LHAIN9gK9sn4cGowBArA_-DUz0rxQycXrr3vFhvUqMM9Pa5tP2cDBxqBzW_re-HqzVLVAngEO8FAORbaQ36ANr0BULZ_q2PBFdDbEUJhQqr7LCGGuXO1snQ-bYx5SdFP1GZllmKNTxYv66H8E7zYyvQLsq3jour2LNjQ4PyAbo">
   <meta property="og:type" content="website">
   <!-- GA4 Tracking Code -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-JLH9GD9SVR"></script>
@@ -148,12 +148,14 @@
     .footer-brand p { font-size:11px; color:#64748b; }
     .footer-brand a { display:inline-block; margin-top:8px; padding:6px 16px; border:1px solid #cbd5e1; border-radius:6px; color:#475569; text-decoration:none; font-size:11px; font-weight:700; transition:.2s; }
     .footer-brand a:hover { background:#f1f5f9; color:#0f172a; border-color:#94a3b8; }
-    .pc-1 .doc-header { margin-bottom:16px; } .pc-1 .doc-title-area h2 { font-size:24px; } .pc-1 .main-table th, .pc-1 .main-table td { padding:4px 6px; font-size:10.5px; } .pc-1 .main-table tbody tr { height:26px; }
+    .pc-1 .main-table tbody tr { height:26px; }
     .panel-input-scroll::-webkit-scrollbar, .panel-preview::-webkit-scrollbar { width:6px; }
     .panel-input-scroll::-webkit-scrollbar-track, .panel-preview::-webkit-scrollbar-track { background:#f8fafc; }
     .panel-input-scroll::-webkit-scrollbar-thumb, .panel-preview::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:4px; }
-    .panel-hidden { display:none !important; }
+    
+    /* 모바일 환경(1023px 이하)에서만 숨김 클래스와 스택 구조가 적용되도록 수정 완료 */
     @media (max-width:1023px) {
+      .panel-hidden { display:none !important; }
       .mobile-tabs { display:flex; }
       .main-layout { flex-direction:column; height:auto; overflow:visible; }
       .panel-input { width:100%; border-right:none; border-bottom:1px solid #e2e8f0; height:calc(100vh - 110px); padding:20px; display:block; overflow-y:auto; }
@@ -163,6 +165,7 @@
       .a4-sheet { min-width:750px; width:750px; padding:24px; margin:0 12px; }
       .slot-grid, .slot-grid-flight, .slot-grid-simple, .form-row.cols-2 { grid-template-columns:1fr; }
     }
+    
     @media (max-width:480px) {
       .top-header { padding:12px; }
       .top-header img { height:26px; }
@@ -170,6 +173,7 @@
       .panel-input { padding:16px; height:calc(100vh - 100px); }
       .a4-sheet { min-width:680px; width:680px; padding:20px; }
     }
+    
     /* 본 페이지 자체의 인쇄 여백 최적화 */
     @media print {
       *, *::before, *::after { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box !important; }
@@ -235,6 +239,8 @@
           <optgroup label="[가격 산출 내역서]">
             <option value="JPY" selected>해외행사 - JPY (엔화)</option>
             <option value="USD">해외행사 - USD (달러)</option>
+            <!-- 호주 달러 추가 완료 -->
+            <option value="AUD">해외행사 - AUD (호주달러)</option>
             <option value="CNY">해외행사 - CNY (위안화)</option>
             <option value="KRW_JEJU">국내행사 - 제주 (KRW)</option>
             <option value="KRW_MAINLAND">국내행사 - 내륙 (KRW)</option>
@@ -584,7 +590,8 @@
     $$('.error-border').forEach(el => el.classList.remove('error-border')); $$('.error-row-container').forEach(el => el.classList.remove('error-row-container'));
     if (mode === 'detailed') {
       const basePax = extractBasePax(); const exRateInput = $('#inp-exRate'); const exRate = parseCurrency(exRateInput.value);
-      const ranges = { JPY:[5,20], USD:[1000,2000], CNY:[100,300] };
+      // AUD(호주 달러) 환율 경고 범위(800~1200) 추가
+      const ranges = { JPY:[5,20], USD:[1000,2000], CNY:[100,300], AUD:[800,1200] };
       if (ranges[currencyVal]) {
         const [min, max] = ranges[currencyVal];
         if (exRate < min || exRate > max) { warnings.push({ msg:`환율 경고: ${currencyVal} 환율(${exRate})이 일반적인 범위를 벗어났습니다.`, targetId:'wrap-exRate' }); exRateInput.classList.add('error-border'); }
@@ -657,28 +664,168 @@
     (data.simples || []).forEach(item => addRow('simple', item, true));
     toggleVatManual(); syncCurrencyUI(); calculateAndRender(); renderWarnings();
   }
+
+  function safeJsonParse(text, fallback = {}) {
+    try {
+      if (typeof text !== 'string') return fallback;
+      const normalized = text.replace(/^\uFEFF/, '').trim();
+      if (!normalized) return fallback;
+      return JSON.parse(normalized);
+    } catch (error) {
+      console.warn('JSON parse error:', error);
+      return fallback;
+    }
+  }
+  function isPlainObject(value) {
+    return !!value && Object.prototype.toString.call(value) === '[object Object]';
+  }
+  function sanitizePresetName(name) {
+    return String(name || '').replace(/[\\/:*?"<>|]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  function buildPresetNameFromData(data) {
+    const client = sanitizePresetName(data?.clientName || data?.simToName || '불러온견적');
+    const title = sanitizePresetName(data?.docTitle || data?.simSubject || '견적');
+    const date = sanitizePresetName(data?.issueDate || data?.simInv || getFormattedDate('dot'));
+    return sanitizePresetName(`${client}_${title}_${date}`) || '불러온견적';
+  }
+  function getPresetStore() {
+    const parsed = safeJsonParse(lsGet('tourmaker_presets'), {});
+    if (!isPlainObject(parsed)) return {};
+    return parsed;
+  }
+  function normalizeImportedPresetMap(raw) {
+    let source = raw;
+    if (isPlainObject(source) && isPlainObject(source.presets)) source = source.presets;
+    if (!isPlainObject(source)) throw new Error('지원하지 않는 JSON 루트 형식입니다.');
+
+    const presetShapeKeys = ['currency', 'clientName', 'docTitle', 'travelDate', 'paxStr', 'issueDate', 'flights', 'locals', 'domestics', 'simples'];
+    const looksLikeSinglePreset = presetShapeKeys.some(key => key in source);
+    if (looksLikeSinglePreset) {
+      return { [buildPresetNameFromData(source)]: source };
+    }
+
+    const normalized = {};
+    Object.entries(source).forEach(([key, value]) => {
+      if (!isPlainObject(value)) return;
+      const safeName = sanitizePresetName(key) || buildPresetNameFromData(value);
+      normalized[safeName] = value;
+    });
+
+    if (!Object.keys(normalized).length) {
+      throw new Error('복원 가능한 견적 데이터가 없습니다.');
+    }
+    return normalized;
+  }
+
   function updatePresetDropdown(filterText='') {
-    const select = $('#preset-select'); const presets = JSON.parse(lsGet('tourmaker_presets')); const keys = Object.keys(presets).sort();
+    const select = $('#preset-select'); 
+    const presets = getPresetStore(); 
+    const keys = Object.keys(presets).sort((a, b) => a.localeCompare(b, 'ko'));
     select.innerHTML = '<option value="">저장된 템플릿 선택...</option>'; let matchCount = 0;
-    keys.forEach(key => { if (key.toLowerCase().includes(filterText.toLowerCase())) { const option = document.createElement('option'); option.value = key; option.textContent = key; select.appendChild(option); matchCount++; } });
+    keys.forEach(key => { 
+      if (key.toLowerCase().includes(String(filterText || '').toLowerCase())) { 
+        const option = document.createElement('option'); 
+        option.value = key; option.textContent = key; select.appendChild(option); matchCount++; 
+      } 
+    });
     if (filterText && matchCount > 0) select.selectedIndex = 1;
   }
   function lsGet(key, fallback = '{}') { try { return localStorage.getItem(key) || fallback; } catch(e) { console.warn('localStorage read error:', e); return fallback; } }
   function lsSet(key, value) { try { localStorage.setItem(key, value); return true; } catch(e) { console.warn('localStorage write error:', e); alert('⚠️ 저장 실패: 브라우저 저장 공간이 부족하거나 개인정보 보호 모드일 수 있습니다.'); return false; } }
   function savePreset() {
     const modeName = $('#inp-currency').value === 'SIMPLE_QUOTE' ? $('#inp-sim-toName').value : $('#inp-clientName').value;
-    const presetName = prompt('현재 견적을 브라우저에 저장할 이름을 입력하세요.', `${modeName || '임시견적'} 견적`); if (!presetName) return;
-    const presets = JSON.parse(lsGet('tourmaker_presets')); presets[presetName] = getFormData();
-    if (lsSet('tourmaker_presets', JSON.stringify(presets))) { $('#preset-search').value = ''; updatePresetDropdown(); $('#preset-select').value = presetName; alert(`[${presetName}] 견적이 저장되었습니다.`); }
+    const defaultName = sanitizePresetName(`${modeName || '임시견적'} 견적`);
+    const presetName = sanitizePresetName(prompt('현재 견적을 브라우저에 저장할 이름을 입력하세요.', defaultName)); if (!presetName) return;
+    const presets = getPresetStore(); presets[presetName] = getFormData();
+    if (lsSet('tourmaker_presets', JSON.stringify(presets, null, 2))) { $('#preset-search').value = ''; updatePresetDropdown(); $('#preset-select').value = presetName; alert(`[${presetName}] 견적이 저장되었습니다.`); }
   }
-  function loadPreset() { const selectedName = $('#preset-select').value; if (!selectedName) return alert('먼저 불러올 템플릿을 선택해주세요.'); const presets = JSON.parse(lsGet('tourmaker_presets')); if (presets[selectedName]) setFormData(presets[selectedName]); }
-  function deletePreset() { const selectedName = $('#preset-select').value; if (!selectedName) return; if (!confirm(`[${selectedName}] 견적을 영구 삭제하시겠습니까?`)) return; const presets = JSON.parse(lsGet('tourmaker_presets')); delete presets[selectedName]; lsSet('tourmaker_presets', JSON.stringify(presets)); updatePresetDropdown(); alert('삭제되었습니다.'); }
-  function exportData() { const data = lsGet('tourmaker_presets'); if (!data || data === '{}') return alert('백업할 데이터가 없습니다. 먼저 템플릿을 저장해주세요.'); const blob = new Blob([data], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `tourmaker_presets_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url); }
+  function loadPreset() { 
+    const selectedName = $('#preset-select').value; 
+    if (!selectedName) return; 
+    const presets = getPresetStore(); 
+    if (presets[selectedName]) setFormData(presets[selectedName]); 
+  }
+  function deletePreset() { 
+    const selectedName = $('#preset-select').value; if (!selectedName) return; 
+    if (!confirm(`[${selectedName}] 견적을 영구 삭제하시겠습니까?`)) return; 
+    const presets = getPresetStore(); delete presets[selectedName]; 
+    if (lsSet('tourmaker_presets', JSON.stringify(presets, null, 2))) {
+      updatePresetDropdown(); alert('삭제되었습니다.'); 
+    }
+  }
+  function exportData() { 
+    const presets = getPresetStore(); 
+    if (!Object.keys(presets).length) return alert('백업할 데이터가 없습니다. 먼저 템플릿을 저장해주세요.'); 
+    const payload = '\uFEFF' + JSON.stringify(presets, null, 2);
+    const blob = new Blob([payload], { type: 'application/json;charset=utf-8' }); 
+    const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `tourmaker_presets_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url); 
+  }
+
   function importData(event) {
-    const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
-    reader.onload = e => { try { const json = JSON.parse(e.target.result); const currentData = JSON.parse(lsGet('tourmaker_presets')); lsSet('tourmaker_presets', JSON.stringify({ ...currentData, ...json })); updatePresetDropdown(); alert('데이터가 성공적으로 복원(병합)되었습니다.'); } catch { alert('잘못된 백업 파일 형식입니다.'); } };
-    reader.readAsText(file); event.target.value = '';
+    const input = event.target;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onerror = () => {
+      alert('파일을 읽는 중 오류가 발생했습니다. 다시 시도해주세요.');
+      input.value = '';
+    };
+    reader.onload = e => {
+      try {
+        const rawText = String(e.target?.result || '').replace(/^\uFEFF/, '');
+        if (!rawText.trim()) throw new Error('빈 파일입니다.');
+
+        const importedRaw = JSON.parse(rawText);
+        const importedPresets = normalizeImportedPresetMap(importedRaw);
+        const currentData = getPresetStore();
+
+        const importedKeys = Object.keys(importedPresets);
+        const overwriteKeys = importedKeys.filter(key => key in currentData);
+        if (overwriteKeys.length) {
+          const preview = overwriteKeys.slice(0, 5).join(', ');
+          const moreText = overwriteKeys.length > 5 ? ` 외 ${overwriteKeys.length - 5}건` : '';
+          const ok = confirm(`동일한 이름의 견적 ${overwriteKeys.length}건이 있습니다.\n[${preview}${moreText}]\n기존 데이터를 덮어쓸까요?`);
+          if (!ok) {
+            input.value = '';
+            return;
+          }
+        }
+
+        const merged = { ...currentData, ...importedPresets };
+        const saved = lsSet('tourmaker_presets', JSON.stringify(merged, null, 2));
+        if (!saved) {
+          input.value = '';
+          return;
+        }
+
+        updatePresetDropdown();
+        
+        const targetKey = importedKeys[importedKeys.length - 1];
+        if (targetKey) {
+            $('#preset-select').value = targetKey;
+            setFormData(merged[targetKey]);
+            alert(`✅ 복원이 완료되었습니다.\n새로 추가된 [${targetKey}] 견적을 화면에 자동으로 불러왔습니다.`);
+            
+            // 데이터를 불러온 후 즉시 편집할 수 있도록 데스크탑/모바일 모두 '입력창'을 기본으로 띄웁니다.
+            switchTab('input'); 
+            
+            // 화면 스크롤 최상단으로 복귀
+            $('#panelInput').scrollTop = 0;
+            if ($('#panelPreview')) $('#panelPreview').scrollTop = 0;
+        } else {
+            alert(`데이터 복구가 완료되었습니다.\n- 가져온 견적: ${importedKeys.length}건`); 
+        }
+      } catch (error) {
+        console.error(error);
+        alert(`업로드 실패: ${error.message || '잘못된 백업 파일 형식입니다.'}`);
+      } finally {
+        input.value = '';
+      }
+    };
+    reader.readAsText(file, 'utf-8');
   }
+
   function clearForm() {
     if (!confirm('모든 데이터를 지우고 새 문서를 작성하시겠습니까?')) return;
     $$('input[type="text"], textarea').forEach(el => { if (el.id !== 'inp-sim-bankName' && el.id !== 'inp-sim-bankNum' && el.id !== 'inp-sim-bankHolder') el.value = ''; });
@@ -704,7 +851,9 @@
     
     $('#out-clientName').textContent = $('#inp-clientName').value; $('#out-docTitle').textContent = $('#inp-docTitle').value; $('#out-travelDate').textContent = $('#inp-travelDate').value; $('#out-paxStr').textContent = $('#inp-paxStr').value;
     $('#out-issueAndRate').textContent = isKRW ? `${$('#inp-issueDate').value} / 국내행사 (환율 미적용)` : `${$('#inp-issueDate').value} / ${currency} ${exRate} 기준(송금)`;
-    const cN = currency === 'JPY' ? '엔화' : (currency === 'USD' ? '달러' : (isKRW ? '원화' : '위안화')); const cS = currency === 'USD' ? '$' : (isKRW ? '₩' : (currency === 'JPY' ? '¥' : '¥')); const col = isKRW ? 5 : 6;
+    const cN = currency === 'JPY' ? '엔화' : (currency === 'USD' ? '달러' : (currency === 'AUD' ? '호주달러' : (isKRW ? '원화' : '위안화'))); 
+    const cS = (currency === 'USD' || currency === 'AUD') ? '$' : (isKRW ? '₩' : '¥'); 
+    const col = isKRW ? 5 : 6;
     $('#main-thead').innerHTML = `<tr><th style="width:9%">구분</th><th style="width:${isKRW ? '14%' : '11%'}">항목</th><th style="width:${isKRW ? '24%' : '18%'}">내용</th><th style="width:9%;font-size:10px;line-height:1.3">인원/객실수<br>차량대수</th>${!isKRW ? `<th style="width:11%;background:#fef08a;color:#0f172a">${cN} 단가<br><span style="font-weight:400;color:#475569">${currency}</span></th>` : ''}<th style="width:${isKRW ? '15%' : '12%'}">원화 단가<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '16%' : '14%'}">총금액<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '13%' : '16%'}">비고</th></tr>`;
     let tF = 0, tL = 0, tD = 0;
     const flights = getRowData('flight').filter(r => r.name.trim()).map(r => ({ ...r, qty:Number(r.qty)||0, krw:Number(r.krw)||0, tot:(Number(r.qty)||0)*(Number(r.krw)||0) })); tF = flights.reduce((s, r) => s + r.tot, 0);
@@ -812,8 +961,20 @@
   
   function switchTab(tab) {
     const input = $('#panelInput'); const preview = $('#panelPreview');
-    if (tab === 'input') { input.classList.remove('panel-hidden'); preview.classList.add('panel-hidden'); $('#tabInput').classList.add('active'); $('#tabPreview').classList.remove('active'); } 
-    else { calculateAndRender(); input.classList.add('panel-hidden'); preview.classList.remove('panel-hidden'); $('#tabInput').classList.remove('active'); $('#tabPreview').classList.add('active'); $('#panelPreview').scrollLeft = 0; window.scrollTo(0,0); }
+    if (tab === 'input') { 
+      input.classList.remove('panel-hidden'); 
+      preview.classList.add('panel-hidden'); 
+      $('#tabInput').classList.add('active'); 
+      $('#tabPreview').classList.remove('active'); 
+    } 
+    else { 
+      calculateAndRender(); 
+      input.classList.add('panel-hidden'); 
+      preview.classList.remove('panel-hidden'); 
+      $('#tabInput').classList.remove('active'); 
+      $('#tabPreview').classList.add('active'); 
+      $('#panelPreview').scrollLeft = 0; window.scrollTo(0,0); 
+    }
   }
   
   function printPDF() {
@@ -846,7 +1007,7 @@
     
     const clone = $('#print-section').cloneNode(true);
     const currentCurrency = $('#inp-currency').value;
-    const isForeign = ['JPY', 'USD', 'CNY'].includes(currentCurrency);
+    const isForeign = ['JPY', 'USD', 'CNY', 'AUD'].includes(currentCurrency);
     const isSimple = currentCurrency === 'SIMPLE_QUOTE';
     
     if (isSimple) {
@@ -947,6 +1108,14 @@
     } else if (isForeign) {
         topBarSubText = `적용 환율: ${exRate}`;
     }
+
+    // 카카오톡 썸네일 랜덤 지정
+    const ogThumbnails = [
+      'https://blogger.googleusercontent.com/img/a/AVvXsEhGuZrAyWumLFwHek7ioWf8ymhR1D09oemR6FvZDjx2cS-v-cTj9zwxW8Ip4I9AX5c9Da7bqYe3j-wI5H0b8Ioci2LrMDFg3Mgingu0KcsclfIUTE2D1Vt5JyCsLw6XfZ3nV7xYXfnCJPEA4PUGf97gvaByWQgMPE7jKbDAVV2HgkID94oOxxGHNwajh5U',
+      'https://blogger.googleusercontent.com/img/a/AVvXsEjQVWjqNlaxb98AP-qG4LHAIN9gK9sn4cGowBArA_-DUz0rxQycXrr3vFhvUqMM9Pa5tP2cDBxqBzW_re-HqzVLVAngEO8FAORbaQ36ANr0BULZ_q2PBFdDbEUJhQqr7LCGGuXO1snQ-bYx5SdFP1GZllmKNTxYv66H8E7zYyvQLsq3jour2LNjQ4PyAbo',
+      'https://blogger.googleusercontent.com/img/a/AVvXsEhPxG_ONo2BdFAGDNnn-pHIGT'
+    ];
+    const randomOgImage = ogThumbnails[Math.floor(Math.random() * ogThumbnails.length)];
 
     const scriptLogic = `
       const EX_RATE = ${isForeign ? exRate : 1};
@@ -1050,7 +1219,7 @@
       }
     `;
     
-    const fullHtml = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>스마트 산출내역서 - 맞춤 편집용</title><style>${styles}</style></head><body><div class="top-bar no-print"><div style="flex:1"><p style="font-size:16px;font-weight:800;margin-bottom:0">💡 스마트 산출내역서 (맞춤 편집용)</p>${topBarSubText ? `<p style="font-size:13px;color:#94a3b8;margin-top:6px;font-weight:600;">${topBarSubText}</p>` : ''}</div><button class="btn-print" onclick="window.print()">🖨️ PDF 저장</button></div>${sheetHtml}<script>${scriptLogic}<\/script></body></html>`;
+    const fullHtml = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>투어메이커 - 맞춤 견적서</title><meta property="og:title" content="투어메이커 맞춤 견적서"><meta property="og:description" content="고객님을 위한 투어메이커 공식 견적서/산출내역서입니다."><meta property="og:image" content="${randomOgImage}"><meta property="og:type" content="website"><style>${styles}</style></head><body><div class="top-bar no-print"><div style="flex:1"><p style="font-size:16px;font-weight:800;margin-bottom:0">💡 스마트 산출내역서 (맞춤 편집용)</p>${topBarSubText ? `<p style="font-size:13px;color:#94a3b8;margin-top:6px;font-weight:600;">${topBarSubText}</p>` : ''}</div><button class="btn-print" onclick="window.print()">🖨️ PDF 저장</button></div>${sheetHtml}<script>${scriptLogic}<\/script></body></html>`;
     const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -1129,6 +1298,14 @@
     $('#btn-import').addEventListener('click', () => $('#import-file').click());
     $('#import-file').addEventListener('change', importData);
     $('#preset-search').addEventListener('input', e => updatePresetDropdown(e.target.value));
+    
+    // 드롭다운 변경 시 자동으로 불러오기 적용
+    $('#preset-select').addEventListener('change', (e) => {
+        if(e.target.value) {
+            loadPreset();
+        }
+    });
+
     $('#inp-currency').addEventListener('change', toggleDocMode);
     $('#inp-sim-vat').addEventListener('change', () => { toggleVatManual(); calculateAndRender(); scheduleValidation(); });
     $('#inp-sim-extraFee').addEventListener('change', () => { calculateAndRender(); scheduleValidation(); });
