@@ -47,11 +47,12 @@
     .template-select { flex:1; border:1px solid #cbd5e1; border-radius:6px; padding:8px 10px; font-size:13px; outline:none; transition:.2s; }
     .template-search { width:130px; border:1px solid #cbd5e1; border-radius:6px; padding:8px 10px; font-size:13px; outline:none; background:#fff; transition:.2s; }
     .template-select:focus, .template-search:focus, .form-input:focus, .form-select:focus, .slot-input:focus { border-color:#3b82f6; box-shadow:0 0 0 2px rgba(59,130,246,.1); }
-    .btn-load, .btn-save, .btn-delete, .btn-backup, .btn-restore { border:none; padding:8px 14px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; transition:.2s; }
+    .btn-load, .btn-save, .btn-delete, .btn-backup, .btn-restore, .btn-export-current { border:none; padding:8px 14px; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer; transition:.2s; }
     .btn-load { background:#334155; color:#fff; } .btn-load:hover { background:#0f172a; }
     .btn-save { background:#2563eb; color:#fff; } .btn-save:hover { background:#1d4ed8; }
     .btn-delete { background:#fff; color:#ef4444; border:1px solid #fca5a5; } .btn-delete:hover { background:#fef2f2; border-color:#ef4444; }
-    .backup-controls { display:flex; gap:8px; justify-content:flex-end; padding-top:8px; border-top:1px dashed #cbd5e1; }
+    .backup-controls { display:flex; flex-wrap: wrap; gap:8px; justify-content:flex-end; padding-top:8px; border-top:1px dashed #cbd5e1; }
+    .btn-export-current { background:#f0f9ff; color:#0284c7; border:1px solid #7dd3fc; padding:6px 12px; font-size:12px; } .btn-export-current:hover { background:#e0f2fe; }
     .btn-backup { background:#fff; color:#059669; border:1px solid #6ee7b7; padding:6px 12px; font-size:12px; } .btn-backup:hover { background:#ecfdf5; }
     .btn-restore { background:#fff; color:#d97706; border:1px solid #fcd34d; padding:6px 12px; font-size:12px; } .btn-restore:hover { background:#fffbeb; }
     .warning-panel { background:#fef2f2; border:1px solid #f87171; border-radius:8px; padding:16px; margin-bottom:24px; color:#991b1b; box-shadow:0 2px 4px rgba(239,68,68,.05); }
@@ -153,7 +154,7 @@
     .panel-input-scroll::-webkit-scrollbar-track, .panel-preview::-webkit-scrollbar-track { background:#f8fafc; }
     .panel-input-scroll::-webkit-scrollbar-thumb, .panel-preview::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:4px; }
     
-    /* 모바일 환경(1023px 이하)에서만 숨김 클래스와 스택 구조가 적용되도록 수정 완료 */
+    /* 모바일 환경(1023px 이하) */
     @media (max-width:1023px) {
       .panel-hidden { display:none !important; }
       .mobile-tabs { display:flex; }
@@ -230,7 +231,9 @@
         <div class="backup-controls">
           <input type="file" id="import-file" accept=".json" style="display:none;">
           <button type="button" id="btn-import" class="btn-restore">📂 데이터 복구(업로드)</button>
-          <button type="button" id="btn-export" class="btn-backup">💾 데이터 백업(다운로드)</button>
+          <!-- 새롭게 추가된 단일 공유용 내보내기 버튼 -->
+          <button type="button" id="btn-export-current" class="btn-export-current">📤 현재 문서 단독 공유(JSON)</button>
+          <button type="button" id="btn-export" class="btn-backup" title="저장된 모든 템플릿을 한 번에 백업합니다.">💾 전체 데이터 백업</button>
         </div>
       </div>
       <div class="form-group highlight">
@@ -239,7 +242,6 @@
           <optgroup label="[가격 산출 내역서]">
             <option value="JPY" selected>해외행사 - JPY (엔화)</option>
             <option value="USD">해외행사 - USD (달러)</option>
-            <!-- 호주 달러 추가 완료 -->
             <option value="AUD">해외행사 - AUD (호주달러)</option>
             <option value="CNY">해외행사 - CNY (위안화)</option>
             <option value="KRW_JEJU">국내행사 - 제주 (KRW)</option>
@@ -328,7 +330,6 @@
           </div>
           <div class="form-row cols-2"><div><label class="form-label">입금 기한 (By Due)</label><input type="text" id="inp-sim-due" class="form-input" value="행사 출발 전 완납"></div></div>
           
-          <!-- 기납금 입력란 -->
           <div class="form-row cols-1" style="background:#eff6ff; padding:12px; border:1px dashed #3b82f6; border-radius:6px; margin-top:8px;">
             <div>
               <label class="form-label" style="color:#1d4ed8; font-size:13px;">💰 기납금 (선입금/계약금) 차감액</label>
@@ -590,7 +591,6 @@
     $$('.error-border').forEach(el => el.classList.remove('error-border')); $$('.error-row-container').forEach(el => el.classList.remove('error-row-container'));
     if (mode === 'detailed') {
       const basePax = extractBasePax(); const exRateInput = $('#inp-exRate'); const exRate = parseCurrency(exRateInput.value);
-      // AUD(호주 달러) 환율 경고 범위(800~1200) 추가
       const ranges = { JPY:[5,20], USD:[1000,2000], CNY:[100,300], AUD:[800,1200] };
       if (ranges[currencyVal]) {
         const [min, max] = ranges[currencyVal];
@@ -683,10 +683,10 @@
     return String(name || '').replace(/[\\/:*?"<>|]/g, ' ').replace(/\s+/g, ' ').trim();
   }
   function buildPresetNameFromData(data) {
-    const client = sanitizePresetName(data?.clientName || data?.simToName || '불러온견적');
+    const client = sanitizePresetName(data?.clientName || data?.simToName || '임시견적');
     const title = sanitizePresetName(data?.docTitle || data?.simSubject || '견적');
     const date = sanitizePresetName(data?.issueDate || data?.simInv || getFormattedDate('dot'));
-    return sanitizePresetName(`${client}_${title}_${date}`) || '불러온견적';
+    return sanitizePresetName(`${client}_${title}_${date}`) || '임시견적';
   }
   function getPresetStore() {
     const parsed = safeJsonParse(lsGet('tourmaker_presets'), {});
@@ -753,12 +753,32 @@
       updatePresetDropdown(); alert('삭제되었습니다.'); 
     }
   }
+  
+  // 전체 백업용 함수
   function exportData() { 
     const presets = getPresetStore(); 
     if (!Object.keys(presets).length) return alert('백업할 데이터가 없습니다. 먼저 템플릿을 저장해주세요.'); 
     const payload = '\uFEFF' + JSON.stringify(presets, null, 2);
     const blob = new Blob([payload], { type: 'application/json;charset=utf-8' }); 
     const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `tourmaker_presets_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url); 
+  }
+
+  // ★ 단일 문서(현재 화면) 전송용 함수 추가 ★
+  function exportCurrentData() {
+    const currentData = getFormData();
+    const presetName = buildPresetNameFromData(currentData);
+    
+    // 가져올때 기존 로직이 원활하게 작동하도록 { 키: 데이터 } 형태로 래핑하여 내보냄
+    const exportObj = { [presetName]: currentData };
+    
+    const payload = '\uFEFF' + JSON.stringify(exportObj, null, 2);
+    const blob = new Blob([payload], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `공유용_${presetName}.json`; // 파일명 앞에 '공유용' 명시
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   function importData(event) {
@@ -807,10 +827,8 @@
             setFormData(merged[targetKey]);
             alert(`✅ 복원이 완료되었습니다.\n새로 추가된 [${targetKey}] 견적을 화면에 자동으로 불러왔습니다.`);
             
-            // 데이터를 불러온 후 즉시 편집할 수 있도록 데스크탑/모바일 모두 '입력창'을 기본으로 띄웁니다.
             switchTab('input'); 
             
-            // 화면 스크롤 최상단으로 복귀
             $('#panelInput').scrollTop = 0;
             if ($('#panelPreview')) $('#panelPreview').scrollTop = 0;
         } else {
@@ -1294,7 +1312,11 @@
     $('#btn-save-preset').addEventListener('click', savePreset);
     $('#btn-load-preset').addEventListener('click', loadPreset);
     $('#btn-delete-preset').addEventListener('click', deletePreset);
-    $('#btn-export').addEventListener('click', exportData);
+    
+    // 백업/추출 버튼 이벤트 연동
+    $('#btn-export').addEventListener('click', exportData); // 기존 전체 백업
+    $('#btn-export-current').addEventListener('click', exportCurrentData); // 신규 단독 백업
+    
     $('#btn-import').addEventListener('click', () => $('#import-file').click());
     $('#import-file').addEventListener('change', importData);
     $('#preset-search').addEventListener('input', e => updatePresetDropdown(e.target.value));
