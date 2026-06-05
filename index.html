@@ -8,6 +8,9 @@
   <meta property="og:description" content="고객 제출용 공식 행사비 산출 내역서 (국내/해외 통합)">
   <meta property="og:image" content="https://blogger.googleusercontent.com/img/a/AVvXsEjQVWjqNlaxb98AP-qG4LHAIN9gK9sn4cGowBArA_-DUz0rxQycXrr3vFhvUqMM9Pa5tP2cDBxqBzW_re-HqzVLVAngEO8FAORbaQ36ANr0BULZ_q2PBFdDbEUJhQqr7LCGGuXO1snQ-bYx5SdFP1GZllmKNTxYv66H8E7zYyvQLsq3jour2LNjQ4PyAbo">
   <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <!-- GA4 Tracking Code -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-JLH9GD9SVR"></script>
   <script>
@@ -18,7 +21,7 @@
   </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Pretendard', 'Malgun Gothic', 'Apple SD Gothic Neo', -apple-system, BlinkMacSystemFont, sans-serif; background: #f8fafc; color: #334155; -webkit-text-size-adjust: 100%; }
+    body { font-family: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', -apple-system, BlinkMacSystemFont, sans-serif; background: #f8fafc; color: #334155; -webkit-text-size-adjust: 100%; }
     .top-header { background: #ffffff; color: #0f172a; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #e2e8f0; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
     .top-header img { height: 32px; object-fit: contain; }
     .top-header h1 { font-size: 16px; font-weight: 700; margin-left: 12px; color: #475569; white-space: nowrap; border-left: 2px solid #e2e8f0; padding-left: 12px; }
@@ -111,7 +114,7 @@
     #simple-input-group, #simple-preview-group { display:none; }
     .doc-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; }
     .doc-header-left { width:45%; } .doc-header-right { width:40%; display:flex; justify-content:flex-end; padding-top:4px; }
-    .doc-header-right img { height:28px; object-fit:contain; }
+    .doc-header-right img { height:36px; object-fit:contain; }
     .doc-title-area { text-align:center; margin-bottom:24px; }
     .doc-title-area h2 { display:inline-block; font-size:28px; font-weight:900; letter-spacing:.15em; border-bottom:3px solid #0f172a; padding:0 24px 6px; color:#0f172a; }
     .doc-title-area p { font-size:11px; color:#64748b; font-weight:700; letter-spacing:.25em; margin-top:6px; text-transform:uppercase; }
@@ -134,7 +137,7 @@
     .simple-header { text-align:center; margin-bottom:30px; margin-top:10px; }
     .simple-header h1 { font-size:36px; font-weight:900; letter-spacing:.8em; padding-left:.8em; color:#000; border-bottom:2px solid #000; display:inline-block; padding-bottom:10px; }
     .simple-info-grid { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:24px; font-size:12px; color:#000; }
-    .simple-info-left { line-height:1.8; } .simple-info-left span { display:inline-block; width:130px; font-weight:600; } .simple-info-right img { height:18px; object-fit:contain; margin-bottom:4px; }
+    .simple-info-left { line-height:1.8; } .simple-info-left span { display:inline-block; width:130px; font-weight:600; } .simple-info-right img { height:34px; object-fit:contain; margin-bottom:4px; }
     .simple-sender-receiver { display:flex; justify-content:space-between; margin-bottom:24px; font-size:12px; color:#000; }
     .sr-box { width:48%; border-top:2px solid #000; border-bottom:2px solid #000; padding:12px 0; display:flex; align-items:center; }
     .sr-label { width:60px; text-align:center; font-weight:800; background:#f8fafc; display:flex; align-items:center; justify-content:center; margin-right:12px; letter-spacing:2px; }
@@ -934,6 +937,44 @@
   }
   function rs(arr, i, key) { let r = 1; for (let j=i+1; j<arr.length; j++) { if (arr[j][key] === arr[i][key]) r++; else break; } return r; }
   function rs2(arr, i) { let r = 1; for (let j=i+1; j<arr.length; j++) { if (arr[j].name === arr[i].name && arr[j].desc === arr[i].desc) r++; else break; } return r; }
+  /** 동일 항목명(차량비·식비 등) 행을 내용·비고를 합치고 금액을 합산해 한 줄로 표시 */
+  function mergeRowsByName(rows) {
+    const groups = []; const idx = new Map();
+    for (const r of rows) {
+      const key = (r.name || '').trim();
+      if (!key) continue;
+      if (!idx.has(key)) {
+        idx.set(key, groups.length);
+        groups.push({
+          name: r.name, descParts: r.desc ? [r.desc] : [], noteParts: r.note ? [r.note] : [],
+          qty: Number(r.qty) || 0, krw: Number(r.krw) || 0, fgn: Number(r.fgn) || 0,
+          tot: Number(r.tot) || 0, hl: !!r.hl, sameKrw: true, sameFgn: true, hasFgn: 'fgn' in r && r.fgn !== undefined
+        });
+      } else {
+        const g = groups[idx.get(key)];
+        if (r.desc && !g.descParts.includes(r.desc)) g.descParts.push(r.desc);
+        if (r.note && !g.noteParts.includes(r.note)) g.noteParts.push(r.note);
+        g.tot += Number(r.tot) || 0;
+        g.hl = g.hl || !!r.hl;
+        const rKrw = Number(r.krw) || 0; const rFgn = Number(r.fgn) || 0;
+        if (g.sameKrw && g.krw !== rKrw) g.sameKrw = false;
+        if (g.sameFgn && g.fgn !== rFgn) g.sameFgn = false;
+        if (g.sameKrw && g.krw === rKrw) g.qty += Number(r.qty) || 0;
+        else { g.sameKrw = false; g.qty = 0; }
+        if (g.sameFgn && g.fgn !== rFgn) g.sameFgn = false;
+      }
+    }
+    return groups.map(g => ({
+      name: g.name,
+      desc: g.descParts.join(' / '),
+      note: g.noteParts.join(' / '),
+      qty: g.sameKrw && g.qty > 0 ? g.qty : '',
+      krw: g.sameKrw ? g.krw : (g.tot > 0 && g.qty > 0 ? Math.round(g.tot / g.qty) : ''),
+      fgn: g.sameFgn ? g.fgn : '',
+      tot: g.tot,
+      hl: g.hl
+    }));
+  }
   
   function renderDetailed() {
     const currency = $('#inp-currency').value; const isMainland = currency === 'KRW_MAINLAND'; const isJeju = currency === 'KRW_JEJU'; const isKRW = isMainland || isJeju; const exRate = isKRW ? 1 : (parseCurrency($('#inp-exRate').value) || 0);
@@ -952,7 +993,7 @@
     $('#main-thead').innerHTML = `<tr><th style="width:9%">구분</th><th style="width:${isKRW ? '14%' : '11%'}">항목</th><th style="width:${isKRW ? '24%' : '18%'}">내용</th><th style="width:9%;font-size:10px;line-height:1.3">인원/객실수<br>차량대수</th>${!isKRW ? `<th style="width:11%;background:#fef08a;color:#0f172a">${cN} 단가<br><span style="font-weight:400;color:#475569">${currency}</span></th>` : ''}<th style="width:${isKRW ? '15%' : '12%'}">원화 단가<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '16%' : '14%'}">총금액<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '13%' : '16%'}">비고</th></tr>`;
     let tF = 0, tL = 0, tD = 0;
     
-    const flights = getRowData('flight').filter(r => r.name.trim()).map(r => ({ ...r, qty:Number(r.qty)||0, krw:Number(r.krw)||0, tot:(Number(r.qty)||0)*(Number(r.krw)||0) })); tF = flights.reduce((s, r) => s + r.tot, 0);
+    const flights = mergeRowsByName(getRowData('flight').filter(r => r.name.trim()).map(r => ({ ...r, qty:Number(r.qty)||0, krw:Number(r.krw)||0, tot:(Number(r.qty)||0)*(Number(r.krw)||0) }))); tF = flights.reduce((s, r) => s + r.tot, 0);
     const fH = isMainland ? '교통비' : '항공료'; const fSub = isMainland ? '(1) 합계 - 교통비' : '(1) 합계 - 항공료'; let h = '';
     if (!flights.length) h += `<tr><td class="text-center font-bold bg-gray-50 export-text">${fH}</td><td colspan="${col - 1}" class="text-center">입력된 항목이 없습니다.</td></tr>`;
     else {
@@ -969,7 +1010,7 @@
     }
     h += `<tr class="subtotal-row"><td colspan="${col}" class="text-center">${fSub}</td><td class="text-right" id="sub-flight">₩${fmtT(tF)}</td><td></td></tr>`; $('#tbody-flight').innerHTML = h;
     
-    const locals = getRowData('local').filter(r => r.name.trim()).map(r => { const qty = Number(r.qty) || 0; const fgn = Number(r.fgn) || 0; const krw = isKRW ? fgn : Math.round(fgn * exRate); return { ...r, qty, fgn, krw, tot:qty * krw }; }); tL = locals.reduce((s, r) => s + r.tot, 0);
+    const locals = mergeRowsByName(getRowData('local').filter(r => r.name.trim()).map(r => { const qty = Number(r.qty) || 0; const fgn = Number(r.fgn) || 0; const krw = isKRW ? fgn : Math.round(fgn * exRate); return { ...r, qty, fgn, krw, tot:qty * krw }; })); tL = locals.reduce((s, r) => s + r.tot, 0);
     const lH = isMainland ? '행사비용' : (isJeju ? '제주(현지)<br>발생비용' : '해외현지<br>발생비용'); const lSub = isMainland ? '(2) 합계 - 행사 비용' : (isJeju ? '(2) 합계 - 제주(현지) 발생 비용' : '(2) 합계 - 해외현지 발생 비용'); h = '';
     if (!locals.length) h += `<tr><td class="text-center font-bold bg-gray-50 export-text">${lH}</td><td colspan="${col - 1}" class="text-center">입력된 항목이 없습니다.</td></tr>`;
     else {
@@ -986,7 +1027,7 @@
     }
     h += `<tr class="subtotal-row"><td colspan="${col}" class="text-center">${lSub}</td><td class="text-right" id="sub-local">₩${fmtT(tL)}</td><td></td></tr>`; $('#tbody-local').innerHTML = h;
     
-    const doms = getRowData('domestic').filter(r => r.name.trim()).map(r => ({ ...r, qty:Number(r.qty)||0, krw:Number(r.krw)||0, tot:(Number(r.qty)||0)*(Number(r.krw)||0) })); tD = doms.reduce((s, r) => s + r.tot, 0); h = '';
+    const doms = mergeRowsByName(getRowData('domestic').filter(r => r.name.trim()).map(r => ({ ...r, qty:Number(r.qty)||0, krw:Number(r.krw)||0, tot:(Number(r.qty)||0)*(Number(r.krw)||0) }))); tD = doms.reduce((s, r) => s + r.tot, 0); h = '';
     if (!doms.length) h += `<tr><td class="text-center font-bold bg-gray-50 export-text">국내 발생 비용</td><td colspan="${col - 1}" class="text-center">입력된 항목이 없습니다.</td></tr>`;
     else {
       for (let i=0; i<doms.length; i++) {
@@ -1027,7 +1068,7 @@
     $('#out-sim-inc').innerHTML = escAttr($('#inp-sim-inc').value).replace(/\n/g, '<br>'); 
     $('#out-sim-exc').innerHTML = escAttr($('#inp-sim-exc').value).replace(/\n/g, '<br>');
     
-    const simples = getRowData('simple').filter(r => r.name.trim()).map(r => ({ ...r, qty:Number(r.qty)||0, krw:Number(r.krw)||0, tot:(Number(r.qty)||0)*(Number(r.krw)||0) }));
+    const simples = mergeRowsByName(getRowData('simple').filter(r => r.name.trim()).map(r => ({ ...r, qty:Number(r.qty)||0, krw:Number(r.krw)||0, tot:(Number(r.qty)||0)*(Number(r.krw)||0) })));
     let subTotal = simples.reduce((s, r) => s + r.tot, 0); let h = ''; const minRows = 5;
     for (let i=0; i<Math.max(simples.length, minRows); i++) {
       if (i < simples.length) {
@@ -1175,7 +1216,7 @@
     
     const styles = `
       *,*::before,*::after{box-sizing:border-box}
-      body{background:#f1f5f9;display:flex;flex-direction:column;align-items:center;padding:40px 20px;margin:0;font-family:'Pretendard','Malgun Gothic',sans-serif;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+      body{background:#f1f5f9;display:flex;flex-direction:column;align-items:center;padding:40px 20px;margin:0;font-family:'Noto Sans KR','Malgun Gothic',sans-serif;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
       .a4-sheet{background:#fff;width:100%;max-width:850px;padding:40px;box-shadow:0 10px 40px rgba(0,0,0,.1);border-radius:4px;margin-bottom:40px;position:relative}
       table{width:100%;border-collapse:collapse;table-layout:fixed;word-break:keep-all}
       th,td{border:1px solid #cbd5e1;padding:6px 8px;font-size:12px;overflow:hidden}
@@ -1184,10 +1225,10 @@
       .subtotal-row td{background:#f1f5f9;font-weight:bold;border-bottom:2px solid #cbd5e1}.grand-row td{background:#f8fafc;font-weight:bold;border-top:2px solid #0f172a}.grand-row-last td{border-bottom:none !important}
       .doc-title-area{text-align:center;margin-bottom:24px}.doc-title-area h2{font-size:28px;border-bottom:3px solid #0f172a;display:inline-block;padding-bottom:6px;margin:0}
       .doc-title-area p{font-size:11px;color:#64748b;font-weight:700;letter-spacing:.25em;margin-top:6px;text-transform:uppercase}
-      .doc-header{display:flex;justify-content:space-between;margin-bottom:24px}.doc-header-left{width:45%}.doc-header-right{width:40%;text-align:right}.doc-header-right img{height:28px}
+      .doc-header{display:flex;justify-content:space-between;margin-bottom:24px}.doc-header-left{width:45%}.doc-header-right{width:40%;text-align:right}.doc-header-right img{height:36px}
       .info-table th{width:28%}.footer-notes{font-size:11px;color:#475569;padding-top:12px}.footer-notes p.title{font-size:12px;font-weight:700;margin-bottom:6px;color:#1e293b}
       .simple-header{text-align:center;margin-bottom:30px;margin-top:10px}.simple-header h1{font-size:36px;border-bottom:2px solid #000;display:inline-block;padding-bottom:10px;margin:0;letter-spacing:.8em;padding-left:.8em}
-      .simple-info-grid{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;font-size:12px}.simple-info-left span{display:inline-block;width:130px;font-weight:600}.simple-info-right img{height:18px}
+      .simple-info-grid{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;font-size:12px}.simple-info-left span{display:inline-block;width:130px;font-weight:600}.simple-info-right img{height:34px}
       .simple-sender-receiver{display:flex;justify-content:space-between;margin-bottom:24px;font-size:12px}.sr-box{width:48%;border-top:2px solid #000;border-bottom:2px solid #000;padding:12px 0;display:flex}
       .sr-label{width:60px;text-align:center;font-weight:800;background:#f8fafc;display:flex;align-items:center;justify-content:center;margin-right:12px;letter-spacing:2px}
       .sr-content{flex:1;line-height:1.8}.sr-content-row{display:flex;align-items:center}.sr-content-row span:first-child{width:15px;text-align:center}.sr-content-row span:last-child{flex:1;padding-left:5px}.sr-content-row.bold span:last-child{font-weight:800;font-size:14px}
@@ -1338,7 +1379,7 @@
       }
     `;
     
-    const fullHtml = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>투어메이커 - 맞춤 견적서</title><meta property="og:title" content="투어메이커 맞춤 견적서"><meta property="og:description" content="고객님을 위한 투어메이커 공식 견적서/산출내역서입니다."><meta property="og:image" content="${randomOgImage}"><meta property="og:type" content="website"><style>${styles}</style></head><body><div class="top-bar no-print"><div style="flex:1"><p style="font-size:16px;font-weight:800;margin-bottom:0">💡 스마트 산출내역서 (맞춤 편집용)</p>${topBarSubText ? `<p style="font-size:13px;color:#94a3b8;margin-top:6px;font-weight:600;">${topBarSubText}</p>` : ''}</div><button class="btn-print" onclick="window.print()">🖨️ PDF 저장</button></div>${sheetHtml}<script>${scriptLogic}<\/script></body></html>`;
+    const fullHtml = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>투어메이커 - 맞춤 견적서</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"><meta property="og:title" content="투어메이커 맞춤 견적서"><meta property="og:description" content="고객님을 위한 투어메이커 공식 견적서/산출내역서입니다."><meta property="og:image" content="${randomOgImage}"><meta property="og:type" content="website"><style>${styles}</style></head><body><div class="top-bar no-print"><div style="flex:1"><p style="font-size:16px;font-weight:800;margin-bottom:0">💡 스마트 산출내역서 (맞춤 편집용)</p>${topBarSubText ? `<p style="font-size:13px;color:#94a3b8;margin-top:6px;font-weight:600;">${topBarSubText}</p>` : ''}</div><button class="btn-print" onclick="window.print()">🖨️ PDF 저장</button></div>${sheetHtml}<script>${scriptLogic}<\/script></body></html>`;
     const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
