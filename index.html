@@ -128,6 +128,7 @@
     .info-table td { color:#0f172a; }
     .main-table { table-layout:fixed; border-top:2px solid #0f172a; border-bottom:2px solid #0f172a; }
     .main-table th, .main-table td { border:1px solid #cbd5e1; padding:6px 8px; font-size:11px; vertical-align:middle; overflow:hidden; word-break:keep-all; color:#1e293b; }
+    .main-table td.sec-label-cell { line-height:1.3; font-size:10px; padding:4px 3px; overflow:visible; white-space:normal; vertical-align:middle; }
     .main-table th { text-align:center; font-weight:700; background:#f8fafc; color:#0f172a; }
     .main-table tbody tr { height:28px; }
     .text-center { text-align:center; } .text-right { text-align:right; } .font-bold { font-weight:700; } .font-semibold { font-weight:600; }
@@ -198,6 +199,7 @@
       .a4-sheet { box-shadow:none !important; max-width:100% !important; width:100% !important; min-width:0 !important; padding:0 !important; margin:0 !important; border:none !important; overflow: hidden !important; page-break-inside: avoid; }
       .main-table, .info-table, .simple-table { table-layout: fixed !important; width: 100% !important; word-break: keep-all !important; overflow: hidden !important; }
       .main-table th, .main-table td, .simple-table th, .simple-table td { overflow: hidden !important; white-space: normal !important; word-break: keep-all !important; word-wrap: normal !important; overflow-wrap: normal !important; }
+      .main-table td.sec-label-cell { overflow: visible !important; line-height: 1.3 !important; font-size: 10px !important; padding: 4px 3px !important; }
       .footer-brand a { display:none !important; }
       .stamp-image { position: absolute !important; left: 48px !important; bottom: -18px !important; }
       @page { size:A4 portrait; margin:10mm; }
@@ -562,8 +564,19 @@
     if (data.secLocal != null) $('#inp-sec-local').value = data.secLocal;
     if (data.secDomestic != null) $('#inp-sec-domestic').value = data.secDomestic;
   }
+  function normalizeSecLabelLines(text) {
+    const raw = String(text || '').trim();
+    if (!raw || raw.includes('\n')) return raw;
+    const compact = raw.replace(/\s+/g, '');
+    if (compact.startsWith('해외현지') && compact.includes('발생')) return '해외현지\n발생비용';
+    if (compact.startsWith('제주(현지)') && compact.includes('발생')) return '제주(현지)\n발생비용';
+    if (compact.startsWith('국내') && compact.includes('발생')) return '국내\n발생비용';
+    const split = compact.match(/^(.{2,}?)((?:발생|운영).+)$/);
+    if (split && compact.length >= 7) return `${split[1]}\n${split[2]}`;
+    return raw;
+  }
   function formatSecLabelForTable(text) {
-    return escAttr(String(text || '')).replace(/\n/g, '<br>');
+    return escAttr(normalizeSecLabelLines(text)).replace(/\n/g, '<br>');
   }
   
   function escAttr(str='') { return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -1055,12 +1068,12 @@
     
     const flights = getRowData('flight').filter(r => r.name.trim()).map(r => ({ ...r, qty:Number(r.qty)||0, krw:Number(r.krw)||0, tot:(Number(r.qty)||0)*(Number(r.krw)||0) })); tF = flights.reduce((s, r) => s + r.tot, 0);
     let h = '';
-    if (!flights.length) h += `<tr><td class="text-center font-bold bg-gray-50 export-text">${fH}</td><td colspan="${col - 1}" class="text-center">입력된 항목이 없습니다.</td></tr>`;
+    if (!flights.length) h += `<tr><td class="text-center font-bold bg-gray-50 export-text sec-label-cell">${fH}</td><td colspan="${col - 1}" class="text-center">입력된 항목이 없습니다.</td></tr>`;
     else {
       for (let i=0; i<flights.length; i++) {
         const hC = flights[i].hl ? ' hl-text' : ''; // 💡 항목 강조 반영
         h += '<tr>';
-        if (i === 0) h += `<td rowspan="${flights.length}" class="text-center font-bold bg-gray-50 export-text">${fH}</td>`;
+        if (i === 0) h += `<td rowspan="${flights.length}" class="text-center font-bold bg-gray-50 export-text sec-label-cell">${fH}</td>`;
         if (i === 0 || flights[i].name !== flights[i-1].name) h += `<td rowspan="${rs(flights, i, 'name')}" class="text-center export-text${hC}">${escAttr(flights[i].name)}</td>`;
         if (i === 0 || flights[i].name !== flights[i-1].name || flights[i].desc !== flights[i-1].desc) h += `<td rowspan="${rs2(flights, i)}" class="export-text${hC}">${escAttr(flights[i].desc)}</td>`;
         h += `<td class="text-center export-qty${hC}" data-group="flight">${fmt(flights[i].qty)}</td>`;
@@ -1072,12 +1085,12 @@
     
     const locals = getRowData('local').filter(r => r.name.trim()).map(r => { const qty = Number(r.qty) || 0; const fgn = Number(r.fgn) || 0; const krw = isKRW ? fgn : Math.round(fgn * exRate); return { ...r, qty, fgn, krw, tot:qty * krw }; }); tL = locals.reduce((s, r) => s + r.tot, 0);
     h = '';
-    if (!locals.length) h += `<tr><td class="text-center font-bold bg-gray-50 export-text">${lH}</td><td colspan="${col - 1}" class="text-center">입력된 항목이 없습니다.</td></tr>`;
+    if (!locals.length) h += `<tr><td class="text-center font-bold bg-gray-50 export-text sec-label-cell">${lH}</td><td colspan="${col - 1}" class="text-center">입력된 항목이 없습니다.</td></tr>`;
     else {
       for (let i=0; i<locals.length; i++) {
         const hC = locals[i].hl ? ' hl-text' : ''; // 💡 항목 강조 반영
         h += '<tr>';
-        if (i === 0) h += `<td rowspan="${locals.length}" class="text-center font-bold bg-gray-50 export-text">${lH}</td>`;
+        if (i === 0) h += `<td rowspan="${locals.length}" class="text-center font-bold bg-gray-50 export-text sec-label-cell">${lH}</td>`;
         if (i === 0 || locals[i].name !== locals[i-1].name) h += `<td rowspan="${rs(locals, i, 'name')}" class="text-center export-text${hC}">${escAttr(locals[i].name)}</td>`;
         if (i === 0 || locals[i].name !== locals[i-1].name || locals[i].desc !== locals[i-1].desc) h += `<td rowspan="${rs2(locals, i)}" class="export-text${hC}">${escAttr(locals[i].desc)}</td>`;
         h += `<td class="text-center export-qty${hC}" data-group="local">${fmt(locals[i].qty)}</td>`;
@@ -1088,12 +1101,12 @@
     h += `<tr class="subtotal-row"><td colspan="${col}" class="text-center">(2) 합계</td><td class="text-right" id="sub-local">₩${fmtT(tL)}</td><td></td></tr>`; $('#tbody-local').innerHTML = h;
     
     const doms = getRowData('domestic').filter(r => r.name.trim()).map(r => ({ ...r, qty:Number(r.qty)||0, krw:Number(r.krw)||0, tot:(Number(r.qty)||0)*(Number(r.krw)||0) })); tD = doms.reduce((s, r) => s + r.tot, 0); h = '';
-    if (!doms.length) h += `<tr><td class="text-center font-bold bg-gray-50 export-text">${dH}</td><td colspan="${col - 1}" class="text-center">입력된 항목이 없습니다.</td></tr>`;
+    if (!doms.length) h += `<tr><td class="text-center font-bold bg-gray-50 export-text sec-label-cell">${dH}</td><td colspan="${col - 1}" class="text-center">입력된 항목이 없습니다.</td></tr>`;
     else {
       for (let i=0; i<doms.length; i++) {
         const hC = doms[i].hl ? ' hl-text' : ''; // 💡 항목 강조 반영
         h += '<tr>';
-        if (i === 0) h += `<td rowspan="${doms.length}" class="text-center font-bold bg-gray-50 export-text">${dH}</td>`;
+        if (i === 0) h += `<td rowspan="${doms.length}" class="text-center font-bold bg-gray-50 export-text sec-label-cell">${dH}</td>`;
         if (i === 0 || doms[i].name !== doms[i-1].name) h += `<td rowspan="${rs(doms, i, 'name')}" class="text-center export-text${hC}">${escAttr(doms[i].name)}</td>`;
         if (i === 0 || doms[i].name !== doms[i-1].name || doms[i].desc !== doms[i-1].desc) h += `<td rowspan="${rs2(doms, i)}" class="export-text${hC}">${escAttr(doms[i].desc)}</td>`;
         h += `<td class="text-center export-qty${hC}" data-group="domestic">${fmt(doms[i].qty)}</td>`;
@@ -1280,6 +1293,7 @@
       .a4-sheet{background:#fff;width:100%;max-width:850px;padding:40px;box-shadow:0 10px 40px rgba(0,0,0,.1);border-radius:4px;margin-bottom:40px;position:relative}
       table{width:100%;border-collapse:collapse;table-layout:fixed;word-break:keep-all}
       th,td{border:1px solid #cbd5e1;padding:6px 8px;font-size:12px;overflow:hidden}
+      td.sec-label-cell{overflow:visible;line-height:1.3;font-size:10px;padding:4px 3px;white-space:normal}
       th{background:#f8fafc;font-weight:bold;text-align:center;color:#0f172a}
       .text-center{text-align:center}.text-right{text-align:right}.font-bold{font-weight:bold}.bg-gray-50{background:#f8fafc}.bg-yellow-50{background:#fef9c3}
       .subtotal-row td{background:#f1f5f9;font-weight:bold;border-bottom:2px solid #cbd5e1}.grand-row td{background:#f8fafc;font-weight:bold;border-top:2px solid #0f172a}.grand-row-last td{border-bottom:none !important}
