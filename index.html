@@ -74,7 +74,7 @@
     .blue::before { background:#2563eb; } .dark::before { background:#334155; } .green::before { background:#059669; } .orange::before { background:#ea580c; } .cyan::before { background:#0891b2; }
     .form-row { display:grid; gap:12px; margin-bottom:12px; }
     .form-row.cols-2 { grid-template-columns:1fr 1fr; } .form-row.cols-1 { grid-template-columns:1fr; }
-    .sec-label-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:-8px 0 14px; padding:10px 12px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:6px; }
+    .sec-label-row { display:grid; grid-template-columns:1fr; gap:10px; margin:-8px 0 14px; padding:10px 12px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:6px; }
     .sec-label-row label { display:block; font-size:11px; font-weight:700; color:#64748b; margin-bottom:4px; }
     .sec-label-input { padding:6px 10px !important; font-size:12px !important; font-weight:600; }
     .sec-label-hint { grid-column:1 / -1; font-size:11px; color:#94a3b8; line-height:1.4; margin-top:-2px; }
@@ -292,8 +292,7 @@
           <div class="section-title dark" id="title-flight-area">2. 항공료 영역 (원화 직접 입력)</div>
           <div class="sec-label-row">
             <div><label for="inp-sec-flight">표 구분명 (출력)</label><input type="text" id="inp-sec-flight" class="form-input sec-label-input" value="항공료" placeholder="예: 항공료, 교통비"></div>
-            <div><label for="inp-sec-flight-sub">합계 표기 (출력)</label><input type="text" id="inp-sec-flight-sub" class="form-input sec-label-input" value="(1) 합계 - 항공료" placeholder="예: (1) 합계 - 항공료"></div>
-            <p class="sec-label-hint">※ 산출표 좌측 「구분」 열과 합계 행에 표시됩니다. 줄바꿈은 Enter로 입력 가능합니다.</p>
+            <p class="sec-label-hint">※ 산출표 좌측 「구분」 열에 표시됩니다. 줄바꿈은 Enter로 입력 가능합니다.</p>
           </div>
           <div id="flight-inputs-container"></div>
           <button type="button" class="btn-add-item" id="btn-add-flight">+ 항공비 항목 추가</button>
@@ -302,7 +301,6 @@
           <div class="section-title green" id="title-local-expense">3. 해외현지 발생비용 (외화 입력)</div>
           <div class="sec-label-row">
             <div><label for="inp-sec-local">표 구분명 (출력)</label><input type="text" id="inp-sec-local" class="form-input sec-label-input" value="해외현지&#10;발생비용" placeholder="예: 행사비용, 제주(현지) 발생비용"></div>
-            <div><label for="inp-sec-local-sub">합계 표기 (출력)</label><input type="text" id="inp-sec-local-sub" class="form-input sec-label-input" value="(2) 합계 - 해외현지 발생 비용" placeholder="예: (2) 합계 - 알선수수료"></div>
           </div>
           <p class="hint-text">카드를 드래그 앤 드롭하여 순서를 변경할 수 있습니다. <strong>💡 색상강조</strong> 버튼을 누르면 해당 행이 빨갛게 하이라이트 됩니다.</p>
           <div id="local-inputs-container"></div>
@@ -312,7 +310,6 @@
           <div class="section-title orange" id="title-domestic-area">4. 국내 발생 비용 (원화 직접 입력)</div>
           <div class="sec-label-row">
             <div><label for="inp-sec-domestic">표 구분명 (출력)</label><input type="text" id="inp-sec-domestic" class="form-input sec-label-input" value="국내 발생 비용" placeholder="예: 기획운영비"></div>
-            <div><label for="inp-sec-domestic-sub">합계 표기 (출력)</label><input type="text" id="inp-sec-domestic-sub" class="form-input sec-label-input" value="(3) 합계 - 국내 발생 비용" placeholder="예: (3) 합계 - 기획운영비"></div>
           </div>
           <div id="domestic-inputs-container"></div>
           <button type="button" class="btn-add-item" id="btn-add-domestic">+ 국내 발생비용 항목 추가</button>
@@ -532,12 +529,12 @@
   ];
 
   const SECTION_DEFAULTS = {
-    JPY: { flight: '항공료', flightSub: '(1) 합계 - 항공료', local: '해외현지\n발생비용', localSub: '(2) 합계 - 해외현지 발생 비용', domestic: '국내 발생 비용', domesticSub: '(3) 합계 - 국내 발생 비용', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 해외현지 발생비용 (외화 입력)', domesticTitle: '4. 국내 발생 비용 (원화 직접 입력)' },
-    USD: { flight: '항공료', flightSub: '(1) 합계 - 항공료', local: '해외현지\n발생비용', localSub: '(2) 합계 - 해외현지 발생 비용', domestic: '국내 발생 비용', domesticSub: '(3) 합계 - 국내 발생 비용', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 해외현지 발생비용 (외화 입력)', domesticTitle: '4. 국내 발생 비용 (원화 직접 입력)' },
-    AUD: { flight: '항공료', flightSub: '(1) 합계 - 항공료', local: '해외현지\n발생비용', localSub: '(2) 합계 - 해외현지 발생 비용', domestic: '국내 발생 비용', domesticSub: '(3) 합계 - 국내 발생 비용', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 해외현지 발생비용 (외화 입력)', domesticTitle: '4. 국내 발생 비용 (원화 직접 입력)' },
-    CNY: { flight: '항공료', flightSub: '(1) 합계 - 항공료', local: '해외현지\n발생비용', localSub: '(2) 합계 - 해외현지 발생 비용', domestic: '국내 발생 비용', domesticSub: '(3) 합계 - 국내 발생 비용', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 해외현지 발생비용 (외화 입력)', domesticTitle: '4. 국내 발생 비용 (원화 직접 입력)' },
-    KRW_MAINLAND: { flight: '교통비', flightSub: '(1) 합계 - 교통비', local: '행사비용', localSub: '(2) 합계 - 행사 비용', domestic: '기획운영비', domesticSub: '(3) 합계 - 기획운영비', flightTitle: '2. 교통비 영역 (원화 직접 입력)', localTitle: '3. 행사비용 (원화 직접 입력)', domesticTitle: '4. 기획운영비 (원화 직접 입력)' },
-    KRW_JEJU: { flight: '항공료', flightSub: '(1) 합계 - 항공료', local: '제주(현지)\n발생비용', localSub: '(2) 합계 - 제주(현지) 발생 비용', domestic: '기획운영비', domesticSub: '(3) 합계 - 기획운영비', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 제주(현지) 발생비용 (원화 직접 입력)', domesticTitle: '4. 기획운영비 (원화 직접 입력)' }
+    JPY: { flight: '항공료', local: '해외현지\n발생비용', domestic: '국내 발생 비용', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 해외현지 발생비용 (외화 입력)', domesticTitle: '4. 국내 발생 비용 (원화 직접 입력)' },
+    USD: { flight: '항공료', local: '해외현지\n발생비용', domestic: '국내 발생 비용', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 해외현지 발생비용 (외화 입력)', domesticTitle: '4. 국내 발생 비용 (원화 직접 입력)' },
+    AUD: { flight: '항공료', local: '해외현지\n발생비용', domestic: '국내 발생 비용', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 해외현지 발생비용 (외화 입력)', domesticTitle: '4. 국내 발생 비용 (원화 직접 입력)' },
+    CNY: { flight: '항공료', local: '해외현지\n발생비용', domestic: '국내 발생 비용', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 해외현지 발생비용 (외화 입력)', domesticTitle: '4. 국내 발생 비용 (원화 직접 입력)' },
+    KRW_MAINLAND: { flight: '교통비', local: '행사비용', domestic: '기획운영비', flightTitle: '2. 교통비 영역 (원화 직접 입력)', localTitle: '3. 행사비용 (원화 직접 입력)', domesticTitle: '4. 기획운영비 (원화 직접 입력)' },
+    KRW_JEJU: { flight: '항공료', local: '제주(현지)\n발생비용', domestic: '기획운영비', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 제주(현지) 발생비용 (원화 직접 입력)', domesticTitle: '4. 기획운영비 (원화 직접 입력)' }
   };
   function getSectionDefaults(currency) {
     return SECTION_DEFAULTS[currency] || SECTION_DEFAULTS.JPY;
@@ -545,11 +542,8 @@
   function applySectionLabelDefaults(currency) {
     const d = getSectionDefaults(currency);
     $('#inp-sec-flight').value = d.flight;
-    $('#inp-sec-flight-sub').value = d.flightSub;
     $('#inp-sec-local').value = d.local;
-    $('#inp-sec-local-sub').value = d.localSub;
     $('#inp-sec-domestic').value = d.domestic;
-    $('#inp-sec-domestic-sub').value = d.domesticSub;
     $('#title-flight-area').textContent = d.flightTitle;
     $('#title-local-expense').innerHTML = currency === 'JPY' || currency === 'USD' || currency === 'AUD' || currency === 'CNY'
       ? `${d.localTitle} <span style="font-size:12px;font-weight:400;color:#64748b;margin-left:8px;">*원화 자동 환산</span>`
@@ -559,20 +553,14 @@
   function getSectionLabelsFromForm() {
     return {
       flight: $('#inp-sec-flight').value.trim() || '항공료',
-      flightSub: $('#inp-sec-flight-sub').value.trim() || '(1) 합계 - 항공료',
       local: $('#inp-sec-local').value.trim() || '해외현지\n발생비용',
-      localSub: $('#inp-sec-local-sub').value.trim() || '(2) 합계 - 해외현지 발생 비용',
-      domestic: $('#inp-sec-domestic').value.trim() || '국내 발생 비용',
-      domesticSub: $('#inp-sec-domestic-sub').value.trim() || '(3) 합계 - 국내 발생 비용'
+      domestic: $('#inp-sec-domestic').value.trim() || '국내 발생 비용'
     };
   }
   function setSectionLabelsFromData(data) {
     if (data.secFlight != null) $('#inp-sec-flight').value = data.secFlight;
-    if (data.secFlightSub != null) $('#inp-sec-flight-sub').value = data.secFlightSub;
     if (data.secLocal != null) $('#inp-sec-local').value = data.secLocal;
-    if (data.secLocalSub != null) $('#inp-sec-local-sub').value = data.secLocalSub;
     if (data.secDomestic != null) $('#inp-sec-domestic').value = data.secDomestic;
-    if (data.secDomesticSub != null) $('#inp-sec-domestic-sub').value = data.secDomesticSub;
   }
   function formatSecLabelForTable(text) {
     return escAttr(String(text || '')).replace(/\n/g, '<br>');
@@ -785,9 +773,9 @@
       clientName: $('#inp-clientName').value, docTitle: $('#inp-docTitle').value, travelDate: $('#inp-travelDate').value, paxStr: $('#inp-paxStr').value, issueDate: $('#inp-issueDate').value, exRate: parseCurrency($('#inp-exRate').value), detSpecialNote: $('#inp-det-specialNote').value,
       detShowTaxNote: $('#inp-det-showTaxNote').checked,
       detIssueHl: $('#inp-hl-issueDate').checked, // 💡 발송일 강조 여부 저장
-      secFlight: $('#inp-sec-flight').value, secFlightSub: $('#inp-sec-flight-sub').value,
-      secLocal: $('#inp-sec-local').value, secLocalSub: $('#inp-sec-local-sub').value,
-      secDomestic: $('#inp-sec-domestic').value, secDomesticSub: $('#inp-sec-domestic-sub').value,
+      secFlight: $('#inp-sec-flight').value,
+      secLocal: $('#inp-sec-local').value,
+      secDomestic: $('#inp-sec-domestic').value,
       flights: getRowData('flight'), locals: getRowData('local'), domestics: getRowData('domestic'),
       simDep: $('#inp-sim-dep').value, simInv: $('#inp-sim-inv').value, simSubject: $('#inp-sim-subject').value, simToName: $('#inp-sim-toName').value, simToAddr: $('#inp-sim-toAddr').value, simToPerson: $('#inp-sim-toPerson').value, simBankName: $('#inp-sim-bankName').value, simBankNum: $('#inp-sim-bankNum').value, simBankHolder: $('#inp-sim-bankHolder').value, simDue: $('#inp-sim-due').value, simVat: $('#inp-sim-vat').value, simVatManual: parseCurrency($('#inp-sim-vat-manual').value), simExtraFee: $('#inp-sim-extraFee').value, simTaxNote: $('#inp-sim-taxNote').value, simInc: $('#inp-sim-inc').value, simExc: $('#inp-sim-exc').value, 
       simples: getRowData('simple'),
@@ -1051,11 +1039,8 @@
     const currency = $('#inp-currency').value; const isMainland = currency === 'KRW_MAINLAND'; const isJeju = currency === 'KRW_JEJU'; const isKRW = isMainland || isJeju; const exRate = isKRW ? 1 : (parseCurrency($('#inp-exRate').value) || 0);
     const sec = getSectionLabelsFromForm();
     const fH = formatSecLabelForTable(sec.flight);
-    const fSub = escAttr(sec.flightSub);
     const lH = formatSecLabelForTable(sec.local);
-    const lSub = escAttr(sec.localSub);
     const dH = formatSecLabelForTable(sec.domestic);
-    const dSub = escAttr(sec.domesticSub);
     
     $('#out-clientName').textContent = $('#inp-clientName').value; $('#out-docTitle').textContent = $('#inp-docTitle').value; $('#out-travelDate').textContent = $('#inp-travelDate').value; $('#out-paxStr').textContent = $('#inp-paxStr').value;
     
@@ -1083,7 +1068,7 @@
         h += `<td class="text-right export-krw${hC}" data-group="flight">${fmt(flights[i].krw)}</td><td class="text-right font-semibold export-tot${hC}" data-group="flight">${fmtT(flights[i].tot)}</td><td class="text-center export-text${hC}">${escAttr(flights[i].note || '')}</td></tr>`;
       }
     }
-    h += `<tr class="subtotal-row"><td colspan="${col}" class="text-center">${fSub}</td><td class="text-right" id="sub-flight">₩${fmtT(tF)}</td><td></td></tr>`; $('#tbody-flight').innerHTML = h;
+    h += `<tr class="subtotal-row"><td colspan="${col}" class="text-center">(1) 합계</td><td class="text-right" id="sub-flight">₩${fmtT(tF)}</td><td></td></tr>`; $('#tbody-flight').innerHTML = h;
     
     const locals = getRowData('local').filter(r => r.name.trim()).map(r => { const qty = Number(r.qty) || 0; const fgn = Number(r.fgn) || 0; const krw = isKRW ? fgn : Math.round(fgn * exRate); return { ...r, qty, fgn, krw, tot:qty * krw }; }); tL = locals.reduce((s, r) => s + r.tot, 0);
     h = '';
@@ -1100,7 +1085,7 @@
         h += `<td class="text-right export-krw${hC}" data-group="local">${fmt(locals[i].krw)}</td><td class="text-right font-semibold export-tot${hC}" data-group="local">${fmtT(locals[i].tot)}</td><td class="text-center export-text${hC}">${escAttr(locals[i].note || '')}</td></tr>`;
       }
     }
-    h += `<tr class="subtotal-row"><td colspan="${col}" class="text-center">${lSub}</td><td class="text-right" id="sub-local">₩${fmtT(tL)}</td><td></td></tr>`; $('#tbody-local').innerHTML = h;
+    h += `<tr class="subtotal-row"><td colspan="${col}" class="text-center">(2) 합계</td><td class="text-right" id="sub-local">₩${fmtT(tL)}</td><td></td></tr>`; $('#tbody-local').innerHTML = h;
     
     const doms = getRowData('domestic').filter(r => r.name.trim()).map(r => ({ ...r, qty:Number(r.qty)||0, krw:Number(r.krw)||0, tot:(Number(r.qty)||0)*(Number(r.krw)||0) })); tD = doms.reduce((s, r) => s + r.tot, 0); h = '';
     if (!doms.length) h += `<tr><td class="text-center font-bold bg-gray-50 export-text">${dH}</td><td colspan="${col - 1}" class="text-center">입력된 항목이 없습니다.</td></tr>`;
@@ -1116,7 +1101,7 @@
         h += `<td class="text-right export-krw${hC}" data-group="domestic">${fmt(doms[i].krw)}</td><td class="text-right font-semibold export-tot${hC}" data-group="domestic">${fmtT(doms[i].tot)}</td><td class="text-center export-text${hC}">${escAttr(doms[i].note || '')}</td></tr>`;
       }
     }
-    h += `<tr class="subtotal-row"><td colspan="${col}" class="text-center">${dSub}</td><td class="text-right" id="sub-domestic">₩${fmtT(tD)}</td><td></td></tr>`; $('#tbody-domestic').innerHTML = h;
+    h += `<tr class="subtotal-row"><td colspan="${col}" class="text-center">(3) 합계</td><td class="text-right" id="sub-domestic">₩${fmtT(tD)}</td><td></td></tr>`; $('#tbody-domestic').innerHTML = h;
     const grandTotal = tF + tL + tD; const eventOnly = tL + tD; 
     
     const specialNote = escAttr($('#inp-det-specialNote').value.trim()); 
