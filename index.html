@@ -301,7 +301,7 @@
         <div class="form-group">
           <div class="section-title green" id="title-local-expense">3. 해외현지 발생비용 (외화 입력)</div>
           <div class="sec-label-row">
-            <div><label for="inp-sec-local">표 구분명 (출력)</label><input type="text" id="inp-sec-local" class="form-input sec-label-input" value="해외현지&#10;발생비용" placeholder="예: 알선수수료, 가이드, 행사비용"></div>
+            <div><label for="inp-sec-local">표 구분명 (출력)</label><input type="text" id="inp-sec-local" class="form-input sec-label-input" value="해외현지&#10;발생비용" placeholder="예: 행사비용, 제주(현지) 발생비용"></div>
             <div><label for="inp-sec-local-sub">합계 표기 (출력)</label><input type="text" id="inp-sec-local-sub" class="form-input sec-label-input" value="(2) 합계 - 해외현지 발생 비용" placeholder="예: (2) 합계 - 알선수수료"></div>
           </div>
           <p class="hint-text">카드를 드래그 앤 드롭하여 순서를 변경할 수 있습니다. <strong>💡 색상강조</strong> 버튼을 누르면 해당 행이 빨갛게 하이라이트 됩니다.</p>
@@ -311,8 +311,8 @@
         <div class="form-group">
           <div class="section-title orange" id="title-domestic-area">4. 국내 발생 비용 (원화 직접 입력)</div>
           <div class="sec-label-row">
-            <div><label for="inp-sec-domestic">표 구분명 (출력)</label><input type="text" id="inp-sec-domestic" class="form-input sec-label-input" value="국내 발생 비용" placeholder="예: 자체수배, 기타경비"></div>
-            <div><label for="inp-sec-domestic-sub">합계 표기 (출력)</label><input type="text" id="inp-sec-domestic-sub" class="form-input sec-label-input" value="(3) 합계 - 국내 발생 비용" placeholder="예: (3) 합계 - 자체수배"></div>
+            <div><label for="inp-sec-domestic">표 구분명 (출력)</label><input type="text" id="inp-sec-domestic" class="form-input sec-label-input" value="국내 발생 비용" placeholder="예: 기획운영비"></div>
+            <div><label for="inp-sec-domestic-sub">합계 표기 (출력)</label><input type="text" id="inp-sec-domestic-sub" class="form-input sec-label-input" value="(3) 합계 - 국내 발생 비용" placeholder="예: (3) 합계 - 기획운영비"></div>
           </div>
           <div id="domestic-inputs-container"></div>
           <button type="button" class="btn-add-item" id="btn-add-domestic">+ 국내 발생비용 항목 추가</button>
@@ -536,8 +536,8 @@
     USD: { flight: '항공료', flightSub: '(1) 합계 - 항공료', local: '해외현지\n발생비용', localSub: '(2) 합계 - 해외현지 발생 비용', domestic: '국내 발생 비용', domesticSub: '(3) 합계 - 국내 발생 비용', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 해외현지 발생비용 (외화 입력)', domesticTitle: '4. 국내 발생 비용 (원화 직접 입력)' },
     AUD: { flight: '항공료', flightSub: '(1) 합계 - 항공료', local: '해외현지\n발생비용', localSub: '(2) 합계 - 해외현지 발생 비용', domestic: '국내 발생 비용', domesticSub: '(3) 합계 - 국내 발생 비용', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 해외현지 발생비용 (외화 입력)', domesticTitle: '4. 국내 발생 비용 (원화 직접 입력)' },
     CNY: { flight: '항공료', flightSub: '(1) 합계 - 항공료', local: '해외현지\n발생비용', localSub: '(2) 합계 - 해외현지 발생 비용', domestic: '국내 발생 비용', domesticSub: '(3) 합계 - 국내 발생 비용', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 해외현지 발생비용 (외화 입력)', domesticTitle: '4. 국내 발생 비용 (원화 직접 입력)' },
-    KRW_MAINLAND: { flight: '교통비', flightSub: '(1) 합계 - 교통비', local: '알선수수료', localSub: '(2) 합계 - 알선수수료', domestic: '자체수배', domesticSub: '(3) 합계 - 자체수배', flightTitle: '2. 교통비 영역 (원화 직접 입력)', localTitle: '3. 알선수수료·가이드 등 (원화 직접 입력)', domesticTitle: '4. 자체수배·기타경비 (원화 직접 입력)' },
-    KRW_JEJU: { flight: '항공료', flightSub: '(1) 합계 - 항공료', local: '제주(현지)\n발생비용', localSub: '(2) 합계 - 제주(현지) 발생 비용', domestic: '알선수수료', domesticSub: '(3) 합계 - 알선수수료', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 제주(현지) 발생비용 (원화 직접 입력)', domesticTitle: '4. 알선수수료·자체수배 (원화 직접 입력)' }
+    KRW_MAINLAND: { flight: '교통비', flightSub: '(1) 합계 - 교통비', local: '행사비용', localSub: '(2) 합계 - 행사 비용', domestic: '기획운영비', domesticSub: '(3) 합계 - 기획운영비', flightTitle: '2. 교통비 영역 (원화 직접 입력)', localTitle: '3. 행사비용 (원화 직접 입력)', domesticTitle: '4. 기획운영비 (원화 직접 입력)' },
+    KRW_JEJU: { flight: '항공료', flightSub: '(1) 합계 - 항공료', local: '제주(현지)\n발생비용', localSub: '(2) 합계 - 제주(현지) 발생 비용', domestic: '기획운영비', domesticSub: '(3) 합계 - 기획운영비', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 제주(현지) 발생비용 (원화 직접 입력)', domesticTitle: '4. 기획운영비 (원화 직접 입력)' }
   };
   function getSectionDefaults(currency) {
     return SECTION_DEFAULTS[currency] || SECTION_DEFAULTS.JPY;
