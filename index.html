@@ -267,8 +267,9 @@
         </select>
         <div class="exrate-row" id="wrap-exRate">
           <label for="inp-exRate">적용 환율 :</label>
-          <input type="text" id="inp-exRate" class="exrate-input amount" value="9.5">
+          <input type="text" id="inp-exRate" class="exrate-input amount" value="9.51">
           <span style="font-size:12px;color:#64748b;">기준(송금)</span>
+          <span style="font-size:11px;color:#94a3b8;margin-left:4px;">※ 통화 변경 시 최신 기준값 자동 반영</span>
         </div>
       </div>
       <div id="detailed-input-group">
@@ -530,6 +531,21 @@
     { name: '국내진행', desc: '여행자보험, 공항수송, 운영관리비', qty: 1, krw: 6427000, hl: false }
   ];
 
+  // 적용 환율 기본값 (원화/1외화단위, 송금·전신환 매도율 기준 · 2026-06-17 고시)
+  const EXRATE_DEFAULTS = {
+    JPY: 9.51,   // 100엔 ≒ 951원
+    USD: 1521,
+    AUD: 1077,
+    CNY: 225
+  };
+  function getExRateDefault(currency) {
+    return EXRATE_DEFAULTS[currency] ?? EXRATE_DEFAULTS.JPY;
+  }
+  function applyExRateDefault(currency) {
+    const curr = currency || $('#inp-currency').value;
+    if (EXRATE_DEFAULTS[curr] != null) $('#inp-exRate').value = fmt(getExRateDefault(curr));
+  }
+
   const SECTION_DEFAULTS = {
     JPY: { flight: '항공료', local: '해외현지\n발생비용', domestic: '국내 발생 비용', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 해외현지 발생비용 (외화 입력)', domesticTitle: '4. 국내 발생 비용 (원화 직접 입력)' },
     USD: { flight: '항공료', local: '해외현지\n발생비용', domestic: '국내 발생 비용', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 해외현지 발생비용 (외화 입력)', domesticTitle: '4. 국내 발생 비용 (원화 직접 입력)' },
@@ -698,7 +714,10 @@
     const curr = $('#inp-currency').value;
     $('#wrap-exRate').style.display = (curr === 'KRW_MAINLAND' || curr === 'KRW_JEJU' || curr === 'SIMPLE_QUOTE') ? 'none' : 'flex';
     $$('.l-fgn').forEach(el => { el.placeholder = (curr === 'KRW_MAINLAND' || curr === 'KRW_JEJU') ? '단가(₩)' : '단가(외화)'; });
-    if (applyDefaults && curr !== 'SIMPLE_QUOTE') applySectionLabelDefaults(curr);
+    if (applyDefaults && curr !== 'SIMPLE_QUOTE') {
+      applySectionLabelDefaults(curr);
+      applyExRateDefault(curr);
+    }
   }
   function toggleDocMode(applySectionDefaults = false) {
     const simple = $('#inp-currency').value === 'SIMPLE_QUOTE';
@@ -799,7 +818,7 @@
   function setFormData(data) {
     const hasCustomSec = data.secFlight != null || data.secLocal != null || data.secDomestic != null;
     $('#inp-currency').value = data.currency || 'JPY'; toggleDocMode(false);
-    $('#inp-clientName').value = data.clientName || ''; $('#inp-docTitle').value = data.docTitle || ''; $('#inp-travelDate').value = data.travelDate || ''; $('#inp-paxStr').value = data.paxStr || ''; $('#inp-issueDate').value = data.issueDate || getFormattedDate('dot'); $('#inp-exRate').value = data.exRate ? fmt(data.exRate) : '9.5'; $('#inp-det-specialNote').value = data.detSpecialNote || '';
+    $('#inp-clientName').value = data.clientName || ''; $('#inp-docTitle').value = data.docTitle || ''; $('#inp-travelDate').value = data.travelDate || ''; $('#inp-paxStr').value = data.paxStr || ''; $('#inp-issueDate').value = data.issueDate || getFormattedDate('dot'); $('#inp-exRate').value = data.exRate ? fmt(data.exRate) : fmt(getExRateDefault(data.currency || 'JPY')); $('#inp-det-specialNote').value = data.detSpecialNote || '';
     $('#inp-det-showTaxNote').checked = data.detShowTaxNote !== false; 
     $('#inp-hl-issueDate').checked = !!data.detIssueHl;
     $('#inp-sim-hl-issueDate').checked = !!data.simIssueHl;
