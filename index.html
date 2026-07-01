@@ -258,6 +258,7 @@
             <option value="USD">해외행사 - USD (달러)</option>
             <option value="AUD">해외행사 - AUD (호주달러)</option>
             <option value="CNY">해외행사 - CNY (위안화)</option>
+            <option value="SGD">해외행사 - SGD (싱가폴달러)</option>
             <option value="KRW_JEJU">국내행사 - 제주 (KRW)</option>
             <option value="KRW_MAINLAND">국내행사 - 내륙 (KRW)</option>
           </optgroup>
@@ -536,7 +537,8 @@
     JPY: 9.51,   // 100엔 ≒ 951원
     USD: 1521,
     AUD: 1077,
-    CNY: 225
+    CNY: 225,
+    SGD: 1150
   };
   function getExRateDefault(currency) {
     return EXRATE_DEFAULTS[currency] ?? EXRATE_DEFAULTS.JPY;
@@ -551,6 +553,7 @@
     USD: { flight: '항공료', local: '해외현지\n발생비용', domestic: '국내 발생 비용', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 해외현지 발생비용 (외화 입력)', domesticTitle: '4. 국내 발생 비용 (원화 직접 입력)' },
     AUD: { flight: '항공료', local: '해외현지\n발생비용', domestic: '국내 발생 비용', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 해외현지 발생비용 (외화 입력)', domesticTitle: '4. 국내 발생 비용 (원화 직접 입력)' },
     CNY: { flight: '항공료', local: '해외현지\n발생비용', domestic: '국내 발생 비용', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 해외현지 발생비용 (외화 입력)', domesticTitle: '4. 국내 발생 비용 (원화 직접 입력)' },
+    SGD: { flight: '항공료', local: '해외현지\n발생비용', domestic: '국내 발생 비용', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 해외현지 발생비용 (외화 입력)', domesticTitle: '4. 국내 발생 비용 (원화 직접 입력)' },
     KRW_MAINLAND: { flight: '교통비', local: '행사비용', domestic: '기획운영비', flightTitle: '2. 교통비 영역 (원화 직접 입력)', localTitle: '3. 행사비용 (원화 직접 입력)', domesticTitle: '4. 기획운영비 (원화 직접 입력)' },
     KRW_JEJU: { flight: '항공료', local: '제주(현지)\n발생비용', domestic: '기획운영비', flightTitle: '2. 항공료 영역 (원화 직접 입력)', localTitle: '3. 제주(현지) 발생비용 (원화 직접 입력)', domesticTitle: '4. 기획운영비 (원화 직접 입력)' }
   };
@@ -563,7 +566,7 @@
     $('#inp-sec-local').value = d.local;
     $('#inp-sec-domestic').value = d.domestic;
     $('#title-flight-area').textContent = d.flightTitle;
-    $('#title-local-expense').innerHTML = currency === 'JPY' || currency === 'USD' || currency === 'AUD' || currency === 'CNY'
+    $('#title-local-expense').innerHTML = currency === 'JPY' || currency === 'USD' || currency === 'AUD' || currency === 'CNY' || currency === 'SGD'
       ? `${d.localTitle} <span style="font-size:12px;font-weight:400;color:#64748b;margin-left:8px;">*원화 자동 환산</span>`
       : d.localTitle;
     $('#title-domestic-area').textContent = d.domesticTitle;
@@ -745,7 +748,7 @@
     $$('.error-border').forEach(el => el.classList.remove('error-border')); $$('.error-row-container').forEach(el => el.classList.remove('error-row-container'));
     if (mode === 'detailed') {
       const basePax = extractBasePax(); const exRateInput = $('#inp-exRate'); const exRate = parseCurrency(exRateInput.value);
-      const ranges = { JPY:[5,20], USD:[1000,2000], CNY:[100,300], AUD:[800,1200] };
+      const ranges = { JPY:[5,20], USD:[1000,2000], CNY:[100,300], AUD:[800,1200], SGD:[900,1300] };
       if (ranges[currencyVal]) {
         const [min, max] = ranges[currencyVal];
         if (exRate < min || exRate > max) { warnings.push({ msg:`환율 경고: ${currencyVal} 환율(${exRate})이 일반적인 범위를 벗어났습니다.`, targetId:'wrap-exRate' }); exRateInput.classList.add('error-border'); }
@@ -1079,8 +1082,8 @@
     $('#out-issueAndRate').textContent = isKRW ? `${$('#inp-issueDate').value} / 국내행사 (환율 미적용)` : `${$('#inp-issueDate').value} / ${currency} ${exRate} 기준(송금)`;
     $('#out-issueAndRate').className = $('#inp-hl-issueDate').checked ? 'export-text hl-text' : 'export-text'; // 💡 발송일 강조 반영
     
-    const cN = currency === 'JPY' ? '엔화' : (currency === 'USD' ? '달러' : (currency === 'AUD' ? '호주달러' : (isKRW ? '원화' : '위안화'))); 
-    const cS = (currency === 'USD' || currency === 'AUD') ? '$' : (isKRW ? '₩' : '¥'); 
+    const cN = currency === 'JPY' ? '엔화' : (currency === 'USD' ? '달러' : (currency === 'AUD' ? '호주달러' : (currency === 'SGD' ? '싱가폴달러' : (isKRW ? '원화' : '위안화')))); 
+    const cS = (currency === 'USD' || currency === 'AUD' || currency === 'SGD') ? '$' : (isKRW ? '₩' : '¥'); 
     const col = isKRW ? 5 : 6;
     $('#main-thead').innerHTML = `<tr><th style="width:9%">구분</th><th style="width:${isKRW ? '14%' : '11%'}">항목</th><th style="width:${isKRW ? '24%' : '18%'}">내용</th><th style="width:9%;font-size:10px;line-height:1.3">인원/객실수<br>차량대수</th>${!isKRW ? `<th style="width:11%;background:#fef08a;color:#0f172a">${cN} 단가<br><span style="font-weight:400;color:#475569">${currency}</span></th>` : ''}<th style="width:${isKRW ? '15%' : '12%'}">원화 단가<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '16%' : '14%'}">총금액<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '13%' : '16%'}">비고</th></tr>`;
     let tF = 0, tL = 0, tD = 0;
@@ -1256,7 +1259,7 @@
     
     const clone = $('#print-section').cloneNode(true);
     const currentCurrency = $('#inp-currency').value;
-    const isForeign = ['JPY', 'USD', 'CNY', 'AUD'].includes(currentCurrency);
+    const isForeign = ['JPY', 'USD', 'CNY', 'AUD', 'SGD'].includes(currentCurrency);
     const isSimple = currentCurrency === 'SIMPLE_QUOTE';
     
     if (isSimple) {
