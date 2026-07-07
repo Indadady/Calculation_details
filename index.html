@@ -121,7 +121,14 @@
     .doc-header-right img { height:36px; object-fit:contain; }
     .doc-title-area { text-align:center; margin-bottom:24px; }
     .doc-title-area h2 { display:inline-block; font-size:28px; font-weight:900; letter-spacing:.15em; border-bottom:3px solid #0f172a; padding:0 24px 6px; color:#0f172a; }
+    .doc-title-area.quote-mode h2 { letter-spacing:.45em; padding-left:.45em; }
     .doc-title-area p { font-size:11px; color:#64748b; font-weight:700; letter-spacing:.25em; margin-top:6px; text-transform:uppercase; }
+    .doc-label-toggle { display:flex; gap:8px; }
+    .doc-label-option { flex:1; position:relative; cursor:pointer; }
+    .doc-label-option input { position:absolute; opacity:0; width:0; height:0; }
+    .doc-label-option span { display:block; text-align:center; padding:10px 8px; border:2px solid #cbd5e1; border-radius:8px; font-size:13px; font-weight:700; color:#64748b; background:#fff; transition:.2s; }
+    .doc-label-option input:checked + span { border-color:#2563eb; background:#eff6ff; color:#1d4ed8; box-shadow:0 0 0 2px rgba(37,99,235,.15); }
+    .doc-label-option:hover span { border-color:#94a3b8; }
     .info-table, .main-table, .simple-table { width:100%; border-collapse:collapse; }
     .info-table th, .info-table td { border:1px solid #cbd5e1; padding:5px 8px; font-size:12px; }
     .info-table th { background:#f8fafc; color:#334155; font-weight:700; text-align:center; width:28%; }
@@ -291,6 +298,22 @@
               <input type="text" id="inp-issueDate" class="form-input" value="2026.03.16">
             </div>
           </div>
+          <div class="form-row cols-1" style="margin-top:4px;">
+            <div>
+              <label class="form-label">문서 표지 타이틀</label>
+              <div class="doc-label-toggle">
+                <label class="doc-label-option">
+                  <input type="radio" name="det-doc-label" id="inp-det-docLabel-calc" value="calculation" checked>
+                  <span>가격 산출 내역서</span>
+                </label>
+                <label class="doc-label-option">
+                  <input type="radio" name="det-doc-label" id="inp-det-docLabel-quote" value="quote">
+                  <span>견적서</span>
+                </label>
+              </div>
+              <p class="hint-text" style="margin-top:8px; margin-bottom:0;">계약 전 기관 제출 시 <strong>견적서</strong>, 계약 체결 후에는 <strong>가격 산출 내역서</strong>로 전환하세요.</p>
+            </div>
+          </div>
         </div>
         <div class="form-group">
           <div class="section-title dark" id="title-flight-area">2. 항공료 영역 (원화 직접 입력)</div>
@@ -428,7 +451,7 @@
             </div>
             <div class="doc-header-right"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHfgIX70O5k6Anuo0UgALIdaG9jSga9auHu3uyz0uEirylGPAJnjN_qQbvEGMUvPqUQf_g9FMNUHRxlDcUBf4vZ3Mpy4TnA9WxbmzWYK11gt2zuy_Irl4wctNFjcjLyPo0GPXV792o_J7L9guRMuDfeC1gy7USwywjYbECZgzcsHybuGRRAXAnO1eNmP8/s320/logo.png" alt="TOURMAKER"></div>
           </div>
-          <div class="doc-title-area"><h2>가격 산출 내역서</h2><p>Calculation Details</p></div>
+          <div class="doc-title-area" id="out-det-docTitleArea"><h2 id="out-det-docTitleMain">가격 산출 내역서</h2><p id="out-det-docTitleSub">Calculation Details</p></div>
         </div>
         <div id="table-area" style="margin-bottom:8px;">
           <table class="main-table" id="main-table">
@@ -493,7 +516,7 @@
         </div>
       </div>
       <div class="footer-brand">
-        <p>[System Powered by TOURMAKER] 본 산출 내역서는 <strong style="color:#1e293b;">투어메이커</strong>의 기획과 트래블 테크 기술 제휴로 제작되었습니다.</p>
+        <p id="out-footer-brand-text">[System Powered by TOURMAKER] 본 산출 내역서는 <strong style="color:#1e293b;">투어메이커</strong>의 기획과 트래블 테크 기술 제휴로 제작되었습니다.</p>
         <a href="https://tourmaker.kr" target="_blank" rel="noopener noreferrer" class="no-print">투어메이커 홈페이지 바로가기</a>
       </div>
     </div>
@@ -728,7 +751,26 @@
     $('#simple-input-group').style.display = simple ? 'block' : 'none'; $('#simple-preview-group').style.display = simple ? 'block' : 'none';
     syncCurrencyUI(applySectionDefaults); toggleVatManual(); calculateAndRender(); scheduleValidation();
   }
+  function getDetDocLabelMode() {
+    return $('#inp-det-docLabel-quote').checked ? 'quote' : 'calculation';
+  }
+  function applyDetDocLabel() {
+    const isQuote = getDetDocLabelMode() === 'quote';
+    const titleArea = $('#out-det-docTitleArea');
+    const titleMain = $('#out-det-docTitleMain');
+    const titleSub = $('#out-det-docTitleSub');
+    const footerText = $('#out-footer-brand-text');
+    if (titleArea) titleArea.classList.toggle('quote-mode', isQuote);
+    if (titleMain) titleMain.textContent = isQuote ? '견 적 서' : '가격 산출 내역서';
+    if (titleSub) titleSub.textContent = isQuote ? 'Quotation' : 'Calculation Details';
+    if (footerText) {
+      footerText.innerHTML = isQuote
+        ? '[System Powered by TOURMAKER] 본 견적서는 <strong style="color:#1e293b;">투어메이커</strong>의 기획과 트래블 테크 기술 제휴로 제작되었습니다.'
+        : '[System Powered by TOURMAKER] 본 산출 내역서는 <strong style="color:#1e293b;">투어메이커</strong>의 기획과 트래블 테크 기술 제휴로 제작되었습니다.';
+    }
+  }
   function toggleVatManual() { $('#inp-sim-vat-manual').style.display = $('#inp-sim-vat').value === 'manual' ? 'block' : 'none'; }
+
   function extractBasePax() {
     const paxStr = ($('#inp-paxStr').value || '').replace(/\s/g, '');
     const totalMatch = paxStr.match(/총?(\d+)명/);
@@ -807,6 +849,7 @@
       currency: $('#inp-currency').value, 
       clientName: $('#inp-clientName').value, docTitle: $('#inp-docTitle').value, travelDate: $('#inp-travelDate').value, paxStr: $('#inp-paxStr').value, issueDate: $('#inp-issueDate').value, exRate: parseCurrency($('#inp-exRate').value), detSpecialNote: $('#inp-det-specialNote').value,
       detShowTaxNote: $('#inp-det-showTaxNote').checked,
+      detDocLabelMode: getDetDocLabelMode(),
       detIssueHl: $('#inp-hl-issueDate').checked, // 💡 발송일 강조 여부 저장
       secFlight: $('#inp-sec-flight').value,
       secLocal: $('#inp-sec-local').value,
@@ -823,6 +866,11 @@
     $('#inp-currency').value = data.currency || 'JPY'; toggleDocMode(false);
     $('#inp-clientName').value = data.clientName || ''; $('#inp-docTitle').value = data.docTitle || ''; $('#inp-travelDate').value = data.travelDate || ''; $('#inp-paxStr').value = data.paxStr || ''; $('#inp-issueDate').value = data.issueDate || getFormattedDate('dot'); $('#inp-exRate').value = data.exRate ? fmt(data.exRate) : fmt(getExRateDefault(data.currency || 'JPY')); $('#inp-det-specialNote').value = data.detSpecialNote || '';
     $('#inp-det-showTaxNote').checked = data.detShowTaxNote !== false; 
+    if (data.detDocLabelMode === 'quote') {
+      $('#inp-det-docLabel-quote').checked = true;
+    } else {
+      $('#inp-det-docLabel-calc').checked = true;
+    }
     $('#inp-hl-issueDate').checked = !!data.detIssueHl;
     $('#inp-sim-hl-issueDate').checked = !!data.simIssueHl;
     if (hasCustomSec) setSectionLabelsFromData(data);
@@ -1023,6 +1071,7 @@
     $('#inp-sim-deposit').value = '';
     
     $('#inp-det-showTaxNote').checked = true;
+    $('#inp-det-docLabel-calc').checked = true;
     $('#inp-hl-issueDate').checked = false;
     $('#inp-sim-hl-issueDate').checked = false;
     
@@ -1071,6 +1120,7 @@
   }
   
   function renderDetailed() {
+    applyDetDocLabel();
     const currency = $('#inp-currency').value; const isMainland = currency === 'KRW_MAINLAND'; const isJeju = currency === 'KRW_JEJU'; const isKRW = isMainland || isJeju; const exRate = isKRW ? 1 : (parseCurrency($('#inp-exRate').value) || 0);
     const sec = getSectionLabelsFromForm();
     const fH = formatSecLabelForTable(sec.flight);
@@ -1320,6 +1370,7 @@
       .text-center{text-align:center}.text-right{text-align:right}.font-bold{font-weight:bold}.bg-gray-50{background:#f8fafc}.bg-yellow-50{background:#fef9c3}
       .subtotal-row td{background:#f1f5f9;font-weight:bold;border-bottom:2px solid #cbd5e1}.grand-row td{background:#f8fafc;font-weight:bold;border-top:2px solid #0f172a}.grand-row-last td{border-bottom:none !important}
       .doc-title-area{text-align:center;margin-bottom:24px}.doc-title-area h2{font-size:28px;border-bottom:3px solid #0f172a;display:inline-block;padding-bottom:6px;margin:0}
+      .doc-title-area.quote-mode h2{letter-spacing:.45em;padding-left:.45em}
       .doc-title-area p{font-size:11px;color:#64748b;font-weight:700;letter-spacing:.25em;margin-top:6px;text-transform:uppercase}
       .doc-header{display:flex;justify-content:space-between;margin-bottom:24px}.doc-header-left{width:45%}.doc-header-right{width:40%;text-align:right}.doc-header-right img{height:36px}
       .info-table th{width:28%}.footer-notes{font-size:11px;color:#475569;padding-top:12px}.footer-notes p.title{font-size:12px;font-weight:700;margin-bottom:6px;color:#1e293b}
@@ -1582,6 +1633,7 @@
     $('#inp-sim-extraFee').addEventListener('change', () => { calculateAndRender(); scheduleValidation(); });
     
     $('#inp-det-showTaxNote').addEventListener('change', () => { calculateAndRender(); });
+    $$('input[name="det-doc-label"]').forEach(el => el.addEventListener('change', () => { calculateAndRender(); }));
     $('#inp-hl-issueDate').addEventListener('change', () => { calculateAndRender(); });
     $('#inp-sim-hl-issueDate').addEventListener('change', () => { calculateAndRender(); });
 
