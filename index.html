@@ -2956,13 +2956,7 @@
     `;
 
     let topBarSubText = '';
-    if (isSimple) {
-        topBarSubText = `✅ 자동계산 켜짐 · 부가세: ${vatType === 'auto' ? '10% (자동 연동)' : (vatType === 'manual' ? '수동 입력' : '불포함')} · 단가·수량만 고치면 총액이 바뀝니다. Chrome/Edge로 열어 주세요.`;
-    } else if (isForeign) {
-        topBarSubText = `✅ 자동계산 켜짐 · 적용 환율 ${exRate} · 노란 외화단가와 수량만 고치세요. 원화단가(환율 환산)와 총액은 잠겨 있고 자동으로 바뀝니다.`;
-    } else {
-        topBarSubText = '✅ 자동계산 켜짐 · 단가·수량만 고치면 총액이 바뀝니다. Chrome/Edge로 열어 주세요.';
-    }
+    if (isForeign) topBarSubText = `적용 환율: ${exRate}`;
 
     const ogThumbnails = [
       'https://blogger.googleusercontent.com/img/a/AVvXsEhGuZrAyWumLFwHek7ioWf8ymhR1D09oemR6FvZDjx2cS-v-cTj9zwxW8Ip4I9AX5c9Da7bqYe3j-wI5H0b8Ioci2LrMDFg3Mgingu0KcsclfIUTE2D1Vt5JyCsLw6XfZ3nV7xYXfnCJPEA4PUGf97gvaByWQgMPE7jKbDAVV2HgkID94oOxxGHNwajh5U',
@@ -3105,13 +3099,11 @@
     if(window.addEventListener){
       window.addEventListener('beforeprint', function(){ recalcSheet(); });
     }
-    var warn = document.getElementById('tm-js-warn');
-    if(warn) warn.parentNode.removeChild(warn);
   }
 })();
 `;
     
-    const fullHtml = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>투어메이커 - 맞춤 견적서 (자동계산)</title><!-- tourmaker-web-edit-calc --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"><meta property="og:title" content="투어메이커 맞춤 견적서"><meta property="og:description" content="고객님을 위한 투어메이커 공식 견적서/산출내역서입니다."><meta property="og:image" content="${randomOgImage}"><meta property="og:type" content="website"><style>${styles}</style></head><body><div id="tm-js-warn" style="max-width:850px;width:100%;margin:0 auto 16px;padding:12px 16px;background:#fef2f2;color:#991b1b;font-weight:700;border-radius:8px;">총액이 자동으로 안 바뀌면 주소창 오른쪽에서 차단된 콘텐츠(스크립트)를 허용한 뒤 새로고침하세요. Chrome/Edge로 연 웹 편집본 HTML에서만 계산됩니다.</div><script>${scriptLogic}<\/script><div class="top-bar no-print"><div style="flex:1"><p style="font-size:16px;font-weight:800;margin-bottom:0">💡 스마트 산출내역서 (맞춤 편집용)</p>${topBarSubText ? `<p style="font-size:13px;color:#94a3b8;margin-top:6px;font-weight:600;">${topBarSubText}</p>` : ''}</div><button class="btn-print" onclick="tmBeforePrint();window.print()">🖨️ PDF 저장</button></div>${sheetHtml}</body></html>`;
+    const fullHtml = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>투어메이커 견적서</title><!-- tourmaker-web-edit-calc --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"><meta property="og:title" content="투어메이커 맞춤 견적서"><meta property="og:description" content="고객님을 위한 투어메이커 공식 견적서/산출내역서입니다."><meta property="og:image" content="${randomOgImage}"><meta property="og:type" content="website"><style>${styles}</style></head><body><script>${scriptLogic}<\/script><div class="top-bar no-print"><div style="flex:1">${topBarSubText ? `<p style="font-size:16px;font-weight:800;margin:0">${topBarSubText}</p>` : ''}</div><button class="btn-print" onclick="tmBeforePrint();window.print()">🖨️ PDF 저장</button></div>${sheetHtml}</body></html>`;
     const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
