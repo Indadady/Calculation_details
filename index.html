@@ -2773,16 +2773,18 @@
         if (simGroup) simGroup.remove();
     }
     
+    const onSync = 'inputmode="numeric" autocomplete="off" oninput="tmSync(this)" onkeyup="tmSync(this)" onchange="tmSync(this)"';
     clone.querySelectorAll('.export-qty').forEach(el => { 
-        el.innerHTML = `<input type="text" class="c-qty" value="${escAttr(el.textContent)}" data-group="${el.dataset.group || ''}">`; 
+        el.innerHTML = `<input type="text" class="c-qty" value="${escAttr(el.textContent)}" data-group="${el.dataset.group || ''}" ${onSync}>`; 
         el.classList.remove('export-qty'); 
     });
     
     clone.querySelectorAll('.export-krw').forEach(el => { 
         const group = el.dataset.group || '';
-        const isReadonly = (isForeign && group === 'local');
-        const readonlyAttr = isReadonly ? 'readonly tabindex="-1" title="외화 단가를 고치면 환율로 자동 계산됩니다"' : '';
-        el.innerHTML = `<input type="text" class="c-krw" value="${escAttr(el.textContent)}" data-group="${group}" ${readonlyAttr}>`; 
+        const krwHint = (isForeign && group === 'local')
+          ? 'title="원화단가 (직접 수정 가능 · 외화단가를 고치면 환율로 다시 계산됩니다)"'
+          : '';
+        el.innerHTML = `<input type="text" class="c-krw" value="${escAttr(el.textContent)}" data-group="${group}" ${krwHint} ${onSync}>`; 
         el.classList.remove('export-krw'); 
     });
     
@@ -2791,19 +2793,20 @@
         el.removeAttribute('id');
         const inItem = !!el.closest('tr.item-row');
         const readonlyAttr = inItem ? '' : 'readonly tabindex="-1" title="자동 계산 항목"';
-        el.innerHTML = `<input type="text" class="c-tot" ${idAttr} value="${escAttr(el.textContent)}" data-group="${el.dataset.group || ''}" ${readonlyAttr}>`; 
+        const totSync = inItem ? onSync : '';
+        el.innerHTML = `<input type="text" class="c-tot" ${idAttr} value="${escAttr(el.textContent)}" data-group="${el.dataset.group || ''}" ${readonlyAttr} ${totSync}>`; 
         el.classList.remove('export-tot'); 
     });
     
     clone.querySelectorAll('.export-deposit').forEach(el => { 
         const valOnly = el.textContent.replace(/[^0-9]/g, '');
-        el.innerHTML = `<input type="text" class="c-deposit" value="${escAttr(fmt(valOnly))}" style="width:100%; text-align:right; font-weight:900; font-size:16px; color:#2563eb; background:transparent; border:none; outline:none;" placeholder="입금액 변경">`; 
+        el.innerHTML = `<input type="text" class="c-deposit" value="${escAttr(fmt(valOnly))}" ${onSync} style="width:100%; text-align:right; font-weight:900; font-size:16px; color:#2563eb; background:transparent; border:none; outline:none;" placeholder="입금액 변경">`; 
         el.classList.remove('export-deposit'); 
     });
     
     clone.querySelectorAll('.export-fgn').forEach(el => {
         const group = el.closest('tr')?.querySelector('[data-group]')?.dataset.group || 'local';
-        el.outerHTML = `<input type="text" class="c-fgn" value="${escAttr(el.textContent.trim())}" data-group="${group}">`;
+        el.outerHTML = `<input type="text" class="c-fgn" value="${escAttr(el.textContent.trim())}" data-group="${group}" ${onSync}>`;
     });
     
     clone.querySelectorAll('.export-text').forEach(el => { 
@@ -2868,11 +2871,11 @@
 
     let topBarSubText = '';
     if (isSimple) {
-        topBarSubText = `부가세: ${vatType === 'auto' ? '10% (자동 연동)' : (vatType === 'manual' ? '수동 입력' : '불포함')} · 단가·수량·총액을 고치면 합계가 자동 계산됩니다`;
+        topBarSubText = `부가세: ${vatType === 'auto' ? '10% (자동 연동)' : (vatType === 'manual' ? '수동 입력' : '불포함')} · 단가·수량만 고쳐도 총액·합계가 바로 다시 계산됩니다. Chrome/Edge로 열어 주세요.`;
     } else if (isForeign) {
-        topBarSubText = `적용 환율: ${exRate} · 외화단가·수량·총액을 고치면 합계가 자동 계산됩니다`;
+        topBarSubText = `적용 환율: ${exRate} · 수량·원화단가·노란 외화단가만 고쳐도 행 총액과 아래 합계가 바로 다시 계산됩니다. Chrome/Edge로 열어 주세요.`;
     } else {
-        topBarSubText = '단가·수량·총액을 고치면 합계가 자동 계산됩니다';
+        topBarSubText = '수량·단가만 고쳐도 총액·합계가 바로 다시 계산됩니다. Chrome/Edge로 열어 주세요.';
     }
 
     const ogThumbnails = [
@@ -2883,9 +2886,13 @@
     const randomOgImage = ogThumbnails[Math.floor(Math.random() * ogThumbnails.length)];
 
     const scriptLogic = `
-      const EX_RATE = ${isForeign ? exRate : 1};
-      const VAT_TYPE = '${vatType}';
-      const EXTRA_TYPE = '${extraType}';
+      /* tourmaker-web-edit-calc */
+      window.EX_RATE = ${isForeign ? exRate : 1};
+      window.VAT_TYPE = '${vatType}';
+      window.EXTRA_TYPE = '${extraType}';
+      var EX_RATE = window.EX_RATE;
+      var VAT_TYPE = window.VAT_TYPE;
+      var EXTRA_TYPE = window.EXTRA_TYPE;
 
       function parse(v){ return Number(String(v).replace(/[^0-9.-]/g,''))||0; }
       function formatCurrency(v){
@@ -2907,23 +2914,40 @@
               totEl.value = formatCurrency(parse(krwEl.value) * parse(qtyEl.value));
           }
       }
+      function tmSync(el) {
+          if(!el) return;
+          const field = el.classList && (el.classList.contains('c-fgn') || el.classList.contains('c-krw') || el.classList.contains('c-qty') || el.classList.contains('c-tot') || el.classList.contains('c-deposit'))
+            ? el
+            : (el.closest && el.closest('.c-fgn, .c-krw, .c-qty, .c-tot, .c-deposit'));
+          if(!field) return;
+          const tr = field.closest('tr');
+          if(field.classList.contains('c-fgn')) lineRecalc(tr, true);
+          else if(field.classList.contains('c-krw') || field.classList.contains('c-qty')) lineRecalc(tr, false);
+          recalcAll();
+      }
+      window.tmSync = tmSync;
 
-      document.addEventListener('input', e => {
-        const t = e.target;
-        if(t.classList.contains('c-fgn')) { lineRecalc(t.closest('tr'), true); recalcAll(); }
-        else if(t.classList.contains('c-krw') || t.classList.contains('c-qty')) { lineRecalc(t.closest('tr'), false); recalcAll(); }
-        else if(t.classList.contains('c-tot') || t.classList.contains('c-deposit')) { recalcAll(); }
-      });
-
-      document.addEventListener('change', e => {
+      document.addEventListener('input', function(e){ tmSync(e.target); }, true);
+      document.addEventListener('keyup', function(e){
+        if(e.target && e.target.closest && e.target.closest('.c-fgn, .c-krw, .c-qty, .c-tot, .c-deposit')) tmSync(e.target);
+      }, true);
+      document.addEventListener('paste', function(e){
+        var t = e.target;
+        if(t && t.closest && t.closest('.c-fgn, .c-krw, .c-qty, .c-tot, .c-deposit')) {
+          setTimeout(function(){ tmSync(t); }, 0);
+        }
+      }, true);
+      document.addEventListener('change', function(e){
          const t = e.target;
+         if(!t || !t.classList) return;
          if(t.classList.contains('c-fgn') || t.classList.contains('c-krw') || t.classList.contains('c-qty') || t.classList.contains('c-tot') || t.classList.contains('c-deposit')) {
              if(t.value) t.value = formatCurrency(t.value);
+             tmSync(t);
          }
-      });
-      document.addEventListener('click', e => {
-         const td = e.target.closest('.cell-fgn-td');
-         if(td && !e.target.classList.contains('c-fgn')) {
+      }, true);
+      document.addEventListener('click', function(e) {
+         const td = e.target.closest && e.target.closest('.cell-fgn-td');
+         if(td && !(e.target.classList && e.target.classList.contains('c-fgn'))) {
              const inp = td.querySelector('.c-fgn');
              if(inp) inp.focus();
          }
@@ -2932,9 +2956,9 @@
       function recalcAll() {
         if(document.getElementById('main-table')) {
             let flightSum = 0, localSum = 0, domSum = 0;
-            document.querySelectorAll('input.c-tot[data-group="flight"]').forEach(el => flightSum += parse(el.value));
-            document.querySelectorAll('input.c-tot[data-group="local"]').forEach(el => localSum += parse(el.value));
-            document.querySelectorAll('input.c-tot[data-group="domestic"]').forEach(el => domSum += parse(el.value));
+            document.querySelectorAll('input.c-tot[data-group="flight"]').forEach(function(el){ flightSum += parse(el.value); });
+            document.querySelectorAll('input.c-tot[data-group="local"]').forEach(function(el){ localSum += parse(el.value); });
+            document.querySelectorAll('input.c-tot[data-group="domestic"]').forEach(function(el){ domSum += parse(el.value); });
 
             const subF = document.getElementById('sub-flight'); if(subF) subF.textContent = '₩' + formatCurrency(flightSum);
             const subL = document.getElementById('sub-local'); if(subL) subL.textContent = '₩' + formatCurrency(localSum);
@@ -2943,7 +2967,7 @@
             const grand2 = document.getElementById('grand-2'); if(grand2) grand2.textContent = '₩' + formatCurrency(localSum + domSum);
         } else if(document.getElementById('simple-table')) {
             let subTotal = 0;
-            document.querySelectorAll('input.c-tot[data-group="simple"]').forEach(el => subTotal += parse(el.value));
+            document.querySelectorAll('input.c-tot[data-group="simple"]').forEach(function(el){ subTotal += parse(el.value); });
             const stSub = document.getElementById('st-sub'); if(stSub) stSub.textContent = formatCurrency(subTotal);
 
             const vatEl = document.getElementById('st-vat');
@@ -2978,7 +3002,7 @@
       }
     `;
     
-    const fullHtml = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>투어메이커 - 맞춤 견적서</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"><meta property="og:title" content="투어메이커 맞춤 견적서"><meta property="og:description" content="고객님을 위한 투어메이커 공식 견적서/산출내역서입니다."><meta property="og:image" content="${randomOgImage}"><meta property="og:type" content="website"><style>${styles}</style></head><body><div class="top-bar no-print"><div style="flex:1"><p style="font-size:16px;font-weight:800;margin-bottom:0">💡 스마트 산출내역서 (맞춤 편집용)</p>${topBarSubText ? `<p style="font-size:13px;color:#94a3b8;margin-top:6px;font-weight:600;">${topBarSubText}</p>` : ''}</div><button class="btn-print" onclick="window.print()">🖨️ PDF 저장</button></div>${sheetHtml}<script>${scriptLogic}<\/script></body></html>`;
+    const fullHtml = `<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>투어메이커 - 맞춤 견적서</title><!-- tourmaker-web-edit-calc --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"><meta property="og:title" content="투어메이커 맞춤 견적서"><meta property="og:description" content="고객님을 위한 투어메이커 공식 견적서/산출내역서입니다."><meta property="og:image" content="${randomOgImage}"><meta property="og:type" content="website"><style>${styles}</style><script>${scriptLogic}<\/script></head><body><noscript><p style="max-width:850px;margin:16px auto;padding:12px 16px;background:#fef2f2;color:#991b1b;font-weight:700;">이 파일은 Chrome 또는 Edge로 열어야 수량·단가 변경 시 총액이 자동 계산됩니다.</p></noscript><div class="top-bar no-print"><div style="flex:1"><p style="font-size:16px;font-weight:800;margin-bottom:0">💡 스마트 산출내역서 (맞춤 편집용)</p>${topBarSubText ? `<p style="font-size:13px;color:#94a3b8;margin-top:6px;font-weight:600;">${topBarSubText}</p>` : ''}</div><button class="btn-print" onclick="window.print()">🖨️ PDF 저장</button></div>${sheetHtml}</body></html>`;
     const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
