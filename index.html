@@ -283,10 +283,29 @@
         <div class="warning-title">⚠️ 검수 경고: 확인이 필요한 항목이 있습니다.</div>
         <ul id="warning-list" class="warning-list"></ul>
       </div>
+      <div class="template-manager">
+        <div class="template-header">
+          <span>견적 보관함 <small id="preset-count" style="font-weight:600;color:#64748b;">0건</small></span>
+          <button type="button" class="btn-clear" id="btn-clear-form">새 문서</button>
+        </div>
+        <p class="backup-label" style="margin-bottom:10px;">이 PC 브라우저에만 저장됩니다. 예전에 「현재 상태 저장」한 견적이 있으면 목록에 바로 나옵니다.</p>
+        <div class="template-controls">
+          <input type="text" id="preset-search" class="template-search" placeholder="🔍 제목 검색...">
+          <select id="preset-select" class="template-select"><option value="">저장된 견적 선택...</option></select>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:8px;">
+          <button type="button" id="btn-load-preset" class="btn-load" style="flex:1">불러오기</button>
+          <button type="button" id="btn-save-preset" class="btn-save" style="flex:1">현재 상태 저장</button>
+          <button type="button" id="btn-delete-preset" class="btn-delete">삭제</button>
+        </div>
+        <div class="backup-controls">
+          <div class="backup-label">보관함 통째 백업 (다른 PC로 옮길 때)</div>
+          <button type="button" id="btn-export" class="btn-backup" title="저장된 모든 견적을 한 번에 백업합니다.">💾 전체 JSON 백업</button>
+        </div>
+      </div>
       <div class="file-bar">
         <div class="file-bar-head">
           <strong>행사 파일</strong>
-          <button type="button" class="btn-clear" id="btn-clear-form">새 문서</button>
         </div>
         <input type="file" id="import-file" accept=".json" style="display:none;">
         <input type="file" id="import-xlsx-file" accept=".xlsx,.xls" style="display:none;">
@@ -296,7 +315,7 @@
           <button type="button" id="btn-export-current" class="btn-export-current">📤 현재 문서 JSON</button>
         </div>
       </div>
-      <p class="work-hint">왼쪽에서는 통화·기본정보·특이사항만 넣고, <strong>항목·단가·수량은 오른쪽 견적서 표에서 바로 수정</strong>합니다. 같은 항목명은 한 칸으로 묶입니다. 행 추가는 표 아래 + 버튼, 삭제는 각 행의 ✕입니다. 엑셀로 작업한 파일도 JSON처럼 왼쪽에서 열 수 있습니다.</p>
+      <p class="work-hint">왼쪽에서는 통화·기본정보·특이사항만 넣고, <strong>항목·단가·수량은 오른쪽 견적서 표에서 바로 수정</strong>합니다. 같은 항목명은 한 칸으로 묶입니다. 행 추가는 표 아래 + 버튼, 삭제는 각 행의 ✕입니다. 웹 저장은 이 브라우저 보관함이고, 엑셀·JSON 파일도 왼쪽에서 열 수 있습니다.</p>
       <div class="form-group highlight">
         <div class="section-title cyan">통화 지역 선택</div>
         <select id="inp-currency" class="form-select" style="padding:10px; font-size:14px; color:#2563eb; border-color:#93c5fd;">
@@ -1108,15 +1127,19 @@
   }
 
   function updatePresetDropdown(filterText='') {
-    const select = $('#preset-select'); 
-    const presets = getPresetStore(); 
+    const select = $('#preset-select');
+    const presets = getPresetStore();
     const keys = Object.keys(presets).sort((a, b) => a.localeCompare(b, 'ko'));
-    select.innerHTML = '<option value="">저장된 템플릿 선택...</option>'; let matchCount = 0;
-    keys.forEach(key => { 
-      if (key.toLowerCase().includes(String(filterText || '').toLowerCase())) { 
-        const option = document.createElement('option'); 
-        option.value = key; option.textContent = key; select.appendChild(option); matchCount++; 
-      } 
+    const countEl = $('#preset-count');
+    if (countEl) countEl.textContent = keys.length ? `${keys.length}건` : '비어 있음';
+    if (!select) return;
+    select.innerHTML = `<option value="">저장된 견적 선택...${keys.length ? ` (${keys.length}건)` : ''}</option>`;
+    let matchCount = 0;
+    keys.forEach(key => {
+      if (key.toLowerCase().includes(String(filterText || '').toLowerCase())) {
+        const option = document.createElement('option');
+        option.value = key; option.textContent = key; select.appendChild(option); matchCount++;
+      }
     });
     if (filterText && matchCount > 0) select.selectedIndex = 1;
   }
@@ -3194,6 +3217,12 @@
       if (e.target.matches('#warning-list li')) scrollToRow(e.target.dataset.row);
     });
     $('#btn-clear-form').addEventListener('click', clearForm);
+    $('#btn-load-preset').addEventListener('click', loadPreset);
+    $('#btn-save-preset').addEventListener('click', savePreset);
+    $('#btn-delete-preset').addEventListener('click', deletePreset);
+    $('#btn-export').addEventListener('click', exportData);
+    $('#preset-search').addEventListener('input', e => updatePresetDropdown(e.target.value));
+    $('#preset-select').addEventListener('dblclick', loadPreset);
     $('#btn-export-current').addEventListener('click', exportCurrentData);
     $('#btn-import').addEventListener('click', () => $('#import-file').click());
     $('#btn-xlsx-import').addEventListener('click', () => $('#import-xlsx-file').click());
@@ -3226,6 +3255,7 @@
     buildInitialInputs(); 
     bindEvents(); 
     toggleDocMode(true, true); 
+    updatePresetDropdown();
     calculateAndRender(); 
     scheduleValidation();
   });
