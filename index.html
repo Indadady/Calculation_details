@@ -2991,28 +2991,38 @@
   function initDragAndDrop() {}
 
   function isImeEvent(e) {
-    return !!(e.isComposing || e.keyCode === 229 || e.inputType === 'insertCompositionText' || e.inputType === 'deleteCompositionText');
+    return !!(e.isComposing || e.keyCode === 229);
   }
-  function isAmountEditor(el) {
-    return el && (el.classList.contains('cell-qty') || el.classList.contains('cell-krw') || el.classList.contains('cell-fgn'));
+  function amountField(el) {
+    return el && el.closest ? el.closest('.cell-qty, .cell-krw, .cell-fgn') : null;
+  }
+  function recalcSheetTotals() {
+    if ($('#inp-currency').value === 'SIMPLE_QUOTE') refreshSimpleComputed();
+    else refreshDetailedComputed();
+    document.title = getAutoFileName();
   }
   function bindEvents() {
     document.addEventListener('input', e => {
-      if (isImeEvent(e)) return;
       if (e.target.closest('.item-row')) {
-        if (isAmountEditor(e.target)) calculateAndRender();
-        else if ($('#inp-currency').value === 'SIMPLE_QUOTE') refreshSimpleComputed();
+        if (amountField(e.target)) {
+          if (e.isComposing) return;
+          recalcSheetTotals();
+        } else if ($('#inp-currency').value === 'SIMPLE_QUOTE') refreshSimpleComputed();
         scheduleValidation();
         return;
       }
+      if (isImeEvent(e)) return;
       if (e.target.classList.contains('amount')) e.target.value = formatCurrencyValue(e.target.value);
       calculateAndRender(); scheduleValidation();
     });
     document.addEventListener('compositionend', e => {
       if (!e.target.closest('.item-row')) return;
-      if (isAmountEditor(e.target)) calculateAndRender();
+      if (amountField(e.target)) recalcSheetTotals();
       else if ($('#inp-currency').value === 'SIMPLE_QUOTE') refreshSimpleComputed();
       scheduleValidation();
+    });
+    document.addEventListener('focusout', e => {
+      if (amountField(e.target)) recalcSheetTotals();
     });
     document.addEventListener('click', e => {
       const addBtn = e.target.closest('[data-add]');
