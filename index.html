@@ -203,7 +203,7 @@
     .cell-desc, .cell-qty, .cell-krw, .cell-fgn, .cell-note { outline:none; }
     .cell-fgn-td { overflow:visible !important; background:#fef9c3; }
     .fgn-cell-wrap { display:flex; align-items:center; gap:2px; min-width:0; width:100%; }
-    .fgn-sym { flex:0 0 auto; pointer-events:none; font-size:9px; color:#9ca3af; }
+    .fgn-sym { flex:0 0 auto; pointer-events:none; font-size:10px; color:#9ca3af; white-space:nowrap; font-weight:700; }
     .cell-fgn { display:block; flex:1; min-width:0; text-align:right; min-height:16px; }
     [contenteditable="true"] { cursor:text; border-radius:3px; }
     [contenteditable="true"]:hover { background:#fefce8; }
@@ -312,7 +312,7 @@
           </optgroup>
         </select>
         <div class="exrate-row" id="wrap-exRate">
-          <label for="inp-exRate">적용 환율 :</label>
+          <label for="inp-exRate" id="lbl-exRate">적용 환율 (엔화 ¥) :</label>
           <input type="text" id="inp-exRate" class="exrate-input amount" value="9.51">
           <span style="font-size:12px;color:#64748b;">기준(송금)</span>
         </div>
@@ -720,12 +720,28 @@
     const c = curr || $('#inp-currency').value;
     return c === 'KRW_MAINLAND' || c === 'KRW_JEJU';
   }
+  const CURRENCY_MARKS = {
+    JPY: { cN: '엔화', cS: '¥' },
+    USD: { cN: '달러', cS: '$' },
+    AUD: { cN: '호주달러', cS: 'A$' },
+    SGD: { cN: '싱가폴달러', cS: 'S$' },
+    CNY: { cN: '위안화', cS: '元' },
+    KRW_MAINLAND: { cN: '원화', cS: '₩' },
+    KRW_JEJU: { cN: '원화', cS: '₩' },
+    SIMPLE_QUOTE: { cN: '원화', cS: '₩' }
+  };
   function currencyMeta(curr) {
     const currency = curr || $('#inp-currency').value;
     const isKRW = isKRWCurrency(currency);
-    const cN = currency === 'JPY' ? '엔화' : (currency === 'USD' ? '달러' : (currency === 'AUD' ? '호주달러' : (currency === 'SGD' ? '싱가폴달러' : (isKRW ? '원화' : '위안화'))));
-    const cS = (currency === 'USD' || currency === 'AUD' || currency === 'SGD') ? '$' : (isKRW ? '₩' : '¥');
-    return { currency, isKRW, cN, cS, layout: isKRW ? 'krw' : 'foreign' };
+    const mark = CURRENCY_MARKS[currency] || CURRENCY_MARKS.JPY;
+    return { currency, isKRW, cN: mark.cN, cS: mark.cS, layout: isKRW ? 'krw' : 'foreign' };
+  }
+  function syncForeignCurrencyMarks(meta) {
+    const m = meta || currencyMeta();
+    const lbl = $('#lbl-exRate');
+    if (lbl) lbl.textContent = m.isKRW ? '적용 환율 :' : `적용 환율 (${m.cN} ${m.cS}) :`;
+    if (m.isKRW) return;
+    $$('.fgn-sym').forEach(el => { if (el.textContent !== m.cS) el.textContent = m.cS; });
   }
   function rowCtrlHtml() {
     return `<div class="row-ctrl no-print"><button type="button" class="btn-toggle-hl js-toggle-hl" title="색상 강조">💡</button><button type="button" class="btn-delete-row js-delete-row" title="항목 삭제">✕</button></div>`;
@@ -804,7 +820,9 @@
     rebuildDetailedSection('flight', (flights && flights.length) ? flights : [emptyItem('flight')]);
     rebuildDetailedSection('local', (locals && locals.length) ? locals : [emptyItem('local')]);
     rebuildDetailedSection('domestic', (domestics && domestics.length) ? domestics : [emptyItem('domestic')]);
-    $('#main-table').dataset.layout = currencyMeta().layout;
+    const meta = currencyMeta();
+    $('#main-table').dataset.layout = meta.layout;
+    $('#main-table').dataset.currency = meta.currency;
     refreshDetailedComputed();
   }
   function buildSimpleItemRow(data) {
@@ -833,6 +851,7 @@
   function syncCurrencyUI(applyDefaults = false) {
     const curr = $('#inp-currency').value;
     $('#wrap-exRate').style.display = (curr === 'KRW_MAINLAND' || curr === 'KRW_JEJU' || curr === 'SIMPLE_QUOTE') ? 'none' : 'flex';
+    syncForeignCurrencyMarks();
     if (applyDefaults && curr !== 'SIMPLE_QUOTE') {
       applySectionLabelDefaults(curr);
       applyExRateDefault(curr);
@@ -1241,13 +1260,14 @@
     if (currency === 'USD') return '"$"#,##0.00_);[Red]("$"#,##0.00)';
     if (currency === 'AUD') return '"A$"#,##0.00_);[Red]("A$"#,##0.00)';
     if (currency === 'SGD') return '"S$"#,##0.00_);[Red]("S$"#,##0.00)';
-    if (currency === 'CNY') return '"¥"#,##0.00_);[Red]("¥"#,##0.00)';
+    if (currency === 'CNY') return '"元"#,##0.00_);[Red]("元"#,##0.00)';
+    if (currency === 'JPY') return '"¥"#,##0_);[Red]("¥"#,##0)';
     return '#,##0.00_);[Red](#,##0.00)';
   }
   function rateNumFmt(currency) {
     if (currency === 'USD') return '"$1 = ₩"#,##0';
     if (currency === 'JPY') return '"¥1 = ₩"#,##0.00';
-    if (currency === 'CNY') return '"CNY1 = ₩"#,##0.00';
+    if (currency === 'CNY') return '"元1 = ₩"#,##0.00';
     if (currency === 'AUD') return '"A$1 = ₩"#,##0.00';
     if (currency === 'SGD') return '"S$1 = ₩"#,##0.00';
     return '#,##0.00';
@@ -1345,7 +1365,7 @@
 
     const headers = isKRW
       ? ['구분', '항목', '내용', '인원/객실수/차량대수', '원화 단가\nKRW', '총금액', '비고']
-      : ['구분', '항목', '내용', '인원/객실수/차량대수', `${computed.cN} 단가\n${computed.currency}`, '원화 단가\nKRW', '총금액', '비고'];
+      : ['구분', '항목', '내용', '인원/객실수/차량대수', `${computed.cN} 단가\n${computed.currency} ${computed.cS || ''}`.trim(), '원화 단가\nKRW', '총금액', '비고'];
     ws.getRow(8).height = 35.25;
     headers.forEach((h, i) => {
       const c = i + 2;
@@ -2193,7 +2213,9 @@
       local: data.secLocal || '해외현지\n발생비용',
       domestic: data.secDomestic || '국내 발생 비용'
     };
-    const cN = currency === 'JPY' ? '엔화' : (currency === 'USD' ? '달러' : (currency === 'AUD' ? '호주달러' : (currency === 'SGD' ? '싱가폴달러' : (isKRW ? '원화' : '위안화'))));
+    const mark = currencyMeta(currency);
+    const cN = mark.cN;
+    const cS = mark.cS;
     const flights = (data.flights || []).filter(r => String(r.name || '').trim()).map(r => {
       const qty = Number(r.qty) || 0, krw = Number(r.krw) || 0;
       return { ...r, qty, krw, tot: qty * krw };
@@ -2210,7 +2232,7 @@
     const tF = flights.reduce((s, r) => s + r.tot, 0);
     const tL = locals.reduce((s, r) => s + r.tot, 0);
     const tD = doms.reduce((s, r) => s + r.tot, 0);
-    return { currency, isKRW, exRate, sec, cN, flights, locals, doms, tF, tL, tD, grand: tF + tL + tD, eventOnly: tL + tD };
+    return { currency, isKRW, exRate, sec, cN, cS, flights, locals, doms, tF, tL, tD, grand: tF + tL + tD, eventOnly: tL + tD };
   }
 
   function getSimpleComputed(data) {
@@ -2393,6 +2415,7 @@
     const tF = sumOf('flight');
     const tL = sumOf('local');
     const tD = sumOf('domestic');
+    syncForeignCurrencyMarks(meta);
     const subF = $('#sub-flight'); if (subF) subF.textContent = '₩' + fmtT(tF);
     const subL = $('#sub-local'); if (subL) subL.textContent = '₩' + fmtT(tL);
     const subD = $('#sub-domestic'); if (subD) subD.textContent = '₩' + fmtT(tD);
@@ -2458,9 +2481,11 @@
     const thead = $('#main-thead');
     const theadSig = `${meta.layout}|${meta.cN}|${meta.currency}`;
     if (thead.dataset.sig !== theadSig) {
-      thead.innerHTML = `<tr><th style="width:9%">구분</th><th style="width:${isKRW ? '14%' : '11%'}">항목</th><th style="width:${isKRW ? '24%' : '18%'}">내용</th><th style="width:9%;font-size:10px;line-height:1.3">인원/객실수<br>차량대수</th>${!isKRW ? `<th style="width:11%;background:#fef08a;color:#0f172a">${meta.cN} 단가<br><span style="font-weight:400;color:#475569">${meta.currency}</span></th>` : ''}<th style="width:${isKRW ? '15%' : '12%'}">원화 단가<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '16%' : '14%'}">총금액<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '13%' : '16%'}">비고</th></tr>`;
+      thead.innerHTML = `<tr><th style="width:9%">구분</th><th style="width:${isKRW ? '14%' : '11%'}">항목</th><th style="width:${isKRW ? '24%' : '18%'}">내용</th><th style="width:9%;font-size:10px;line-height:1.3">인원/객실수<br>차량대수</th>${!isKRW ? `<th style="width:11%;background:#fef08a;color:#0f172a">${meta.cN} 단가<br><span style="font-weight:400;color:#475569">${meta.currency} ${meta.cS}</span></th>` : ''}<th style="width:${isKRW ? '15%' : '12%'}">원화 단가<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '16%' : '14%'}">총금액<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '13%' : '16%'}">비고</th></tr>`;
       thead.dataset.sig = theadSig;
     }
+    $('#main-table').dataset.currency = meta.currency;
+    syncForeignCurrencyMarks(meta);
     setInnerHtmlIfChanged($('#tbody-flight .sec-label-cell'), formatSecLabelForTable(sec.flight));
     setInnerHtmlIfChanged($('#tbody-local .sec-label-cell'), formatSecLabelForTable(sec.local));
     setInnerHtmlIfChanged($('#tbody-domestic .sec-label-cell'), formatSecLabelForTable(sec.domestic));
