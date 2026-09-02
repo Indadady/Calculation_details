@@ -192,7 +192,9 @@
     .sheet-add-bar button { background:#fff; border:1px dashed #94a3b8; color:#334155; padding:8px 12px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; }
     .sheet-add-bar button:hover { background:#f8fafc; border-color:#334155; }
     .item-row td { position:relative; }
-    .cell-name-td { overflow:visible !important; padding:6px 6px 6px 22px !important; }
+    .cell-name-td { overflow:visible !important; padding:6px 8px !important; vertical-align:middle; }
+    .cell-qty-td { overflow:visible !important; padding:6px 8px 6px 22px !important; vertical-align:middle; }
+    .cell-desc[rowspan], .cell-name-td[rowspan] { vertical-align:middle; }
     .item-row .row-ctrl { position:absolute; left:2px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:1px; z-index:5; }
     .item-row .row-ctrl button { width:18px; height:18px; padding:0; border-radius:4px; font-size:10px; line-height:1; display:flex; align-items:center; justify-content:center; }
     .item-row .row-ctrl .js-delete-row { border:1px solid #fca5a5; background:#fff; color:#ef4444; font-weight:800; }
@@ -251,7 +253,7 @@
       .footer-brand a { display:none !important; }
       .stamp-image { position: absolute !important; left: 48px !important; bottom: -18px !important; }
       .row-ctrl, .sheet-add-bar { display:none !important; }
-      .cell-name-td { padding:6px 8px !important; }
+      .cell-name-td, .cell-qty-td { padding:6px 8px !important; }
       [contenteditable="true"] { background:transparent !important; box-shadow:none !important; }
       @page { size:A4 portrait; margin:10mm; }
     }
@@ -294,7 +296,7 @@
           <button type="button" id="btn-export-current" class="btn-export-current">📤 현재 문서 JSON</button>
         </div>
       </div>
-      <p class="work-hint">왼쪽에서는 통화·기본정보·특이사항만 넣고, <strong>항목·단가·수량은 오른쪽 견적서 표에서 바로 수정</strong>합니다. 행 추가는 표 아래 + 버튼, 삭제는 각 행 항목 칸의 ✕입니다. 엑셀로 작업한 파일도 JSON처럼 왼쪽에서 열 수 있습니다.</p>
+      <p class="work-hint">왼쪽에서는 통화·기본정보·특이사항만 넣고, <strong>항목·단가·수량은 오른쪽 견적서 표에서 바로 수정</strong>합니다. 같은 항목명은 한 칸으로 묶입니다. 행 추가는 표 아래 + 버튼, 삭제는 각 행의 ✕입니다. 엑셀로 작업한 파일도 JSON처럼 왼쪽에서 열 수 있습니다.</p>
       <div class="form-group highlight">
         <div class="section-title cyan">통화 지역 선택</div>
         <select id="inp-currency" class="form-select" style="padding:10px; font-size:14px; color:#2563eb; border-color:#93c5fd;">
@@ -746,6 +748,29 @@
   function rowCtrlHtml() {
     return `<div class="row-ctrl no-print"><button type="button" class="btn-toggle-hl js-toggle-hl" title="색상 강조">💡</button><button type="button" class="btn-delete-row js-delete-row" title="항목 삭제">✕</button></div>`;
   }
+  function cellKey(v) {
+    return String(v || '').replace(/\u00a0/g, ' ').trim();
+  }
+  function rowspanAttr(n) {
+    return n > 1 ? ` rowspan="${n}"` : '';
+  }
+  function itemSpanFlags(list, i) {
+    const name = cellKey(list[i].name);
+    const desc = cellKey(list[i].desc);
+    const prevName = i ? cellKey(list[i - 1].name) : null;
+    const prevDesc = i ? cellKey(list[i - 1].desc) : null;
+    const showName = i === 0 || !name || name !== prevName;
+    const showDesc = i === 0 || !desc || name !== prevName || desc !== prevDesc;
+    return {
+      showName,
+      showDesc,
+      nameSpan: showName ? rs(list, i, 'name') : 1,
+      descSpan: showDesc ? rs2(list, i) : 1
+    };
+  }
+  function qtyCellHtml(type, qty) {
+    return `<td class="text-center cell-qty-td">${rowCtrlHtml()}<div class="export-qty cell-qty" data-group="${type}" contenteditable="true">${escAttr(qty)}</div></td>`;
+  }
   function readCell(tr, cls) {
     const el = $('.' + cls, tr);
     return el ? String(el.textContent || '').replace(/\u00a0/g, ' ') : '';
@@ -754,11 +779,21 @@
     const sel = type === 'simple'
       ? '#tbody-simple tr.item-row'
       : `#tbody-${type} tr.item-row`;
+    let prevName = '';
+    let prevDesc = '';
     return $$(sel).map(tr => {
+      const hasNameCell = !!$('.cell-name', tr);
+      const hasDescCell = !!$('.cell-desc', tr);
+      const nameRead = readCell(tr, 'cell-name').trim();
+      const descRead = readCell(tr, 'cell-desc').trim();
+      const name = hasNameCell ? nameRead : (nameRead || prevName);
+      const desc = hasDescCell ? descRead : (descRead || prevDesc);
+      prevName = name;
+      prevDesc = desc;
       const qtyRaw = readCell(tr, 'cell-qty').trim();
       const row = {
-        name: readCell(tr, 'cell-name').trim(),
-        desc: readCell(tr, 'cell-desc').trim(),
+        name,
+        desc,
         qty: qtyRaw,
         hl: tr.dataset.hl === 'true'
       };
@@ -776,7 +811,7 @@
     });
   }
   function buildDetailedItemRow(type, data, opts) {
-    const { isKRW, isFirst, count, secHtml, cS } = opts;
+    const { isKRW, isFirst, count, secHtml, cS, showName, showDesc, nameSpan, descSpan } = opts;
     const hlClass = data.hl ? ' hl-on' : '';
     const qty = (data.qty === '' || data.qty == null) ? '' : fmt(data.qty);
     const name = escAttr(data.name || '');
@@ -798,7 +833,13 @@
       if (!isKRW) fgnTd = `<td class="text-right bg-gray-50"></td>`;
       krwTd = `<td class="text-right export-krw cell-krw" data-group="${type}" contenteditable="true">${escAttr(fmt(data.krw))}</td>`;
     }
-    return `<tr class="item-row ${type}-item${hlClass}" data-type="${type}" data-hl="${data.hl ? 'true' : 'false'}">${sec}<td class="text-center cell-name-td">${rowCtrlHtml()}<div class="cell-name export-text" contenteditable="true">${name}</div></td><td class="export-text cell-desc" contenteditable="true">${desc}</td><td class="text-center export-qty cell-qty" data-group="${type}" contenteditable="true">${escAttr(qty)}</td>${fgnTd}${krwTd}<td class="text-right font-semibold export-tot cell-tot cell-computed" data-group="${type}"></td><td class="text-center export-text cell-note" contenteditable="true">${note}</td></tr>`;
+    const nameTd = showName
+      ? `<td class="text-center cell-name-td"${rowspanAttr(nameSpan)}><div class="cell-name export-text" contenteditable="true">${name}</div></td>`
+      : '';
+    const descTd = showDesc
+      ? `<td class="export-text cell-desc"${rowspanAttr(descSpan)} contenteditable="true">${desc}</td>`
+      : '';
+    return `<tr class="item-row ${type}-item${hlClass}" data-type="${type}" data-hl="${data.hl ? 'true' : 'false'}">${sec}${nameTd}${descTd}${qtyCellHtml(type, qty)}${fgnTd}${krwTd}<td class="text-right font-semibold export-tot cell-tot cell-computed" data-group="${type}"></td><td class="text-center export-text cell-note" contenteditable="true">${note}</td></tr>`;
   }
   function rebuildDetailedSection(type, rows) {
     const meta = currencyMeta();
@@ -811,7 +852,7 @@
     const col = meta.isKRW ? 5 : 6;
     let h = '';
     list.forEach((row, i) => {
-      h += buildDetailedItemRow(type, row, { isKRW: meta.isKRW, isFirst: i === 0, count: list.length, secHtml, cS: meta.cS });
+      h += buildDetailedItemRow(type, row, { isKRW: meta.isKRW, isFirst: i === 0, count: list.length, secHtml, cS: meta.cS, ...itemSpanFlags(list, i) });
     });
     h += `<tr class="subtotal-row"><td colspan="${col}" class="text-center">${sumLabel[type]}</td><td class="text-right" id="${sumId[type]}">₩0</td><td></td></tr>`;
     $(`#tbody-${type}`).innerHTML = h;
@@ -825,15 +866,22 @@
     $('#main-table').dataset.currency = meta.currency;
     refreshDetailedComputed();
   }
-  function buildSimpleItemRow(data) {
+  function buildSimpleItemRow(data, flags) {
     const hlClass = data.hl ? ' hl-on' : '';
     const qty = (data.qty === '' || data.qty == null) ? '' : fmt(data.qty);
-    return `<tr class="item-row simple-item${hlClass}" data-type="simple" data-hl="${data.hl ? 'true' : 'false'}"><td class="text-center cell-name-td">${rowCtrlHtml()}<div class="cell-name export-text" contenteditable="true">${escAttr(data.name || '')}</div></td><td class="text-center export-text cell-desc" contenteditable="true">${escAttr(data.desc || '')}</td><td class="text-right export-krw cell-krw" data-group="simple" contenteditable="true">${escAttr(fmt(data.krw))}</td><td class="text-center export-qty cell-qty" data-group="simple" contenteditable="true">${escAttr(qty)}</td><td class="text-right export-tot cell-tot cell-computed" data-group="simple"></td></tr>`;
+    const { showName = true, showDesc = true, nameSpan = 1, descSpan = 1 } = flags || {};
+    const nameTd = showName
+      ? `<td class="text-center cell-name-td"${rowspanAttr(nameSpan)}><div class="cell-name export-text" contenteditable="true">${escAttr(data.name || '')}</div></td>`
+      : '';
+    const descTd = showDesc
+      ? `<td class="text-center export-text cell-desc"${rowspanAttr(descSpan)} contenteditable="true">${escAttr(data.desc || '')}</td>`
+      : '';
+    return `<tr class="item-row simple-item${hlClass}" data-type="simple" data-hl="${data.hl ? 'true' : 'false'}">${nameTd}${descTd}<td class="text-right export-krw cell-krw" data-group="simple" contenteditable="true">${escAttr(fmt(data.krw))}</td>${qtyCellHtml('simple', qty)}<td class="text-right export-tot cell-tot cell-computed" data-group="simple"></td></tr>`;
   }
   function rebuildSimpleItems(rows) {
     const current = rows != null ? rows : getRowData('simple');
     const items = (current && current.length) ? current : [emptyItem('simple')];
-    $('#tbody-simple').innerHTML = items.map(buildSimpleItemRow).join('');
+    $('#tbody-simple').innerHTML = items.map((row, i) => buildSimpleItemRow(row, itemSpanFlags(items, i))).join('');
     refreshSimpleComputed();
   }
   function addRow(type, data={}, skipRender=false) {
@@ -914,6 +962,7 @@
     const warnings = []; const currencyVal = $('#inp-currency').value; const mode = currencyVal === 'SIMPLE_QUOTE' ? 'simple' : 'detailed';
     $$('.error-border').forEach(el => el.classList.remove('error-border')); $$('.error-row-container').forEach(el => el.classList.remove('error-row-container'));
     if (mode === 'detailed') {
+      let prevDetName = '';
       const basePax = extractBasePax(); const exRateInput = $('#inp-exRate'); const exRate = parseCurrency(exRateInput.value);
       const ranges = { JPY:[5,20], USD:[1000,2000], CNY:[100,300], AUD:[800,1200], SGD:[900,1300] };
       if (ranges[currencyVal]) {
@@ -924,10 +973,13 @@
       $$('#main-table tr.item-row').forEach((rowEl, index) => {
         const rowId = `row-det-${index}`; rowEl.id = rowId; let rowHasError = false;
         const nameEl = $('.cell-name', rowEl); const descEl = $('.cell-desc', rowEl); const qtyEl = $('.cell-qty', rowEl); const priceEl = $('.cell-fgn', rowEl) || $('.cell-krw', rowEl); const noteEl = $('.cell-note', rowEl);
-        const name = nameEl?.textContent.trim() || ''; const desc = descEl?.textContent.trim() || ''; const qtyStr = qtyEl?.textContent.trim() || ''; const priceStr = priceEl?.textContent.trim() || ''; const note = noteEl?.textContent.trim() || '';
+        const nameRead = nameEl?.textContent.trim() || '';
+        const name = nameEl ? nameRead : (nameRead || prevDetName);
+        prevDetName = name;
+        const desc = descEl?.textContent.trim() || ''; const qtyStr = qtyEl?.textContent.trim() || ''; const priceStr = priceEl?.textContent.trim() || ''; const note = noteEl?.textContent.trim() || '';
         const qty = Number(String(qtyStr).replace(/,/g,'')) || 0; const price = parseCurrency(priceStr);
         const isAnyFilled = name || desc || qtyStr || priceStr || note; if (!isAnyFilled) return;
-        if (!name && (desc || qtyStr || priceStr || note)) { warnings.push({ msg:`[${index + 1}번째 줄] 항목명이 누락되었습니다.`, targetId:rowId }); nameEl?.classList.add('error-border'); rowHasError = true; }
+        if (nameEl && !name && (desc || qtyStr || priceStr || note)) { warnings.push({ msg:`[${index + 1}번째 줄] 항목명이 누락되었습니다.`, targetId:rowId }); nameEl?.classList.add('error-border'); rowHasError = true; }
         if (name) {
           if (qtyStr !== '' && priceStr === '') { warnings.push({ msg:`[${name}] 항목: 단가가 누락되었습니다.`, targetId:rowId }); priceEl?.classList.add('error-border'); rowHasError = true; }
           if (qtyStr === '' && priceStr !== '') { warnings.push({ msg:`[${name}] 항목: 수량이 누락되었습니다.`, targetId:rowId }); qtyEl?.classList.add('error-border'); rowHasError = true; }
@@ -938,16 +990,20 @@
         if (rowHasError) rowEl.classList.add('error-row-container');
       });
     } else {
+      let prevSimName = '';
       $$('#tbody-simple tr.item-row').forEach((rowEl, index) => {
         const rowId = `row-sim-${index}`; rowEl.id = rowId; let rowHasError = false;
         const nameEl = $('.cell-name', rowEl); const qtyEl = $('.cell-qty', rowEl); const priceEl = $('.cell-krw', rowEl);
-        const name = nameEl?.textContent.trim() || ''; const qtyStr = qtyEl?.textContent.trim() || ''; const priceStr = priceEl?.textContent.trim() || '';
+        const nameRead = nameEl?.textContent.trim() || '';
+        const name = nameEl ? nameRead : (nameRead || prevSimName);
+        prevSimName = name;
+        const qtyStr = qtyEl?.textContent.trim() || ''; const priceStr = priceEl?.textContent.trim() || '';
         if (!name && !qtyStr && !priceStr) return;
         if (name && (qtyStr === '' || priceStr === '')) {
           warnings.push({ msg:`일반 견적 [${name}] 항목: 수량이나 단가가 누락되었습니다.`, targetId:rowId });
           if (!qtyStr) qtyEl?.classList.add('error-border'); if (!priceStr) priceEl?.classList.add('error-border'); rowHasError = true;
         }
-        if (!name && (qtyStr !== '' || priceStr !== '')) { warnings.push({ msg:`일반 견적 [${index + 1}번째 줄]: 내용(Item)이 누락되었습니다.`, targetId:rowId }); nameEl?.classList.add('error-border'); rowHasError = true; }
+        if (nameEl && !name && (qtyStr !== '' || priceStr !== '')) { warnings.push({ msg:`일반 견적 [${index + 1}번째 줄]: 내용(Item)이 누락되었습니다.`, targetId:rowId }); nameEl?.classList.add('error-border'); rowHasError = true; }
         if (rowHasError) rowEl.classList.add('error-row-container');
       });
     }
@@ -2545,8 +2601,27 @@
     rebuildSimpleItems([emptyItem('simple')]);
     setTodayDates(); calculateAndRender(); renderWarnings(); toggleDocMode(true, true); syncCurrencyUI(true); calculateAndRender();
   }
-  function rs(arr, i, key) { let r = 1; for (let j=i+1; j<arr.length; j++) { if (arr[j][key] === arr[i][key]) r++; else break; } return r; }
-  function rs2(arr, i) { let r = 1; for (let j=i+1; j<arr.length; j++) { if (arr[j].name === arr[i].name && arr[j].desc === arr[i].desc) r++; else break; } return r; }
+  function rs(arr, i, key) {
+    const v = cellKey(arr[i][key]);
+    if (!v) return 1;
+    let r = 1;
+    for (let j = i + 1; j < arr.length; j++) {
+      if (cellKey(arr[j][key]) === v) r++;
+      else break;
+    }
+    return r;
+  }
+  function rs2(arr, i) {
+    const n = cellKey(arr[i].name);
+    const d = cellKey(arr[i].desc);
+    if (!n || !d) return 1;
+    let r = 1;
+    for (let j = i + 1; j < arr.length; j++) {
+      if (cellKey(arr[j].name) === n && cellKey(arr[j].desc) === d) r++;
+      else break;
+    }
+    return r;
+  }
   /** 일반 견적서 전용: 동일 Item명 행을 내용·비고를 합치고 금액을 합산해 한 줄로 표시 */
   function mergeRowsByName(rows) {
     const groups = []; const idx = new Map();
@@ -2822,7 +2897,7 @@
       body{background:#f1f5f9;display:flex;flex-direction:column;align-items:center;padding:40px 20px;margin:0;font-family:'Noto Sans KR','Malgun Gothic',sans-serif;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
       .a4-sheet{background:#fff;width:100%;max-width:850px;padding:40px;box-shadow:0 10px 40px rgba(0,0,0,.1);border-radius:4px;margin-bottom:40px;position:relative}
       table{width:100%;border-collapse:collapse;table-layout:fixed;word-break:keep-all}
-      th,td{border:1px solid #cbd5e1;padding:6px 8px;font-size:12px;overflow:hidden}
+      th,td{border:1px solid #cbd5e1;padding:6px 8px;font-size:12px;overflow:hidden;vertical-align:middle}
       td.sec-label-cell{overflow:visible;line-height:1.3;font-size:10px;padding:4px 3px;white-space:normal}
       th{background:#f8fafc;font-weight:bold;text-align:center;color:#0f172a}
       .text-center{text-align:center}.text-right{text-align:right}.font-bold{font-weight:bold}.bg-gray-50{background:#f8fafc}.bg-yellow-50{background:#fef9c3}
@@ -3047,6 +3122,20 @@
     });
     document.addEventListener('focusout', e => {
       if (amountField(e.target)) recalcSheetTotals();
+      const nameOrDesc = e.target.closest && e.target.closest('.cell-name, .cell-desc');
+      if (!nameOrDesc) return;
+      const tr = e.target.closest('tr.item-row');
+      if (!tr) return;
+      const tbody = tr.parentElement;
+      const next = e.relatedTarget;
+      if (next && tbody && tbody.contains(next)) return;
+      if (next && next.closest && next.closest('.row-ctrl, .js-delete-row, .js-toggle-hl, [data-add]')) return;
+      const type = tr.dataset.type;
+      const rows = getRowData(type);
+      if (type === 'simple') rebuildSimpleItems(rows);
+      else rebuildDetailedSection(type, rows);
+      calculateAndRender();
+      scheduleValidation();
     });
     document.addEventListener('click', e => {
       const addBtn = e.target.closest('[data-add]');
