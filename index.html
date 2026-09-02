@@ -2479,7 +2479,7 @@
     $('#out-issueAndRate').className = $('#inp-hl-issueDate').checked ? 'export-text hl-text' : 'export-text';
     const isKRW = meta.isKRW;
     const thead = $('#main-thead');
-    const theadSig = `${meta.layout}|${meta.cN}|${meta.currency}`;
+    const theadSig = `${meta.layout}|${meta.cN}|${meta.currency}|${meta.cS}`;
     if (thead.dataset.sig !== theadSig) {
       thead.innerHTML = `<tr><th style="width:9%">구분</th><th style="width:${isKRW ? '14%' : '11%'}">항목</th><th style="width:${isKRW ? '24%' : '18%'}">내용</th><th style="width:9%;font-size:10px;line-height:1.3">인원/객실수<br>차량대수</th>${!isKRW ? `<th style="width:11%;background:#fef08a;color:#0f172a">${meta.cN} 단가<br><span style="font-weight:400;color:#475569">${meta.currency} ${meta.cS}</span></th>` : ''}<th style="width:${isKRW ? '15%' : '12%'}">원화 단가<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '16%' : '14%'}">총금액<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '13%' : '16%'}">비고</th></tr>`;
       thead.dataset.sig = theadSig;
