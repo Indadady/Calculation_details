@@ -1866,6 +1866,38 @@
     if (list.includes('견적서')) return '견적서';
     return null;
   }
+  function worksheetToAoa(ws) {
+    if (!ws) return [];
+    const range = ws['!ref'] ? XLSX.utils.decode_range(ws['!ref']) : { s: { r: 0, c: 0 }, e: { r: 0, c: 0 } };
+    const aoa = [];
+    for (let r = 0; r <= range.e.r; r++) {
+      const row = [];
+      for (let c = 0; c <= range.e.c; c++) {
+        const cell = ws[XLSX.utils.encode_cell({ r, c })];
+        row.push(cell && cell.v != null ? cell.v : '');
+      }
+      aoa.push(row);
+    }
+    fillMergedAoa(ws, aoa);
+    return aoa;
+  }
+  function headerColMap(row) {
+    const map = {};
+    (row || []).forEach((v, i) => {
+      const raw = cellStr(v);
+      const t = raw.replace(/\s+/g, '');
+      if (!t) return;
+      if (t.includes('구분')) map.sec = i;
+      else if (t.includes('항목') || /^item$/i.test(raw.trim())) map.name = i;
+      else if (t.includes('내용') || /description/i.test(raw)) map.desc = i;
+      else if (t.includes('인원') || t.includes('수량') || /quantity/i.test(raw)) map.qty = i;
+      else if ((t.includes('원화') && t.includes('단가')) || (t.includes('KRW') && t.includes('단가'))) map.krw = i;
+      else if (t.includes('단가') || /unit\s*cost/i.test(raw)) map.fgn = i;
+      else if (t.includes('총금액') || t.includes('총액') || /^total$/i.test(raw.trim())) map.tot = i;
+      else if (t.includes('비고')) map.note = i;
+    });
+    return map;
+  }
   function overlayDetailedPrintMeta(aoa, data) {
     (aoa || []).slice(0, 8).forEach(row => {
       for (let c = 0; c < (row || []).length; c++) {
@@ -1887,32 +1919,37 @@
   function overlayDetailedPrintItems(aoa, data) {
     overlayDetailedPrintMeta(aoa, data);
     let headerIdx = -1;
-    let foreign = !isKRWCurrency(data.currency);
+    let map = {};
     for (let i = 0; i < (aoa || []).length; i++) {
-      const row = aoa[i] || [];
-      if (cellStr(row[1]).includes('구분') && (cellStr(row[2]).includes('항목') || cellStr(row[3]).includes('내용'))) {
+      const cand = headerColMap(aoa[i] || []);
+      if (cand.name != null && cand.qty != null && (cand.fgn != null || cand.krw != null)) {
         headerIdx = i;
-        foreign = /총/.test(cellStr(row[7]));
+        map = cand;
         break;
       }
     }
     if (headerIdx < 0) return false;
-    const krwC = foreign ? 6 : 5;
-    const noteC = foreign ? 8 : 7;
+    const nameC = map.name;
+    const descC = map.desc != null ? map.desc : nameC + 1;
+    const qtyC = map.qty;
+    const fgnC = map.fgn;
+    const krwC = map.krw != null ? map.krw : fgnC;
+    const noteC = map.note;
+    const secC = map.sec;
     const flights = [];
     const locals = [];
     const domestics = [];
     let fallback = 'flight';
     for (let i = headerIdx + 1; i < aoa.length; i++) {
       const row = aoa[i] || [];
-      const sec = cellStr(row[1]);
-      const name = cellStr(row[2]);
-      const desc = cellStr(row[3]);
+      const sec = secC != null ? cellStr(row[secC]) : '';
+      const name = cellStr(row[nameC]);
+      const desc = cellStr(row[descC]);
       const joined = [sec, name, desc].join(' ');
       if (/세금계산서|System by TOURMAKER/.test(joined)) break;
-      if (/특이사항/.test(sec)) {
-        const note = cellStr(row[2]) || cellStr(row[3]);
-        if (note) data.detSpecialNote = note;
+      if (/특이사항/.test(sec) || /특이사항/.test(name)) {
+        const note = desc || name;
+        if (note && note !== '특이사항') data.detSpecialNote = note;
         continue;
       }
       if (/\(\s*1\s*\)/.test(joined) && /합/.test(joined)) { fallback = 'local'; continue; }
@@ -1922,9 +1959,9 @@
       if (/입력된 항목이 없습니다/.test(joined)) continue;
       if (!name && !desc) continue;
       const group = sec ? parseItemGroup(sec) : fallback;
-      const item = { name, desc, qty: parseExcelNumber(row[4]), note: cellStr(row[noteC]), hl: false };
+      const item = { name, desc, qty: parseExcelNumber(row[qtyC]), note: noteC != null ? cellStr(row[noteC]) : '', hl: false };
       if (group === 'local') {
-        item.fgn = parseExcelNumber(row[5]);
+        item.fgn = parseExcelNumber(row[fgnC != null ? fgnC : krwC]);
         locals.push(item);
       } else if (group === 'domestic') {
         item.krw = parseExcelNumber(row[krwC]);
@@ -1942,23 +1979,26 @@
   }
   function overlaySimplePrintItems(aoa, data) {
     let headerIdx = -1;
+    let map = {};
     for (let i = 0; i < (aoa || []).length; i++) {
-      const row = aoa[i] || [];
-      if (/item/i.test(cellStr(row[0])) && /unit cost|quantity/i.test(row.map(cellStr).join(' '))) {
+      const cand = headerColMap(aoa[i] || []);
+      if (cand.name != null && cand.qty != null && (cand.fgn != null || cand.krw != null) && cand.sec == null) {
         headerIdx = i;
+        map = cand;
         break;
       }
     }
     if (headerIdx < 0) return false;
     const simples = [];
+    const priceC = map.krw != null ? map.krw : map.fgn;
     for (let i = headerIdx + 1; i < aoa.length; i++) {
       const row = aoa[i] || [];
-      const name = cellStr(row[0]);
+      const name = cellStr(row[map.name]);
       const joined = row.map(cellStr).join(' ');
       if (/포함사항|불포함사항|입금 계좌|System by TOURMAKER/.test(joined) && !name) break;
       if (/sub total|grand total|기납금|예약금|잔금|balance due/i.test(joined)) {
         if (/기납금|deposit paid/i.test(joined)) {
-          const n = Math.abs(parseExcelNumber(row[9] != null && row[9] !== '' ? row[9] : row[10]));
+          const n = Math.abs(parseExcelNumber(row[map.tot] != null ? row[map.tot] : row[row.length - 1]));
           if (n) data.simDeposit = n;
         }
         continue;
@@ -1966,9 +2006,9 @@
       if (!name || /부가세|기타비용|sub total|grand total/i.test(name)) continue;
       simples.push({
         name,
-        desc: cellStr(row[2]) || cellStr(row[3]),
-        krw: parseExcelNumber(row[5]),
-        qty: parseExcelNumber(row[7]),
+        desc: map.desc != null ? cellStr(row[map.desc]) : '',
+        krw: parseExcelNumber(row[priceC]),
+        qty: parseExcelNumber(row[map.qty]),
         hl: false
       });
     }
@@ -1979,9 +2019,7 @@
   function overlayPrintSheetEdits(wb, data) {
     const name = findPrintSheetName(wb.SheetNames, data);
     if (!name || !wb.Sheets[name]) return;
-    const ws = wb.Sheets[name];
-    const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: '' });
-    fillMergedAoa(ws, aoa);
+    const aoa = worksheetToAoa(wb.Sheets[name]);
     if (data.currency === 'SIMPLE_QUOTE' || looksLikeSimplePrint(aoa)) overlaySimplePrintItems(aoa, data);
     else overlayDetailedPrintItems(aoa, data);
   }
