@@ -1009,12 +1009,36 @@
     return ['식비', '관광지입장료', '여행자보험', '항공료', '숙박'].some(k => n.includes(k))
       || ['중식', '석식', '입장권', '입장료'].some(k => n.includes(k));
   }
-  function qtyFitsPax(qty, pax, extraText) {
-    if (!pax.total || !qty) return true;
-    const allowed = [pax.total, pax.students, pax.teachers].filter(n => n > 0);
-    if (allowed.includes(qty)) return true;
-    if (isFocOrSplitText(extraText) && qty < pax.total) return true;
-    return false;
+  function parseFocRule(text) {
+    const m = String(text || '').match(/(\d+)\s*\+\s*(\d+)/);
+    if (!m) return null;
+    const per = Number(m[1]);
+    const free = Number(m[2]);
+    if (per > 0 && free > 0) return { per, free };
+    return null;
+  }
+  function focPayingTeachers(pax, foc) {
+    if (pax.teachers == null) return null;
+    if (!foc || !pax.students) return pax.teachers;
+    const free = Math.min(pax.teachers, Math.floor(pax.students / foc.per) * foc.free);
+    return Math.max(0, pax.teachers - free);
+  }
+  function allowedPaxQtys(pax, foc) {
+    const paying = focPayingTeachers(pax, foc);
+    const set = new Set();
+    [pax.total, pax.students, pax.teachers, paying].forEach(n => { if (n > 0) set.add(n); });
+    if (pax.students && paying != null) set.add(pax.students + paying);
+    if (pax.students && pax.teachers) set.add(pax.students + pax.teachers);
+    return set;
+  }
+  function venueKey(name, desc) {
+    const d = cellKey(desc).replace(/학생|교사|인솔|선생님|유료|무료입장|무료/g, '').replace(/[()[\]\s/_-]+/g, '');
+    return cellKey(name) + '|' + d;
+  }
+  function qtyFitsPax(qty, pax, extraText, foc) {
+    if (!pax.total || qty == null) return true;
+    const rule = foc || parseFocRule(extraText);
+    return allowedPaxQtys(pax, rule).has(qty);
   }
   function scrollToRow(rowId) {
     const el = document.getElementById(rowId); if (!el) return;
@@ -1034,27 +1058,51 @@
         const [min, max] = ranges[currencyVal];
         if (exRate < min || exRate > max) { warnings.push({ msg:`환율 경고: ${currencyVal} 환율(${exRate})이 일반적인 범위를 벗어났습니다.`, targetId:'wrap-exRate' }); exRateInput.classList.add('error-border'); }
       }
+      const detRows = [];
       $$('#main-table tr.item-row').forEach((rowEl, index) => {
         const rowId = `row-det-${index}`; rowEl.id = rowId;
         const nameEl = $('.cell-name', rowEl); const descEl = $('.cell-desc', rowEl); const qtyEl = $('.cell-qty', rowEl); const priceEl = $('.cell-fgn', rowEl) || $('.cell-krw', rowEl); const noteEl = $('.cell-note', rowEl);
         const nameRead = nameEl?.textContent.trim() || '';
         const name = nameEl ? nameRead : (nameRead || prevDetName);
         prevDetName = name;
-        const desc = descEl?.textContent.trim() || ''; const qtyStr = qtyEl?.textContent.trim() || ''; const priceStr = priceEl?.textContent.trim() || ''; const note = noteEl?.textContent.trim() || '';
+        const descRead = descEl?.textContent.trim() || '';
+        const desc = descEl ? descRead : (descRead || (detRows.length ? detRows[detRows.length - 1].desc : ''));
+        const qtyStr = qtyEl?.textContent.trim() || ''; const priceStr = priceEl?.textContent.trim() || ''; const note = noteEl?.textContent.trim() || '';
         const qty = Number(String(qtyStr).replace(/,/g,'')) || 0; const price = parseCurrency(priceStr);
         const extraText = `${desc} ${note}`;
         const focLike = isFocOrSplitText(extraText);
         const isAnyFilled = name || desc || qtyStr || priceStr || note; if (!isAnyFilled) return;
+        detRows.push({ rowId, name, desc, qty, qtyStr, price, priceStr, note, extraText, focLike, foc: parseFocRule(extraText) });
         if (nameEl && !name && (desc || qtyStr || priceStr || note)) warnings.push({ msg:`[${index + 1}번째 줄] 항목명이 누락되었습니다.`, targetId:rowId });
         if (name) {
           if (qtyStr !== '' && priceStr === '') warnings.push({ msg:`[${name}] 항목: 단가가 누락되었습니다.`, targetId:rowId });
           if (qtyStr === '' && priceStr !== '') warnings.push({ msg:`[${name}] 항목: 수량이 누락되었습니다.`, targetId:rowId });
           if (qtyStr !== '' && qty === 0 && !focLike) warnings.push({ msg:`[${name}] 항목: 수량이 0입니다.`, targetId:rowId });
           if (priceStr !== '' && price === 0 && !focLike) warnings.push({ msg:`[${name}] 항목: 단가가 0입니다.`, targetId:rowId });
-          if (basePax && qtyStr !== '' && isPaxSensitiveName(name) && qty > 0 && !qtyFitsPax(qty, pax, extraText)) {
-            warnings.push({ msg:`[${name}] 수량 확인: ${qty}명 (기준 ${basePax}명). 학생/교사 분리·FOC면 정상입니다.`, targetId:rowId });
-          }
         }
+      });
+      const docFoc = detRows.map(r => r.foc).find(Boolean) || null;
+      const groupSum = {};
+      const groupFoc = {};
+      detRows.forEach(r => {
+        if (!r.name || r.qtyStr === '') return;
+        const key = venueKey(r.name, r.desc);
+        groupSum[key] = (groupSum[key] || 0) + r.qty;
+        if (r.foc && !groupFoc[key]) groupFoc[key] = r.foc;
+      });
+      detRows.forEach(r => {
+        if (!basePax || !r.name || r.qtyStr === '' || !isPaxSensitiveName(r.name) || r.qty < 0) return;
+        const foc = groupFoc[venueKey(r.name, r.desc)] || docFoc;
+        const paying = focPayingTeachers(pax, foc);
+        if (r.qty === 0 && paying === 0) return;
+        if (qtyFitsPax(r.qty, pax, r.extraText, foc)) return;
+        const sum = groupSum[venueKey(r.name, r.desc)] || 0;
+        const okSums = allowedPaxQtys(pax, foc);
+        if (okSums.has(sum)) return;
+        const focHint = foc && paying != null
+          ? ` · ${foc.per}+${foc.free} FOC면 유료 ${pax.students || 0}+${paying}명`
+          : '';
+        warnings.push({ msg:`[${r.name}] 수량 확인: ${r.qty}명 (기준 ${basePax}명${focHint})`, targetId:r.rowId });
       });
     } else {
       let prevSimName = '';
