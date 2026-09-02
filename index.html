@@ -2157,6 +2157,21 @@
     return { currency, isKRW, exRate, sec, cN, flights, locals, doms, tF, tL, tD, grand: tF + tL + tD, eventOnly: tL + tD };
   }
 
+  function getSimpleComputed(data) {
+    const simples = mergeRowsByName((data.simples || []).filter(r => String(r.name || '').trim()).map(r => ({
+      ...r, qty: Number(r.qty) || 0, krw: Number(r.krw) || 0, tot: (Number(r.qty) || 0) * (Number(r.krw) || 0)
+    })));
+    const subTotal = simples.reduce((s, r) => s + r.tot, 0);
+    const vatOpt = data.simVat || 'auto';
+    let vatVal = 0, vatLabel = '부가세 불포함';
+    if (vatOpt === 'auto') { vatVal = Math.floor(subTotal * 0.1); vatLabel = '부가세 (10%)'; }
+    else if (vatOpt === 'manual') { vatVal = Number(data.simVatManual) || 0; vatLabel = '부가세 (부분 과세)'; }
+    const extraVal = (data.simExtraFee === 'auto_50' && vatVal > 0) ? Math.floor(vatVal * 0.5) : 0;
+    const grandTotal = subTotal + vatVal + extraVal;
+    const deposit = Number(data.simDeposit) || 0;
+    return { simples, subTotal, vatVal, vatLabel, extraVal, grandTotal, deposit, balance: grandTotal - deposit };
+  }
+
   function ensureItemSlots() {
     if (!$('#flight-inputs-container').children.length) addRow('flight', {}, true);
     if (!$('#local-inputs-container').children.length) addRow('local', {}, true);
