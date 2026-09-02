@@ -192,15 +192,23 @@
     .sheet-add-bar button { background:#fff; border:1px dashed #94a3b8; color:#334155; padding:8px 12px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; }
     .sheet-add-bar button:hover { background:#f8fafc; border-color:#334155; }
     .item-row td { position:relative; }
-    .item-row .row-ctrl { position:absolute; left:-4px; top:50%; transform:translate(-100%,-50%); display:none; flex-direction:column; gap:2px; z-index:5; }
-    .a4-sheet:hover .item-row:hover .row-ctrl, .item-row:focus-within .row-ctrl { display:flex; }
-    .item-row .row-ctrl button { width:22px; height:22px; padding:0; border-radius:4px; font-size:11px; line-height:1; }
-    .cell-name, .cell-desc, .cell-qty, .cell-krw, .cell-fgn, .cell-note { outline:none; }
+    .cell-name-td { overflow:visible !important; padding:6px 6px 6px 22px !important; }
+    .item-row .row-ctrl { position:absolute; left:2px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:1px; z-index:5; }
+    .item-row .row-ctrl button { width:18px; height:18px; padding:0; border-radius:4px; font-size:10px; line-height:1; display:flex; align-items:center; justify-content:center; }
+    .item-row .row-ctrl .js-delete-row { border:1px solid #fca5a5; background:#fff; color:#ef4444; font-weight:800; }
+    .item-row .row-ctrl .js-delete-row:hover { background:#fee2e2; color:#b91c1c; }
+    .item-row .row-ctrl .js-toggle-hl { display:none; }
+    .item-row:hover .row-ctrl .js-toggle-hl, .item-row:focus-within .row-ctrl .js-toggle-hl { display:flex; }
+    .cell-name { display:block; min-height:16px; outline:none; }
+    .cell-desc, .cell-qty, .cell-krw, .cell-fgn, .cell-note { outline:none; }
+    .cell-fgn-td { overflow:visible !important; background:#fef9c3; }
+    .fgn-cell-wrap { display:flex; align-items:center; gap:2px; min-width:0; width:100%; }
+    .fgn-sym { flex:0 0 auto; pointer-events:none; font-size:9px; color:#9ca3af; }
+    .cell-fgn { display:block; flex:1; min-width:0; text-align:right; min-height:16px; }
     [contenteditable="true"] { cursor:text; border-radius:3px; }
     [contenteditable="true"]:hover { background:#fefce8; }
     [contenteditable="true"]:focus { background:#fffbeb; box-shadow:inset 0 0 0 1px #3b82f6; }
     .cell-computed { cursor:default; background:#f8fafc; }
-    .fgn-sym { float:left; font-size:9px; color:#9ca3af; }
     .item-row.hl-on td, .item-row.hl-on [contenteditable] { color:#dc2626 !important; font-weight:900 !important; }
     .pc-1 .main-table tbody tr { height:26px; }
     .panel-input-scroll::-webkit-scrollbar, .panel-preview::-webkit-scrollbar { width:6px; }
@@ -243,6 +251,7 @@
       .footer-brand a { display:none !important; }
       .stamp-image { position: absolute !important; left: 48px !important; bottom: -18px !important; }
       .row-ctrl, .sheet-add-bar { display:none !important; }
+      .cell-name-td { padding:6px 8px !important; }
       [contenteditable="true"] { background:transparent !important; box-shadow:none !important; }
       @page { size:A4 portrait; margin:10mm; }
     }
@@ -277,13 +286,15 @@
           <strong>행사 파일</strong>
           <button type="button" class="btn-clear" id="btn-clear-form">새 문서</button>
         </div>
-        <input type="file" id="import-file" accept=".json,.xlsx,.xls" style="display:none;">
+        <input type="file" id="import-file" accept=".json" style="display:none;">
+        <input type="file" id="import-xlsx-file" accept=".xlsx,.xls" style="display:none;">
         <div class="file-bar-actions">
           <button type="button" id="btn-import" class="btn-restore">📂 JSON 열기</button>
+          <button type="button" id="btn-xlsx-import" class="btn-xlsx-up">📗 엑셀 열기</button>
           <button type="button" id="btn-export-current" class="btn-export-current">📤 현재 문서 JSON</button>
         </div>
       </div>
-      <p class="work-hint">왼쪽에서는 통화·기본정보·특이사항만 넣고, <strong>항목·단가·수량은 오른쪽 견적서 표에서 바로 수정</strong>합니다. 행 추가는 표 아래 + 버튼, 강조/삭제는 행에 마우스를 올리면 나옵니다.</p>
+      <p class="work-hint">왼쪽에서는 통화·기본정보·특이사항만 넣고, <strong>항목·단가·수량은 오른쪽 견적서 표에서 바로 수정</strong>합니다. 행 추가는 표 아래 + 버튼, 삭제는 각 행 항목 칸의 ✕입니다. 엑셀로 작업한 파일도 JSON처럼 왼쪽에서 열 수 있습니다.</p>
       <div class="form-group highlight">
         <div class="section-title cyan">통화 지역 선택</div>
         <select id="inp-currency" class="form-select" style="padding:10px; font-size:14px; color:#2563eb; border-color:#93c5fd;">
@@ -762,7 +773,7 @@
     let krwTd = '';
     if (type === 'local') {
       if (!isKRW) {
-        fgnTd = `<td class="text-right bg-yellow-50"><span class="fgn-sym">${cS}</span><span class="export-fgn cell-fgn" contenteditable="true">${escAttr(fmt(data.fgn))}</span></td>`;
+        fgnTd = `<td class="text-right bg-yellow-50 cell-fgn-td"><div class="fgn-cell-wrap"><span class="fgn-sym" aria-hidden="true">${cS}</span><div class="export-fgn cell-fgn" contenteditable="true">${escAttr(fmt(data.fgn))}</div></div></td>`;
         krwTd = `<td class="text-right export-krw cell-krw cell-computed" data-group="local"></td>`;
       } else {
         krwTd = `<td class="text-right export-krw cell-krw" data-group="local" contenteditable="true">${escAttr(fmt(data.fgn))}</td>`;
@@ -771,7 +782,7 @@
       if (!isKRW) fgnTd = `<td class="text-right bg-gray-50"></td>`;
       krwTd = `<td class="text-right export-krw cell-krw" data-group="${type}" contenteditable="true">${escAttr(fmt(data.krw))}</td>`;
     }
-    return `<tr class="item-row ${type}-item${hlClass}" data-type="${type}" data-hl="${data.hl ? 'true' : 'false'}">${sec}<td class="text-center export-text">${rowCtrlHtml()}<span class="cell-name" contenteditable="true">${name}</span></td><td class="export-text cell-desc" contenteditable="true">${desc}</td><td class="text-center export-qty cell-qty" data-group="${type}" contenteditable="true">${escAttr(qty)}</td>${fgnTd}${krwTd}<td class="text-right font-semibold export-tot cell-tot cell-computed" data-group="${type}"></td><td class="text-center export-text cell-note" contenteditable="true">${note}</td></tr>`;
+    return `<tr class="item-row ${type}-item${hlClass}" data-type="${type}" data-hl="${data.hl ? 'true' : 'false'}">${sec}<td class="text-center cell-name-td">${rowCtrlHtml()}<div class="cell-name export-text" contenteditable="true">${name}</div></td><td class="export-text cell-desc" contenteditable="true">${desc}</td><td class="text-center export-qty cell-qty" data-group="${type}" contenteditable="true">${escAttr(qty)}</td>${fgnTd}${krwTd}<td class="text-right font-semibold export-tot cell-tot cell-computed" data-group="${type}"></td><td class="text-center export-text cell-note" contenteditable="true">${note}</td></tr>`;
   }
   function rebuildDetailedSection(type, rows) {
     const meta = currencyMeta();
@@ -799,7 +810,7 @@
   function buildSimpleItemRow(data) {
     const hlClass = data.hl ? ' hl-on' : '';
     const qty = (data.qty === '' || data.qty == null) ? '' : fmt(data.qty);
-    return `<tr class="item-row simple-item${hlClass}" data-type="simple" data-hl="${data.hl ? 'true' : 'false'}"><td class="text-center export-text">${rowCtrlHtml()}<span class="cell-name" contenteditable="true">${escAttr(data.name || '')}</span></td><td class="text-center export-text cell-desc" contenteditable="true">${escAttr(data.desc || '')}</td><td class="text-right export-krw cell-krw" data-group="simple" contenteditable="true">${escAttr(fmt(data.krw))}</td><td class="text-center export-qty cell-qty" data-group="simple" contenteditable="true">${escAttr(qty)}</td><td class="text-right export-tot cell-tot cell-computed" data-group="simple"></td></tr>`;
+    return `<tr class="item-row simple-item${hlClass}" data-type="simple" data-hl="${data.hl ? 'true' : 'false'}"><td class="text-center cell-name-td">${rowCtrlHtml()}<div class="cell-name export-text" contenteditable="true">${escAttr(data.name || '')}</div></td><td class="text-center export-text cell-desc" contenteditable="true">${escAttr(data.desc || '')}</td><td class="text-right export-krw cell-krw" data-group="simple" contenteditable="true">${escAttr(fmt(data.krw))}</td><td class="text-center export-qty cell-qty" data-group="simple" contenteditable="true">${escAttr(qty)}</td><td class="text-right export-tot cell-tot cell-computed" data-group="simple"></td></tr>`;
   }
   function rebuildSimpleItems(rows) {
     const current = rows != null ? rows : getRowData('simple');
@@ -2431,6 +2442,10 @@
     }
     $('#tbody-simple').insertAdjacentHTML('beforeend', h);
   }
+  function setInnerHtmlIfChanged(el, html) {
+    if (!el) return;
+    if (el.innerHTML !== html) el.innerHTML = html;
+  }
   function renderDetailed() {
     applyDetDocLabel();
     const meta = currencyMeta();
@@ -2440,10 +2455,15 @@
     $('#out-issueAndRate').textContent = meta.isKRW ? `${$('#inp-issueDate').value} / 국내행사 (환율 미적용)` : `${$('#inp-issueDate').value} / ${meta.currency} ${exRate} 기준(송금)`;
     $('#out-issueAndRate').className = $('#inp-hl-issueDate').checked ? 'export-text hl-text' : 'export-text';
     const isKRW = meta.isKRW;
-    $('#main-thead').innerHTML = `<tr><th style="width:9%">구분</th><th style="width:${isKRW ? '14%' : '11%'}">항목</th><th style="width:${isKRW ? '24%' : '18%'}">내용</th><th style="width:9%;font-size:10px;line-height:1.3">인원/객실수<br>차량대수</th>${!isKRW ? `<th style="width:11%;background:#fef08a;color:#0f172a">${meta.cN} 단가<br><span style="font-weight:400;color:#475569">${meta.currency}</span></th>` : ''}<th style="width:${isKRW ? '15%' : '12%'}">원화 단가<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '16%' : '14%'}">총금액<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '13%' : '16%'}">비고</th></tr>`;
-    const flightSec = $('#tbody-flight .sec-label-cell'); if (flightSec) flightSec.innerHTML = formatSecLabelForTable(sec.flight);
-    const localSec = $('#tbody-local .sec-label-cell'); if (localSec) localSec.innerHTML = formatSecLabelForTable(sec.local);
-    const domSec = $('#tbody-domestic .sec-label-cell'); if (domSec) domSec.innerHTML = formatSecLabelForTable(sec.domestic);
+    const thead = $('#main-thead');
+    const theadSig = `${meta.layout}|${meta.cN}|${meta.currency}`;
+    if (thead.dataset.sig !== theadSig) {
+      thead.innerHTML = `<tr><th style="width:9%">구분</th><th style="width:${isKRW ? '14%' : '11%'}">항목</th><th style="width:${isKRW ? '24%' : '18%'}">내용</th><th style="width:9%;font-size:10px;line-height:1.3">인원/객실수<br>차량대수</th>${!isKRW ? `<th style="width:11%;background:#fef08a;color:#0f172a">${meta.cN} 단가<br><span style="font-weight:400;color:#475569">${meta.currency}</span></th>` : ''}<th style="width:${isKRW ? '15%' : '12%'}">원화 단가<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '16%' : '14%'}">총금액<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '13%' : '16%'}">비고</th></tr>`;
+      thead.dataset.sig = theadSig;
+    }
+    setInnerHtmlIfChanged($('#tbody-flight .sec-label-cell'), formatSecLabelForTable(sec.flight));
+    setInnerHtmlIfChanged($('#tbody-local .sec-label-cell'), formatSecLabelForTable(sec.local));
+    setInnerHtmlIfChanged($('#tbody-domestic .sec-label-cell'), formatSecLabelForTable(sec.domestic));
     if (!$('#tbody-flight tr.item-row')) rebuildDetailedItems(initFlights, initLocals, initDomestics);
     else if ($('#main-table').dataset.layout !== meta.layout) rebuildDetailedItems(getRowData('flight'), getRowData('local'), getRowData('domestic'));
     else refreshDetailedComputed();
@@ -2747,15 +2767,29 @@
 
   function initDragAndDrop() {}
 
+  function isImeEvent(e) {
+    return !!(e.isComposing || e.keyCode === 229 || e.inputType === 'insertCompositionText' || e.inputType === 'deleteCompositionText');
+  }
+  function isAmountEditor(el) {
+    return el && (el.classList.contains('cell-qty') || el.classList.contains('cell-krw') || el.classList.contains('cell-fgn'));
+  }
   function bindEvents() {
     document.addEventListener('input', e => {
+      if (isImeEvent(e)) return;
       if (e.target.closest('.item-row')) {
-        calculateAndRender();
+        if (isAmountEditor(e.target)) calculateAndRender();
+        else if ($('#inp-currency').value === 'SIMPLE_QUOTE') refreshSimpleComputed();
         scheduleValidation();
         return;
       }
       if (e.target.classList.contains('amount')) e.target.value = formatCurrencyValue(e.target.value);
       calculateAndRender(); scheduleValidation();
+    });
+    document.addEventListener('compositionend', e => {
+      if (!e.target.closest('.item-row')) return;
+      if (isAmountEditor(e.target)) calculateAndRender();
+      else if ($('#inp-currency').value === 'SIMPLE_QUOTE') refreshSimpleComputed();
+      scheduleValidation();
     });
     document.addEventListener('click', e => {
       const addBtn = e.target.closest('[data-add]');
@@ -2779,13 +2813,21 @@
         tr.classList.toggle('hl-on', tr.dataset.hl === 'true');
         return;
       }
+      const fgnTd = e.target.closest('.cell-fgn-td');
+      if (fgnTd && !e.target.closest('[contenteditable]')) {
+        const editor = $('.cell-fgn', fgnTd);
+        if (editor) editor.focus();
+        return;
+      }
       if (e.target.matches('#warning-list li')) scrollToRow(e.target.dataset.row);
     });
     $('#btn-clear-form').addEventListener('click', clearForm);
     $('#btn-export-current').addEventListener('click', exportCurrentData);
     $('#btn-import').addEventListener('click', () => $('#import-file').click());
+    $('#btn-xlsx-import').addEventListener('click', () => $('#import-xlsx-file').click());
     $('#btn-export-xlsx').addEventListener('click', exportCompletedExcel);
     $('#import-file').addEventListener('change', importData);
+    $('#import-xlsx-file').addEventListener('change', importData);
 
     $('#inp-currency').addEventListener('change', () => toggleDocMode(true));
     $('#inp-sim-vat').addEventListener('change', () => { toggleVatManual(); calculateAndRender(); scheduleValidation(); });
@@ -2801,7 +2843,9 @@
     $('#tabInput').addEventListener('click', () => switchTab('input'));
     $('#tabPreview').addEventListener('click', () => switchTab('preview'));
     document.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && e.target.closest('.item-row [contenteditable]')) e.preventDefault();
+      if (e.key !== 'Enter' || !e.target.closest('.item-row [contenteditable]')) return;
+      if (isImeEvent(e)) return;
+      e.preventDefault();
     });
   }
 
