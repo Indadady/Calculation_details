@@ -39,7 +39,7 @@
     .mobile-tabs button.active { color:#0f172a; }
     .mobile-tabs button.active::after { content:''; position:absolute; bottom:-1px; left:0; right:0; height:3px; background:#0f172a; }
     .main-layout { display:flex; height:calc(100vh - 57px); overflow:hidden; }
-    .panel-input { width:520px; flex-shrink:0; background:#fff; border-right:1px solid #e2e8f0; padding:24px; box-shadow:4px 0 10px rgba(0,0,0,.02); z-index:10; display:flex; flex-direction:column; position:relative; }
+    .panel-input { width:400px; flex-shrink:0; background:#fff; border-right:1px solid #e2e8f0; padding:20px; box-shadow:4px 0 10px rgba(0,0,0,.02); z-index:10; display:flex; flex-direction:column; position:relative; }
     .panel-input-scroll { flex:1; overflow-y:auto; scroll-behavior:smooth; padding-bottom:80px; }
     .panel-input h2 { font-size:18px; font-weight:800; border-bottom:2px solid #0f172a; padding-bottom:10px; margin-bottom:20px; color:#0f172a; }
     .panel-preview { flex:1; overflow:auto; background:#e2e8f0; display:flex; justify-content:center; align-items:flex-start; padding:32px 16px; }
@@ -125,7 +125,7 @@
     .live-summary-bar { position:absolute; bottom:0; left:0; right:0; background:#0f172a; color:#f8fafc; padding:16px 24px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 -4px 10px rgba(0,0,0,.1); z-index:50; }
     .live-summary-bar .label { font-size:13px; font-weight:600; color:#94a3b8; }
     .live-summary-bar .total-amount { font-size:22px; font-weight:900; color:#fbbf24; }
-    .a4-sheet { background:#fff; width:100%; max-width:850px; padding:40px; box-shadow:0 10px 40px rgba(0,0,0,.1); border-radius:4px; position:relative; }
+    .a4-sheet { background:#fff; width:100%; max-width:850px; padding:40px 40px 40px 48px; box-shadow:0 10px 40px rgba(0,0,0,.1); border-radius:4px; position:relative; }
     #detailed-input-group, #detailed-preview-group { display:block; }
     #simple-input-group, #simple-preview-group { display:none; }
     .doc-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; }
@@ -182,6 +182,26 @@
     .footer-brand p { font-size:11px; color:#64748b; }
     .footer-brand a { display:inline-block; margin-top:8px; padding:6px 16px; border:1px solid #cbd5e1; border-radius:6px; color:#475569; text-decoration:none; font-size:11px; font-weight:700; transition:.2s; }
     .footer-brand a:hover { background:#f1f5f9; color:#0f172a; border-color:#94a3b8; }
+    .file-bar { background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px; margin-bottom:18px; }
+    .file-bar-head { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px; }
+    .file-bar-head strong { font-size:13px; font-weight:800; color:#1e293b; }
+    .file-bar-actions { display:flex; flex-wrap:wrap; gap:6px; }
+    .file-bar-actions button { flex:1; min-width:90px; }
+    .work-hint { font-size:12px; line-height:1.55; color:#475569; background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:10px 12px; margin-bottom:16px; }
+    .sheet-add-bar { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 18px; }
+    .sheet-add-bar button { background:#fff; border:1px dashed #94a3b8; color:#334155; padding:8px 12px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; }
+    .sheet-add-bar button:hover { background:#f8fafc; border-color:#334155; }
+    .item-row td { position:relative; }
+    .item-row .row-ctrl { position:absolute; left:-4px; top:50%; transform:translate(-100%,-50%); display:none; flex-direction:column; gap:2px; z-index:5; }
+    .a4-sheet:hover .item-row:hover .row-ctrl, .item-row:focus-within .row-ctrl { display:flex; }
+    .item-row .row-ctrl button { width:22px; height:22px; padding:0; border-radius:4px; font-size:11px; line-height:1; }
+    .cell-name, .cell-desc, .cell-qty, .cell-krw, .cell-fgn, .cell-note { outline:none; }
+    [contenteditable="true"] { cursor:text; border-radius:3px; }
+    [contenteditable="true"]:hover { background:#fefce8; }
+    [contenteditable="true"]:focus { background:#fffbeb; box-shadow:inset 0 0 0 1px #3b82f6; }
+    .cell-computed { cursor:default; background:#f8fafc; }
+    .fgn-sym { float:left; font-size:9px; color:#9ca3af; }
+    .item-row.hl-on td, .item-row.hl-on [contenteditable] { color:#dc2626 !important; font-weight:900 !important; }
     .pc-1 .main-table tbody tr { height:26px; }
     .panel-input-scroll::-webkit-scrollbar, .panel-preview::-webkit-scrollbar { width:6px; }
     .panel-input-scroll::-webkit-scrollbar-track, .panel-preview::-webkit-scrollbar-track { background:#f8fafc; }
@@ -196,7 +216,7 @@
       .panel-input-scroll { overflow-y:visible; padding-bottom:0; }
       .live-summary-bar { position:relative; margin-top:20px; border-radius:8px; box-shadow:0 4px 6px rgba(0,0,0,.1); }
       .panel-preview { width:100%; padding:20px 0; overflow-x:scroll; overflow-y:visible; height:auto; min-height:0; display:block; -webkit-overflow-scrolling:touch; }
-      .a4-sheet { min-width:750px; width:750px; padding:24px; margin:0 12px; }
+      .a4-sheet { min-width:750px; width:750px; padding:24px 24px 24px 40px; margin:0 12px; }
       .slot-grid, .slot-grid-flight, .slot-grid-simple, .form-row.cols-2 { grid-template-columns:1fr; }
     }
     
@@ -222,6 +242,8 @@
       .main-table td.sec-label-cell { overflow: visible !important; line-height: 1.3 !important; font-size: 10px !important; padding: 4px 3px !important; }
       .footer-brand a { display:none !important; }
       .stamp-image { position: absolute !important; left: 48px !important; bottom: -18px !important; }
+      .row-ctrl, .sheet-add-bar { display:none !important; }
+      [contenteditable="true"] { background:transparent !important; box-shadow:none !important; }
       @page { size:A4 portrait; margin:10mm; }
     }
   </style>
@@ -239,48 +261,29 @@
   </div>
 </div>
 <div class="mobile-tabs no-print" id="mobileTabs">
-  <button id="tabInput" class="active" type="button">데이터 입력</button>
-  <button id="tabPreview" type="button">견적서 보기</button>
+  <button id="tabInput" class="active" type="button">기본 설정</button>
+  <button id="tabPreview" type="button">견적서 작성</button>
 </div>
 <div class="main-layout" id="mainLayout">
   <div class="panel-input no-print" id="panelInput">
     <div class="panel-input-scroll">
-      <h2>문서 기본 설정 및 템플릿</h2>
+      <h2>문서 기본 설정</h2>
       <div id="warning-panel" class="warning-panel hidden">
         <div class="warning-title">⚠️ 검수 경고: 확인이 필요한 항목이 있습니다.</div>
         <ul id="warning-list" class="warning-list"></ul>
       </div>
-      <div class="template-manager">
-        <div class="template-header">
-          <span>견적 템플릿 보관함</span>
-          <button type="button" class="btn-clear" id="btn-clear-form">입력 초기화(새문서)</button>
+      <div class="file-bar">
+        <div class="file-bar-head">
+          <strong>행사 파일</strong>
+          <button type="button" class="btn-clear" id="btn-clear-form">새 문서</button>
         </div>
-        <div class="template-controls">
-          <input type="text" id="preset-search" class="template-search" placeholder="🔍 제목 검색...">
-          <select id="preset-select" class="template-select"><option value="">저장된 템플릿 선택...</option></select>
-        </div>
-        <div style="display:flex; gap:8px; margin-top:8px;">
-          <button type="button" id="btn-load-preset" class="btn-load" style="flex:1">불러오기</button>
-          <button type="button" id="btn-save-preset" class="btn-save" style="flex:1">현재 상태 저장</button>
-          <button type="button" id="btn-delete-preset" class="btn-delete">삭제</button>
-        </div>
-        <div class="excel-controls">
-          <div class="excel-controls-head">
-            <strong>엑셀 업무 파일 (기관 전달·내부 공유)</strong>
-            <span>학교·관공서 담당자가 익숙한 엑셀로 작성·회신합니다. 완성본 엑셀은 다시 업로드할 수 있어 JSON을 주고받을 필요가 없습니다.</span>
-          </div>
-          <button type="button" id="btn-xlsx-template" class="btn-xlsx-tpl">⬇️ 양식 다운</button>
-          <button type="button" id="btn-xlsx-import" class="btn-xlsx-up">📂 엑셀 업로드</button>
-          <button type="button" id="btn-xlsx-export" class="btn-xlsx-done">📗 완성본 엑셀 저장</button>
-        </div>
-        <div class="backup-controls">
-          <input type="file" id="import-file" accept=".xlsx,.xls,.json" style="display:none;">
-          <div class="backup-label">이 PC 브라우저 보관함 백업 (JSON, 기존 파일 호환)</div>
-          <button type="button" id="btn-import" class="btn-restore">📂 JSON 복구</button>
+        <input type="file" id="import-file" accept=".json,.xlsx,.xls" style="display:none;">
+        <div class="file-bar-actions">
+          <button type="button" id="btn-import" class="btn-restore">📂 JSON 열기</button>
           <button type="button" id="btn-export-current" class="btn-export-current">📤 현재 문서 JSON</button>
-          <button type="button" id="btn-export" class="btn-backup" title="저장된 모든 템플릿을 한 번에 백업합니다.">💾 전체 JSON 백업</button>
         </div>
       </div>
+      <p class="work-hint">왼쪽에서는 통화·기본정보·특이사항만 넣고, <strong>항목·단가·수량은 오른쪽 견적서 표에서 바로 수정</strong>합니다. 행 추가는 표 아래 + 버튼, 강조/삭제는 행에 마우스를 올리면 나옵니다.</p>
       <div class="form-group highlight">
         <div class="section-title cyan">통화 지역 선택</div>
         <select id="inp-currency" class="form-select" style="padding:10px; font-size:14px; color:#2563eb; border-color:#93c5fd;">
@@ -301,7 +304,6 @@
           <label for="inp-exRate">적용 환율 :</label>
           <input type="text" id="inp-exRate" class="exrate-input amount" value="9.51">
           <span style="font-size:12px;color:#64748b;">기준(송금)</span>
-          <span style="font-size:11px;color:#94a3b8;margin-left:4px;">※ 통화 변경 시 최신 기준값 자동 반영</span>
         </div>
       </div>
       <div id="detailed-input-group">
@@ -340,40 +342,21 @@
           </div>
         </div>
         <div class="form-group">
-          <div class="section-title dark" id="title-flight-area">2. 항공료 영역 (원화 직접 입력)</div>
-          <div class="sec-label-row">
-            <div><label for="inp-sec-flight">표 구분명 (출력)</label><input type="text" id="inp-sec-flight" class="form-input sec-label-input" value="항공료" placeholder="예: 항공료, 교통비"></div>
-            <p class="sec-label-hint">※ 산출표 좌측 「구분」 열에 표시됩니다. 줄바꿈은 Enter로 입력 가능합니다.</p>
+          <div class="section-title dark">2. 표 구분명</div>
+          <p class="hint-text">산출표 왼쪽 「구분」 열에 표시됩니다.</p>
+          <div class="form-row cols-1">
+            <div><label class="form-label" for="inp-sec-flight">1구간</label><textarea id="inp-sec-flight" class="form-input sec-label-input" rows="2" placeholder="예: 항공료">항공료</textarea></div>
+            <div><label class="form-label" for="inp-sec-local">2구간</label><textarea id="inp-sec-local" class="form-input sec-label-input" rows="2" placeholder="예: 해외현지 발생비용">해외현지
+발생비용</textarea></div>
+            <div><label class="form-label" for="inp-sec-domestic">3구간</label><textarea id="inp-sec-domestic" class="form-input sec-label-input" rows="2" placeholder="예: 국내 발생 비용">국내 발생 비용</textarea></div>
           </div>
-          <div id="flight-inputs-container"></div>
-          <button type="button" class="btn-add-item" id="btn-add-flight">+ 항공비 항목 추가</button>
         </div>
         <div class="form-group">
-          <div class="section-title green" id="title-local-expense">3. 해외현지 발생비용 (외화 입력)</div>
-          <div class="sec-label-row">
-            <div><label for="inp-sec-local">표 구분명 (출력)</label><input type="text" id="inp-sec-local" class="form-input sec-label-input" value="해외현지&#10;발생비용" placeholder="예: 행사비용, 제주(현지) 발생비용"></div>
-          </div>
-          <p class="hint-text">카드를 드래그 앤 드롭하여 순서를 변경할 수 있습니다. <strong>💡 색상강조</strong> 버튼을 누르면 해당 행이 빨갛게 하이라이트 됩니다.</p>
-          <div id="local-inputs-container"></div>
-          <button type="button" class="btn-add-item" id="btn-add-local">+ 현지 발생비용 항목 추가</button>
-        </div>
-        <div class="form-group">
-          <div class="section-title orange" id="title-domestic-area">4. 국내 발생 비용 (원화 직접 입력)</div>
-          <div class="sec-label-row">
-            <div><label for="inp-sec-domestic">표 구분명 (출력)</label><input type="text" id="inp-sec-domestic" class="form-input sec-label-input" value="국내 발생 비용" placeholder="예: 기획운영비"></div>
-          </div>
-          <div id="domestic-inputs-container"></div>
-          <button type="button" class="btn-add-item" id="btn-add-domestic">+ 국내 발생비용 항목 추가</button>
-        </div>
-        <div class="form-group">
-          <div class="section-title dark">5. 하단 특이사항 (선택사항)</div>
-          <p class="hint-text" style="margin-bottom:8px;">표 가장 하단에 강조되어 출력됩니다. (예: 여성기업 수의계약 조건 안내 등)</p>
-          
+          <div class="section-title dark">3. 하단 특이사항</div>
           <label style="display:inline-flex; align-items:center; gap:8px; margin-bottom:12px; padding:8px 12px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:6px; font-size:13px; font-weight:700; color:#1e3a8a; cursor:pointer;">
              <input type="checkbox" id="inp-det-showTaxNote" checked style="width:16px; height:16px; cursor:pointer; accent-color:#2563eb;">
              [세금계산서 발행 관련 안내문] 하단에 노출하기
           </label>
-
           <div class="form-row cols-1">
             <textarea id="inp-det-specialNote" class="form-input" style="height:60px; resize:vertical; font-weight:600; color:#b91c1c;" placeholder="필요 시 기안 및 계약용 특이사항을 자유롭게 입력하세요. (비워두면 출력되지 않습니다.)"></textarea>
           </div>
@@ -403,16 +386,10 @@
             <div><label class="form-label">수신처 주소</label><input type="text" id="inp-sim-toAddr" class="form-input" value="강원도 정선군 사북읍"></div>
             <div><label class="form-label">수신 담당자명</label><input type="text" id="inp-sim-toPerson" class="form-input" value="담당 선생님"></div>
           </div>
-          <div style="margin-top:12px; padding:12px; background:#f8fafc; border-radius:6px; font-size:12px; color:#475569; border:1px dashed #cbd5e1;">💡 발신자 정보(투어메이커 주소, 연락처, 대표자 이재명 및 <strong>법인전자직인</strong>)는 양식에 고정되어 자동 출력됩니다.</div>
+          <div style="margin-top:12px; padding:12px; background:#f8fafc; border-radius:6px; font-size:12px; color:#475569; border:1px dashed #cbd5e1;">발신자 정보(주소, 연락처, 대표자 이재명 및 법인전자직인)는 양식에 고정됩니다.</div>
         </div>
         <div class="form-group">
-          <div class="section-title green">3. 견적 항목 (원화 총액 기준)</div>
-          <p class="hint-text"><strong>💡 색상강조</strong> 버튼을 누르면 해당 행이 빨갛게 하이라이트 됩니다.</p>
-          <div id="simple-items-container"></div>
-          <button type="button" class="btn-add-item" id="btn-add-simple">+ 견적 항목 추가</button>
-        </div>
-        <div class="form-group">
-          <div class="section-title orange">4. 하단 부가 정보 및 세무 설정</div>
+          <div class="section-title orange">3. 하단 부가 정보 및 세무 설정</div>
           <div style="background:#f1f5f9; padding:12px; border:1px dashed #94a3b8; border-radius:6px; margin-bottom:16px;">
             <label class="form-label" style="color:#0f172a; margin-bottom:12px; font-size:13px;">입금 계좌 설정 (법인 외 행사 시 변경 가능)</label>
             <div class="form-row cols-2" style="margin-bottom:8px;">
@@ -422,15 +399,12 @@
             <div class="form-row cols-1" style="margin-bottom:0;"><div><label class="form-label">계좌번호 (Bank Account)</label><input type="text" id="inp-sim-bankNum" class="form-input" value="131-022-382094"></div></div>
           </div>
           <div class="form-row cols-2"><div><label class="form-label">입금 기한 (By Due)</label><input type="text" id="inp-sim-due" class="form-input" value="행사 출발 전 완납"></div></div>
-          
           <div class="form-row cols-1" style="background:#eff6ff; padding:12px; border:1px dashed #3b82f6; border-radius:6px; margin-top:8px;">
             <div>
-              <label class="form-label" style="color:#1d4ed8; font-size:13px;">💰 기납금 (선입금/계약금) 차감액</label>
+              <label class="form-label" style="color:#1d4ed8; font-size:13px;">기납금 (선입금/계약금) 차감액</label>
               <input type="text" id="inp-sim-deposit" class="form-input amount" style="border-color:#93c5fd; font-weight:800; color:#1d4ed8;" placeholder="받으신 금액을 양수로 입력하세요 (미입력 시 출력 안됨)">
-              <p style="font-size:11px; color:#3b82f6; margin-top:6px; margin-bottom:0; line-height:1.4;">입력된 금액은 견적서 하단에 파란색 큰 글씨로 명시되며, 총 견적금액에서 차감되어 <strong>최종 청구 잔금</strong>이 자동 산출됩니다.</p>
             </div>
           </div>
-
           <div class="form-row cols-1" style="background:#fff1f2; padding:12px; border:1px dashed #fca5a5; border-radius:6px; margin-top:8px;">
             <div>
               <label class="form-label" style="color:#be123c;">부가세 (VAT) 표시</label>
@@ -449,7 +423,7 @@
               </select>
             </div>
           </div>
-          <div class="form-row cols-1" style="margin-top:12px;"><div><label class="form-label">특이사항 안내문 (예약 조건, 항공 정보, 세무 안내 등 자유 기재)</label><textarea id="inp-sim-taxNote" class="form-input" style="height:80px; resize:vertical; font-weight:600; color:#b91c1c;">※ 전체 행사비용 세금계산서 발행 시, 당사 매출이 아닌 수탁경비(항공/숙박 등)까지 매출로 과대 계상되어 발생하는 세금 증가분을 보전하기 위해 소정의 기타비용이 추가 청구됨을 양해 부탁드립니다.</textarea></div></div>
+          <div class="form-row cols-1" style="margin-top:12px;"><div><label class="form-label">특이사항 안내문</label><textarea id="inp-sim-taxNote" class="form-input" style="height:80px; resize:vertical; font-weight:600; color:#b91c1c;">※ 전체 행사비용 세금계산서 발행 시, 당사 매출이 아닌 수탁경비(항공/숙박 등)까지 매출로 과대 계상되어 발생하는 세금 증가분을 보전하기 위해 소정의 기타비용이 추가 청구됨을 양해 부탁드립니다.</textarea></div></div>
           <div class="form-row cols-1" style="margin-top:12px;">
             <div><label class="form-label">포함사항 (Inclusions)</label><textarea id="inp-sim-inc" class="form-input" style="height:60px; resize:vertical;">항공료, 항공TAX, 호텔(2인1실), 차량, 식사, 입장료, 기사/가이드 팁, 2억원여행자보험료</textarea></div>
             <div><label class="form-label">불포함사항 (Exclusions)</label><input type="text" id="inp-sim-exc" class="form-input" value="싱글차지, 기타 개인비용 등"></div>
@@ -485,6 +459,11 @@
             <tbody id="tbody-domestic"></tbody>
             <tbody id="tbody-total"></tbody>
           </table>
+          <div class="sheet-add-bar no-print" id="detailed-add-bar">
+            <button type="button" data-add="flight">+ 1구간 항목</button>
+            <button type="button" data-add="local">+ 2구간 항목</button>
+            <button type="button" data-add="domestic">+ 3구간 항목</button>
+          </div>
         </div>
         <div id="footer-area">
           <div class="footer-notes" id="out-det-taxNoteArea">
@@ -525,6 +504,9 @@
           <thead><tr><th style="width:15%">Item</th><th style="width:40%">Description</th><th style="width:15%">Unit cost</th><th style="width:10%">Quantity</th><th style="width:20%">Total</th></tr></thead>
           <tbody id="tbody-simple"></tbody>
         </table>
+        <div class="sheet-add-bar no-print" id="simple-add-bar">
+          <button type="button" data-add="simple">+ 견적 항목 추가</button>
+        </div>
         <div class="simple-footer-bank">
           <p style="margin-bottom:10px;">입금 계좌 정보 (Make All check payable to ;)</p>
           <p><span class="label">은행 (Bank)</span><span class="colon">:</span><span class="val export-text" id="out-sim-bankName"></span></p>
@@ -612,11 +594,16 @@
     $('#inp-sec-flight').value = d.flight;
     $('#inp-sec-local').value = d.local;
     $('#inp-sec-domestic').value = d.domestic;
-    $('#title-flight-area').textContent = d.flightTitle;
-    $('#title-local-expense').innerHTML = currency === 'JPY' || currency === 'USD' || currency === 'AUD' || currency === 'CNY' || currency === 'SGD'
-      ? `${d.localTitle} <span style="font-size:12px;font-weight:400;color:#64748b;margin-left:8px;">*원화 자동 환산</span>`
-      : d.localTitle;
-    $('#title-domestic-area').textContent = d.domesticTitle;
+    updateAddBarLabels(currency);
+  }
+  function updateAddBarLabels(currency) {
+    const d = getSectionDefaults(currency || $('#inp-currency').value);
+    const bar = $('#detailed-add-bar');
+    if (!bar) return;
+    const btns = bar.querySelectorAll('button');
+    if (btns[0]) btns[0].textContent = `+ ${String(d.flight).replace(/\n/g, ' ')}`;
+    if (btns[1]) btns[1].textContent = `+ ${String(d.local).replace(/\n/g, ' ')}`;
+    if (btns[2]) btns[2].textContent = `+ ${String(d.domestic).replace(/\n/g, ' ')}`;
   }
   function getSectionLabelsFromForm() {
     return {
@@ -713,67 +700,151 @@
     $('#inp-sim-inv').value = getFormattedDate('korean');
   }
 
-  function createCardHTML(type, data={}) {
-    const map = {
-      flight: { rootClass: 'flight-item', gridClass: 'slot-grid-flight', amountKey: 'krw', placeholders: ['항목','내용','수량','단가(₩)','비고'], fields: [['name','f-name'],['desc','f-desc'],['qty','f-qty'],['krw','f-krw'],['note','f-note']] },
-      local: { rootClass: 'local-item', gridClass: 'slot-grid', amountKey: 'fgn', placeholders: ['항목명','내용','수량','단가(외화)','비고(빈칸가능)'], fields: [['name','l-name'],['desc','l-desc'],['qty','l-qty'],['fgn','l-fgn'],['note','l-note']] },
-      domestic: { rootClass: 'domestic-item', gridClass: 'slot-grid-flight', amountKey: 'krw', placeholders: ['항목','내용','수량','단가(₩)','비고'], fields: [['name','d-name'],['desc','d-desc'],['qty','d-qty'],['krw','d-krw'],['note','d-note']] },
-      simple: { rootClass: 'simple-item', gridClass: 'slot-grid-simple', amountKey: 'krw', placeholders: ['Item (항목)','Description (내용)','Unit cost (단가)','Quantity'], fields: [['name','s-name'],['desc','s-desc'],['krw','s-krw'],['qty','s-qty']] }
-    };
-    const conf = map[type];
-    const amountVal = conf.amountKey ? fmt(data[conf.amountKey]) : '';
-    
-    const gridFields = type === 'simple' ? conf.fields : conf.fields.slice(0, 4);
-
-    const inputs = gridFields.map(([key, cls], idx) => {
-      const value = key === conf.amountKey ? amountVal : (data[key] ?? '');
-      const isQty = key === 'qty';
-      const isAmount = key === conf.amountKey;
-      const inputType = isQty ? 'number' : 'text';
-      const style = isQty ? 'text-align:center' : (isAmount ? 'text-align:right' : '');
-      return `<input type="${inputType}" class="slot-input ${cls}${isAmount ? ' amount' : ''}" ${style ? `style="${style}"` : ''} value="${escAttr(value)}" placeholder="${conf.placeholders[idx]}">`;
-    }).join('');
-    
-    const noteField = type === 'simple' ? '' : `\n<input type="text" class="slot-input ${conf.fields[4][1]}" style="width:100%; margin-top:4px; background-color:#fff;" value="${escAttr(data.note || '')}" placeholder="📝 ${conf.placeholders[4]}">`;
-    
-    const hlActive = data.hl ? 'active' : '';
-    const hlData = data.hl ? 'true' : 'false';
-
-    return `<div class="slot-card ${conf.rootClass}" draggable="true" data-hl="${hlData}">
-              <div class="slot-card-header">
-                <div style="display:flex; align-items:center; gap:8px;">
-                  <span class="drag-handle" title="이곳을 클릭하고 드래그하여 순서를 변경하세요">⠿ 순서 이동</span>
-                  <button type="button" class="btn-toggle-hl js-toggle-hl ${hlActive}" title="이 항목 강조하기">💡 색상강조</button>
-                </div>
-                <button type="button" class="btn-delete-row js-delete-row" title="항목 삭제">✕</button>
-              </div>
-              <div class="${conf.gridClass}">${inputs}</div>${noteField}
-            </div>`;
+  function emptyItem(type) {
+    return type === 'local'
+      ? { name: '', desc: '', qty: '', fgn: 0, note: '', hl: false }
+      : { name: '', desc: '', qty: '', krw: 0, note: '', hl: false };
+  }
+  function isKRWCurrency(curr) {
+    const c = curr || $('#inp-currency').value;
+    return c === 'KRW_MAINLAND' || c === 'KRW_JEJU';
+  }
+  function currencyMeta(curr) {
+    const currency = curr || $('#inp-currency').value;
+    const isKRW = isKRWCurrency(currency);
+    const cN = currency === 'JPY' ? '엔화' : (currency === 'USD' ? '달러' : (currency === 'AUD' ? '호주달러' : (currency === 'SGD' ? '싱가폴달러' : (isKRW ? '원화' : '위안화'))));
+    const cS = (currency === 'USD' || currency === 'AUD' || currency === 'SGD') ? '$' : (isKRW ? '₩' : '¥');
+    return { currency, isKRW, cN, cS, layout: isKRW ? 'krw' : 'foreign' };
+  }
+  function rowCtrlHtml() {
+    return `<div class="row-ctrl no-print"><button type="button" class="btn-toggle-hl js-toggle-hl" title="색상 강조">💡</button><button type="button" class="btn-delete-row js-delete-row" title="항목 삭제">✕</button></div>`;
+  }
+  function readCell(tr, cls) {
+    const el = $('.' + cls, tr);
+    return el ? String(el.textContent || '').replace(/\u00a0/g, ' ') : '';
+  }
+  function getRowData(type) {
+    const sel = type === 'simple'
+      ? '#tbody-simple tr.item-row'
+      : `#tbody-${type} tr.item-row`;
+    return $$(sel).map(tr => {
+      const qtyRaw = readCell(tr, 'cell-qty').trim();
+      const row = {
+        name: readCell(tr, 'cell-name').trim(),
+        desc: readCell(tr, 'cell-desc').trim(),
+        qty: qtyRaw,
+        hl: tr.dataset.hl === 'true'
+      };
+      if (type === 'local') {
+        const fgnEl = $('.cell-fgn', tr);
+        row.fgn = parseCurrency(fgnEl ? fgnEl.textContent : readCell(tr, 'cell-krw'));
+        row.note = readCell(tr, 'cell-note');
+      } else if (type === 'simple') {
+        row.krw = parseCurrency(readCell(tr, 'cell-krw'));
+      } else {
+        row.krw = parseCurrency(readCell(tr, 'cell-krw'));
+        row.note = readCell(tr, 'cell-note');
+      }
+      return row;
+    });
+  }
+  function buildDetailedItemRow(type, data, opts) {
+    const { isKRW, isFirst, count, secHtml, cS } = opts;
+    const hlClass = data.hl ? ' hl-on' : '';
+    const qty = (data.qty === '' || data.qty == null) ? '' : fmt(data.qty);
+    const name = escAttr(data.name || '');
+    const desc = escAttr(data.desc || '');
+    const note = escAttr(data.note || '');
+    const sec = isFirst
+      ? `<td rowspan="${Math.max(count, 1)}" class="text-center font-bold bg-gray-50 export-text sec-label-cell">${secHtml}</td>`
+      : '';
+    let fgnTd = '';
+    let krwTd = '';
+    if (type === 'local') {
+      if (!isKRW) {
+        fgnTd = `<td class="text-right bg-yellow-50"><span class="fgn-sym">${cS}</span><span class="export-fgn cell-fgn" contenteditable="true">${escAttr(fmt(data.fgn))}</span></td>`;
+        krwTd = `<td class="text-right export-krw cell-krw cell-computed" data-group="local"></td>`;
+      } else {
+        krwTd = `<td class="text-right export-krw cell-krw" data-group="local" contenteditable="true">${escAttr(fmt(data.fgn))}</td>`;
+      }
+    } else {
+      if (!isKRW) fgnTd = `<td class="text-right bg-gray-50"></td>`;
+      krwTd = `<td class="text-right export-krw cell-krw" data-group="${type}" contenteditable="true">${escAttr(fmt(data.krw))}</td>`;
+    }
+    return `<tr class="item-row ${type}-item${hlClass}" data-type="${type}" data-hl="${data.hl ? 'true' : 'false'}">${sec}<td class="text-center export-text">${rowCtrlHtml()}<span class="cell-name" contenteditable="true">${name}</span></td><td class="export-text cell-desc" contenteditable="true">${desc}</td><td class="text-center export-qty cell-qty" data-group="${type}" contenteditable="true">${escAttr(qty)}</td>${fgnTd}${krwTd}<td class="text-right font-semibold export-tot cell-tot cell-computed" data-group="${type}"></td><td class="text-center export-text cell-note" contenteditable="true">${note}</td></tr>`;
+  }
+  function rebuildDetailedSection(type, rows) {
+    const meta = currencyMeta();
+    const sec = getSectionLabelsFromForm();
+    const labelMap = { flight: sec.flight, local: sec.local, domestic: sec.domestic };
+    const sumLabel = { flight: '(1) 합계', local: '(2) 합계', domestic: '(3) 합계' };
+    const sumId = { flight: 'sub-flight', local: 'sub-local', domestic: 'sub-domestic' };
+    const list = (rows && rows.length) ? rows : [emptyItem(type)];
+    const secHtml = formatSecLabelForTable(labelMap[type]);
+    const col = meta.isKRW ? 5 : 6;
+    let h = '';
+    list.forEach((row, i) => {
+      h += buildDetailedItemRow(type, row, { isKRW: meta.isKRW, isFirst: i === 0, count: list.length, secHtml, cS: meta.cS });
+    });
+    h += `<tr class="subtotal-row"><td colspan="${col}" class="text-center">${sumLabel[type]}</td><td class="text-right" id="${sumId[type]}">₩0</td><td></td></tr>`;
+    $(`#tbody-${type}`).innerHTML = h;
+  }
+  function rebuildDetailedItems(flights, locals, domestics) {
+    rebuildDetailedSection('flight', (flights && flights.length) ? flights : [emptyItem('flight')]);
+    rebuildDetailedSection('local', (locals && locals.length) ? locals : [emptyItem('local')]);
+    rebuildDetailedSection('domestic', (domestics && domestics.length) ? domestics : [emptyItem('domestic')]);
+    $('#main-table').dataset.layout = currencyMeta().layout;
+    refreshDetailedComputed();
+  }
+  function buildSimpleItemRow(data) {
+    const hlClass = data.hl ? ' hl-on' : '';
+    const qty = (data.qty === '' || data.qty == null) ? '' : fmt(data.qty);
+    return `<tr class="item-row simple-item${hlClass}" data-type="simple" data-hl="${data.hl ? 'true' : 'false'}"><td class="text-center export-text">${rowCtrlHtml()}<span class="cell-name" contenteditable="true">${escAttr(data.name || '')}</span></td><td class="text-center export-text cell-desc" contenteditable="true">${escAttr(data.desc || '')}</td><td class="text-right export-krw cell-krw" data-group="simple" contenteditable="true">${escAttr(fmt(data.krw))}</td><td class="text-center export-qty cell-qty" data-group="simple" contenteditable="true">${escAttr(qty)}</td><td class="text-right export-tot cell-tot cell-computed" data-group="simple"></td></tr>`;
+  }
+  function rebuildSimpleItems(rows) {
+    const current = rows != null ? rows : getRowData('simple');
+    const items = (current && current.length) ? current : [emptyItem('simple')];
+    $('#tbody-simple').innerHTML = items.map(buildSimpleItemRow).join('');
+    refreshSimpleComputed();
   }
   function addRow(type, data={}, skipRender=false) {
-    const targets = { flight:'#flight-inputs-container', local:'#local-inputs-container', domestic:'#domestic-inputs-container', simple:'#simple-items-container' };
-    $(targets[type]).insertAdjacentHTML('beforeend', createCardHTML(type, data));
+    const rows = getRowData(type);
+    rows.push(Object.keys(data).length ? data : emptyItem(type));
+    if (type === 'simple') rebuildSimpleItems(rows);
+    else rebuildDetailedSection(type, rows);
     if (!skipRender) { calculateAndRender(); scheduleValidation(); }
   }
   function buildInitialInputs() {
-    $('#flight-inputs-container').innerHTML = ''; $('#local-inputs-container').innerHTML = ''; $('#domestic-inputs-container').innerHTML = ''; $('#simple-items-container').innerHTML = '';
-    initFlights.forEach(d => addRow('flight', d, true)); initLocals.forEach(d => addRow('local', d, true)); initDomestics.forEach(d => addRow('domestic', d, true)); initSimples.forEach(d => addRow('simple', d, true));
+    rebuildDetailedItems(initFlights, initLocals, initDomestics);
+    rebuildSimpleItems(initSimples);
     $('#inp-det-specialNote').value = '※ 항공료 및 공항수송차량비 별도 계약\n※ 행사 잔여 금액 49,968,900원으로 5천만원 이하 여성기업 수의계약 진행';
   }
   function syncCurrencyUI(applyDefaults = false) {
     const curr = $('#inp-currency').value;
     $('#wrap-exRate').style.display = (curr === 'KRW_MAINLAND' || curr === 'KRW_JEJU' || curr === 'SIMPLE_QUOTE') ? 'none' : 'flex';
-    $$('.l-fgn').forEach(el => { el.placeholder = (curr === 'KRW_MAINLAND' || curr === 'KRW_JEJU') ? '단가(₩)' : '단가(외화)'; });
     if (applyDefaults && curr !== 'SIMPLE_QUOTE') {
       applySectionLabelDefaults(curr);
       applyExRateDefault(curr);
+    } else {
+      updateAddBarLabels(curr);
     }
   }
-  function toggleDocMode(applySectionDefaults = false) {
+  function toggleDocMode(applySectionDefaults = false, skipRender = false) {
     const simple = $('#inp-currency').value === 'SIMPLE_QUOTE';
     $('#detailed-input-group').style.display = simple ? 'none' : 'block'; $('#detailed-preview-group').style.display = simple ? 'none' : 'block';
     $('#simple-input-group').style.display = simple ? 'block' : 'none'; $('#simple-preview-group').style.display = simple ? 'block' : 'none';
-    syncCurrencyUI(applySectionDefaults); toggleVatManual(); calculateAndRender(); scheduleValidation();
+    syncCurrencyUI(applySectionDefaults); toggleVatManual();
+    if (skipRender) return;
+    if (simple) rebuildSimpleItems();
+    else {
+      const layout = currencyMeta().layout;
+      const prev = $('#main-table').dataset.layout;
+      const flights = getRowData('flight');
+      const locals = getRowData('local');
+      const domestics = getRowData('domestic');
+      if (prev !== layout || !flights.length) rebuildDetailedItems(flights, locals, domestics);
+    }
+    calculateAndRender(); scheduleValidation();
   }
   function getDetDocLabelMode() {
     return $('#inp-det-docLabel-quote').checked ? 'quote' : 'calculation';
@@ -820,11 +891,11 @@
         if (exRate < min || exRate > max) { warnings.push({ msg:`환율 경고: ${currencyVal} 환율(${exRate})이 일반적인 범위를 벗어났습니다.`, targetId:'wrap-exRate' }); exRateInput.classList.add('error-border'); }
       }
       const isPaxSensitiveItem = name => ['식비','관광지입장료','여행자보험','항공료'].includes(name) || ['중식','석식','입장권'].some(k => name.includes(k));
-      $$('.flight-item, .local-item, .domestic-item').forEach((rowEl, index) => {
+      $$('#main-table tr.item-row').forEach((rowEl, index) => {
         const rowId = `row-det-${index}`; rowEl.id = rowId; let rowHasError = false;
-        const nameEl = $('.f-name, .l-name, .d-name', rowEl); const descEl = $('.f-desc, .l-desc, .d-desc', rowEl); const qtyEl = $('.f-qty, .l-qty, .d-qty', rowEl); const priceEl = $('.f-krw, .l-fgn, .d-krw', rowEl); const noteEl = $('.f-note, .l-note, .d-note', rowEl);
-        const name = nameEl?.value.trim() || ''; const desc = descEl?.value.trim() || ''; const qtyStr = qtyEl?.value.trim() || ''; const priceStr = priceEl?.value.trim() || ''; const note = noteEl?.value.trim() || '';
-        const qty = Number(qtyStr) || 0; const price = parseCurrency(priceStr);
+        const nameEl = $('.cell-name', rowEl); const descEl = $('.cell-desc', rowEl); const qtyEl = $('.cell-qty', rowEl); const priceEl = $('.cell-fgn', rowEl) || $('.cell-krw', rowEl); const noteEl = $('.cell-note', rowEl);
+        const name = nameEl?.textContent.trim() || ''; const desc = descEl?.textContent.trim() || ''; const qtyStr = qtyEl?.textContent.trim() || ''; const priceStr = priceEl?.textContent.trim() || ''; const note = noteEl?.textContent.trim() || '';
+        const qty = Number(String(qtyStr).replace(/,/g,'')) || 0; const price = parseCurrency(priceStr);
         const isAnyFilled = name || desc || qtyStr || priceStr || note; if (!isAnyFilled) return;
         if (!name && (desc || qtyStr || priceStr || note)) { warnings.push({ msg:`[${index + 1}번째 줄] 항목명이 누락되었습니다.`, targetId:rowId }); nameEl?.classList.add('error-border'); rowHasError = true; }
         if (name) {
@@ -837,10 +908,10 @@
         if (rowHasError) rowEl.classList.add('error-row-container');
       });
     } else {
-      $$('.simple-item').forEach((rowEl, index) => {
+      $$('#tbody-simple tr.item-row').forEach((rowEl, index) => {
         const rowId = `row-sim-${index}`; rowEl.id = rowId; let rowHasError = false;
-        const nameEl = $('.s-name', rowEl); const qtyEl = $('.s-qty', rowEl); const priceEl = $('.s-krw', rowEl);
-        const name = nameEl?.value.trim() || ''; const qtyStr = qtyEl?.value.trim() || ''; const priceStr = priceEl?.value.trim() || '';
+        const nameEl = $('.cell-name', rowEl); const qtyEl = $('.cell-qty', rowEl); const priceEl = $('.cell-krw', rowEl);
+        const name = nameEl?.textContent.trim() || ''; const qtyStr = qtyEl?.textContent.trim() || ''; const priceStr = priceEl?.textContent.trim() || '';
         if (!name && !qtyStr && !priceStr) return;
         if (name && (qtyStr === '' || priceStr === '')) {
           warnings.push({ msg:`일반 견적 [${name}] 항목: 수량이나 단가가 누락되었습니다.`, targetId:rowId });
@@ -859,15 +930,6 @@
     return warnings;
   }
   function scheduleValidation() { clearTimeout(state.warningTimer); state.warningTimer = setTimeout(renderWarnings, 300); }
-  function getRowData(type) {
-    const configs = { flight: ['.flight-item','.f-name','.f-desc','.f-qty','.f-krw','.f-note'], local: ['.local-item','.l-name','.l-desc','.l-qty','.l-fgn','.l-note'], domestic: ['.domestic-item','.d-name','.d-desc','.d-qty','.d-krw','.d-note'], simple: ['.simple-item','.s-name','.s-desc','.s-qty','.s-krw',null] };
-    const [rootSel, nameSel, descSel, qtySel, amountSel, noteSel] = configs[type];
-    return $$(rootSel).map(el => ({
-      name: $(nameSel, el)?.value || '', desc: $(descSel, el)?.value || '', qty: $(qtySel, el)?.value || '',
-      [type === 'local' ? 'fgn' : 'krw']: parseCurrency($(amountSel, el)?.value || ''), ...(noteSel ? { note: $(noteSel, el)?.value || '' } : {}),
-      hl: el.dataset.hl === 'true' // 강조 여부 저장
-    }));
-  }
   function getFormData() {
     return {
       currency: $('#inp-currency').value, 
@@ -887,7 +949,7 @@
   }
   function setFormData(data) {
     const hasCustomSec = data.secFlight != null || data.secLocal != null || data.secDomestic != null;
-    $('#inp-currency').value = data.currency || 'JPY'; toggleDocMode(false);
+    $('#inp-currency').value = data.currency || 'JPY'; toggleDocMode(false, true);
     $('#inp-clientName').value = data.clientName || ''; $('#inp-docTitle').value = data.docTitle || ''; $('#inp-travelDate').value = data.travelDate || ''; $('#inp-paxStr').value = data.paxStr || ''; $('#inp-issueDate').value = data.issueDate || getFormattedDate('dot'); $('#inp-exRate').value = data.exRate ? fmt(data.exRate) : fmt(getExRateDefault(data.currency || 'JPY')); $('#inp-det-specialNote').value = data.detSpecialNote || '';
     $('#inp-det-showTaxNote').checked = data.detShowTaxNote !== false; 
     if (data.detDocLabelMode === 'quote') {
@@ -900,11 +962,10 @@
     if (hasCustomSec) setSectionLabelsFromData(data);
     else if ((data.currency || 'JPY') !== 'SIMPLE_QUOTE') applySectionLabelDefaults(data.currency || 'JPY');
 
-    $('#flight-inputs-container').innerHTML = ''; $('#local-inputs-container').innerHTML = ''; $('#domestic-inputs-container').innerHTML = ''; $('#simple-items-container').innerHTML = '';
-    (data.flights || []).forEach(item => addRow('flight', item, true)); (data.locals || []).forEach(item => addRow('local', item, true)); (data.domestics || []).forEach(item => addRow('domestic', item, true));
     $('#inp-sim-dep').value = data.simDep || ''; $('#inp-sim-inv').value = data.simInv || getFormattedDate('korean'); $('#inp-sim-subject').value = data.simSubject || ''; $('#inp-sim-toName').value = data.simToName || ''; $('#inp-sim-toAddr').value = data.simToAddr || ''; $('#inp-sim-toPerson').value = data.simToPerson || ''; $('#inp-sim-bankName').value = data.simBankName || '신협'; $('#inp-sim-bankNum').value = data.simBankNum || '131-022-382094'; $('#inp-sim-bankHolder').value = data.simBankHolder || '주식회사 투어메이커'; $('#inp-sim-due').value = data.simDue || ''; $('#inp-sim-vat').value = data.simVat || 'auto'; $('#inp-sim-vat-manual').value = data.simVatManual ? fmt(data.simVatManual) : ''; $('#inp-sim-extraFee').value = data.simExtraFee || '0'; $('#inp-sim-taxNote').value = data.simTaxNote ?? ''; $('#inp-sim-inc').value = data.simInc || ''; $('#inp-sim-exc').value = data.simExc || '';
     $('#inp-sim-deposit').value = data.simDeposit ? fmt(data.simDeposit) : '';
-    (data.simples || []).forEach(item => addRow('simple', item, true));
+    rebuildDetailedItems(data.flights || [], data.locals || [], data.domestics || []);
+    rebuildSimpleItems(data.simples || []);
     toggleVatManual(); syncCurrencyUI(false); calculateAndRender(); renderWarnings();
   }
 
@@ -1044,42 +1105,13 @@
 
         const importedRaw = JSON.parse(rawText);
         const importedPresets = normalizeImportedPresetMap(importedRaw);
-        const currentData = getPresetStore();
-
         const importedKeys = Object.keys(importedPresets);
-        const overwriteKeys = importedKeys.filter(key => key in currentData);
-        if (overwriteKeys.length) {
-          const preview = overwriteKeys.slice(0, 5).join(', ');
-          const moreText = overwriteKeys.length > 5 ? ` 외 ${overwriteKeys.length - 5}건` : '';
-          const ok = confirm(`동일한 이름의 견적 ${overwriteKeys.length}건이 있습니다.\n[${preview}${moreText}]\n기존 데이터를 덮어쓸까요?`);
-          if (!ok) {
-            if (input) input.value = '';
-            return;
-          }
-        }
-
-        const merged = { ...currentData, ...importedPresets };
-        const saved = lsSet('tourmaker_presets', JSON.stringify(merged, null, 2));
-        if (!saved) {
-          if (input) input.value = '';
-          return;
-        }
-
-        updatePresetDropdown();
-        
+        if (!importedKeys.length) throw new Error('불러올 견적 데이터가 없습니다.');
         const targetKey = importedKeys[importedKeys.length - 1];
-        if (targetKey) {
-            $('#preset-select').value = targetKey;
-            setFormData(merged[targetKey]);
-            alert(`✅ 복원이 완료되었습니다.\n새로 추가된 [${targetKey}] 견적을 화면에 자동으로 불러왔습니다.`);
-            
-            switchTab('input'); 
-            
-            $('#panelInput').scrollTop = 0;
-            if ($('#panelPreview')) $('#panelPreview').scrollTop = 0;
-        } else {
-            alert(`데이터 복구가 완료되었습니다.\n- 가져온 견적: ${importedKeys.length}건`); 
-        }
+        setFormData(importedPresets[targetKey]);
+        const extra = importedKeys.length > 1 ? `\n(파일에 ${importedKeys.length}건이 있어 마지막 문서 [${targetKey}]를 열었습니다.)` : '';
+        alert(`문서를 불러왔습니다.${extra}`);
+        switchTab('preview');
       } catch (error) {
         console.error(error);
         alert(`업로드 실패: ${error.message || '잘못된 백업 파일 형식입니다.'}`);
@@ -2186,23 +2218,16 @@
   }
 
   function ensureItemSlots() {
-    if (!$('#flight-inputs-container').children.length) addRow('flight', {}, true);
-    if (!$('#local-inputs-container').children.length) addRow('local', {}, true);
-    if (!$('#domestic-inputs-container').children.length) addRow('domestic', {}, true);
-    if (!$('#simple-items-container').children.length) addRow('simple', {}, true);
+    if (!getRowData('flight').length) addRow('flight', {}, true);
+    if (!getRowData('local').length) addRow('local', {}, true);
+    if (!getRowData('domestic').length) addRow('domestic', {}, true);
+    if (!getRowData('simple').length) addRow('simple', {}, true);
   }
   function rememberImportedDocument(data, message) {
     const presetName = buildPresetNameFromData(data);
-    const presets = getPresetStore();
-    presets[presetName] = data;
-    if (!lsSet('tourmaker_presets', JSON.stringify(presets, null, 2))) return;
-    updatePresetDropdown();
-    $('#preset-select').value = presetName;
     setFormData(data);
     ensureItemSlots();
-    switchTab('input');
-    $('#panelInput').scrollTop = 0;
-    if ($('#panelPreview')) $('#panelPreview').scrollTop = 0;
+    switchTab('preview');
     alert(message.replace('{name}', presetName));
   }
 
@@ -2272,7 +2297,6 @@
     if (!confirm('모든 데이터를 지우고 새 문서를 작성하시겠습니까?')) return;
     $$('input[type="text"], textarea').forEach(el => { if (el.id !== 'inp-sim-bankName' && el.id !== 'inp-sim-bankNum' && el.id !== 'inp-sim-bankHolder') el.value = ''; });
     $$('input[type="number"]').forEach(el => el.value = '');
-    $('#flight-inputs-container').innerHTML = ''; $('#local-inputs-container').innerHTML = ''; $('#domestic-inputs-container').innerHTML = ''; $('#simple-items-container').innerHTML = '';
     $('#inp-sim-bankName').value = '신협'; $('#inp-sim-bankNum').value = '131-022-382094'; $('#inp-sim-bankHolder').value = '주식회사 투어메이커';
     
     $('#inp-currency').value = 'JPY';
@@ -2285,8 +2309,9 @@
     $('#inp-hl-issueDate').checked = false;
     $('#inp-sim-hl-issueDate').checked = false;
     
-    addRow('flight', {}, true); addRow('local', {}, true); addRow('domestic', {}, true); addRow('simple', {}, true);
-    setTodayDates(); calculateAndRender(); renderWarnings(); toggleDocMode(true);
+    rebuildDetailedItems([emptyItem('flight')], [emptyItem('local')], [emptyItem('domestic')]);
+    rebuildSimpleItems([emptyItem('simple')]);
+    setTodayDates(); calculateAndRender(); renderWarnings(); toggleDocMode(true, true); syncCurrencyUI(true); calculateAndRender();
   }
   function rs(arr, i, key) { let r = 1; for (let j=i+1; j<arr.length; j++) { if (arr[j][key] === arr[i][key]) r++; else break; } return r; }
   function rs2(arr, i) { let r = 1; for (let j=i+1; j<arr.length; j++) { if (arr[j].name === arr[i].name && arr[j].desc === arr[i].desc) r++; else break; } return r; }
@@ -2329,143 +2354,115 @@
     }));
   }
   
-  function renderDetailed() {
-    applyDetDocLabel();
-    const currency = $('#inp-currency').value; const isMainland = currency === 'KRW_MAINLAND'; const isJeju = currency === 'KRW_JEJU'; const isKRW = isMainland || isJeju; const exRate = isKRW ? 1 : (parseCurrency($('#inp-exRate').value) || 0);
+  function refreshDetailedComputed() {
+    const meta = currencyMeta();
+    const exRate = meta.isKRW ? 1 : (parseCurrency($('#inp-exRate').value) || 0);
+    const col = meta.isKRW ? 5 : 6;
+    const sumOf = (type) => {
+      let sum = 0;
+      $$(`#tbody-${type} tr.item-row`).forEach(tr => {
+        const qty = parseCurrency(readCell(tr, 'cell-qty'));
+        let krw;
+        if (type === 'local' && !meta.isKRW) {
+          const fgn = parseCurrency(readCell(tr, 'cell-fgn'));
+          krw = Math.round(fgn * exRate);
+          const krwEl = $('.cell-krw', tr);
+          if (krwEl) krwEl.textContent = fmt(krw);
+        } else {
+          krw = parseCurrency(readCell(tr, 'cell-krw'));
+        }
+        const tot = qty * krw;
+        sum += tot;
+        const totEl = $('.cell-tot', tr);
+        if (totEl) totEl.textContent = fmtT(tot);
+        tr.classList.toggle('hl-on', tr.dataset.hl === 'true');
+      });
+      return sum;
+    };
+    const tF = sumOf('flight');
+    const tL = sumOf('local');
+    const tD = sumOf('domestic');
+    const subF = $('#sub-flight'); if (subF) subF.textContent = '₩' + fmtT(tF);
+    const subL = $('#sub-local'); if (subL) subL.textContent = '₩' + fmtT(tL);
+    const subD = $('#sub-domestic'); if (subD) subD.textContent = '₩' + fmtT(tD);
+    const grandTotal = tF + tL + tD;
+    const eventOnly = tL + tD;
     const sec = getSectionLabelsFromForm();
-    const fH = formatSecLabelForTable(sec.flight);
-    const lH = formatSecLabelForTable(sec.local);
-    const dH = formatSecLabelForTable(sec.domestic);
-    
-    $('#out-clientName').textContent = $('#inp-clientName').value; $('#out-docTitle').textContent = $('#inp-docTitle').value; $('#out-travelDate').textContent = $('#inp-travelDate').value; $('#out-paxStr').textContent = $('#inp-paxStr').value;
-    
-    $('#out-issueAndRate').textContent = isKRW ? `${$('#inp-issueDate').value} / 국내행사 (환율 미적용)` : `${$('#inp-issueDate').value} / ${currency} ${exRate} 기준(송금)`;
-    $('#out-issueAndRate').className = $('#inp-hl-issueDate').checked ? 'export-text hl-text' : 'export-text'; // 💡 발송일 강조 반영
-    
-    const cN = currency === 'JPY' ? '엔화' : (currency === 'USD' ? '달러' : (currency === 'AUD' ? '호주달러' : (currency === 'SGD' ? '싱가폴달러' : (isKRW ? '원화' : '위안화')))); 
-    const cS = (currency === 'USD' || currency === 'AUD' || currency === 'SGD') ? '$' : (isKRW ? '₩' : '¥'); 
-    const col = isKRW ? 5 : 6;
-    $('#main-thead').innerHTML = `<tr><th style="width:9%">구분</th><th style="width:${isKRW ? '14%' : '11%'}">항목</th><th style="width:${isKRW ? '24%' : '18%'}">내용</th><th style="width:9%;font-size:10px;line-height:1.3">인원/객실수<br>차량대수</th>${!isKRW ? `<th style="width:11%;background:#fef08a;color:#0f172a">${cN} 단가<br><span style="font-weight:400;color:#475569">${currency}</span></th>` : ''}<th style="width:${isKRW ? '15%' : '12%'}">원화 단가<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '16%' : '14%'}">총금액<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '13%' : '16%'}">비고</th></tr>`;
-    let tF = 0, tL = 0, tD = 0;
-    
-    const flights = getRowData('flight').filter(r => r.name.trim()).map(r => ({ ...r, qty:Number(r.qty)||0, krw:Number(r.krw)||0, tot:(Number(r.qty)||0)*(Number(r.krw)||0) })); tF = flights.reduce((s, r) => s + r.tot, 0);
-    let h = '';
-    if (!flights.length) h += `<tr><td class="text-center font-bold bg-gray-50 export-text sec-label-cell">${fH}</td><td colspan="${col - 1}" class="text-center">입력된 항목이 없습니다.</td></tr>`;
-    else {
-      for (let i=0; i<flights.length; i++) {
-        const hC = flights[i].hl ? ' hl-text' : ''; // 💡 항목 강조 반영
-        h += '<tr>';
-        if (i === 0) h += `<td rowspan="${flights.length}" class="text-center font-bold bg-gray-50 export-text sec-label-cell">${fH}</td>`;
-        if (i === 0 || flights[i].name !== flights[i-1].name) h += `<td rowspan="${rs(flights, i, 'name')}" class="text-center export-text${hC}">${escAttr(flights[i].name)}</td>`;
-        if (i === 0 || flights[i].name !== flights[i-1].name || flights[i].desc !== flights[i-1].desc) h += `<td rowspan="${rs2(flights, i)}" class="export-text${hC}">${escAttr(flights[i].desc)}</td>`;
-        h += `<td class="text-center export-qty${hC}" data-group="flight">${fmt(flights[i].qty)}</td>`;
-        if (!isKRW) h += '<td class="text-right bg-gray-50"></td>';
-        h += `<td class="text-right export-krw${hC}" data-group="flight">${fmt(flights[i].krw)}</td><td class="text-right font-semibold export-tot${hC}" data-group="flight">${fmtT(flights[i].tot)}</td><td class="text-center export-text${hC}">${escAttr(flights[i].note || '')}</td></tr>`;
-      }
-    }
-    h += `<tr class="subtotal-row"><td colspan="${col}" class="text-center">(1) 합계</td><td class="text-right" id="sub-flight">₩${fmtT(tF)}</td><td></td></tr>`; $('#tbody-flight').innerHTML = h;
-    
-    const locals = getRowData('local').filter(r => r.name.trim()).map(r => { const qty = Number(r.qty) || 0; const fgn = Number(r.fgn) || 0; const krw = isKRW ? fgn : Math.round(fgn * exRate); return { ...r, qty, fgn, krw, tot:qty * krw }; }); tL = locals.reduce((s, r) => s + r.tot, 0);
-    h = '';
-    if (!locals.length) h += `<tr><td class="text-center font-bold bg-gray-50 export-text sec-label-cell">${lH}</td><td colspan="${col - 1}" class="text-center">입력된 항목이 없습니다.</td></tr>`;
-    else {
-      for (let i=0; i<locals.length; i++) {
-        const hC = locals[i].hl ? ' hl-text' : ''; // 💡 항목 강조 반영
-        h += '<tr>';
-        if (i === 0) h += `<td rowspan="${locals.length}" class="text-center font-bold bg-gray-50 export-text sec-label-cell">${lH}</td>`;
-        if (i === 0 || locals[i].name !== locals[i-1].name) h += `<td rowspan="${rs(locals, i, 'name')}" class="text-center export-text${hC}">${escAttr(locals[i].name)}</td>`;
-        if (i === 0 || locals[i].name !== locals[i-1].name || locals[i].desc !== locals[i-1].desc) h += `<td rowspan="${rs2(locals, i)}" class="export-text${hC}">${escAttr(locals[i].desc)}</td>`;
-        h += `<td class="text-center export-qty${hC}" data-group="local">${fmt(locals[i].qty)}</td>`;
-        if (!isKRW) h += `<td class="text-right bg-yellow-50${hC}"><span style="float:left;font-size:9px;color:#9ca3af">${cS}</span><span class="export-fgn">${fmt(locals[i].fgn)}</span></td>`;
-        h += `<td class="text-right export-krw${hC}" data-group="local">${fmt(locals[i].krw)}</td><td class="text-right font-semibold export-tot${hC}" data-group="local">${fmtT(locals[i].tot)}</td><td class="text-center export-text${hC}">${escAttr(locals[i].note || '')}</td></tr>`;
-      }
-    }
-    h += `<tr class="subtotal-row"><td colspan="${col}" class="text-center">(2) 합계</td><td class="text-right" id="sub-local">₩${fmtT(tL)}</td><td></td></tr>`; $('#tbody-local').innerHTML = h;
-    
-    const doms = getRowData('domestic').filter(r => r.name.trim()).map(r => ({ ...r, qty:Number(r.qty)||0, krw:Number(r.krw)||0, tot:(Number(r.qty)||0)*(Number(r.krw)||0) })); tD = doms.reduce((s, r) => s + r.tot, 0); h = '';
-    if (!doms.length) h += `<tr><td class="text-center font-bold bg-gray-50 export-text sec-label-cell">${dH}</td><td colspan="${col - 1}" class="text-center">입력된 항목이 없습니다.</td></tr>`;
-    else {
-      for (let i=0; i<doms.length; i++) {
-        const hC = doms[i].hl ? ' hl-text' : ''; // 💡 항목 강조 반영
-        h += '<tr>';
-        if (i === 0) h += `<td rowspan="${doms.length}" class="text-center font-bold bg-gray-50 export-text sec-label-cell">${dH}</td>`;
-        if (i === 0 || doms[i].name !== doms[i-1].name) h += `<td rowspan="${rs(doms, i, 'name')}" class="text-center export-text${hC}">${escAttr(doms[i].name)}</td>`;
-        if (i === 0 || doms[i].name !== doms[i-1].name || doms[i].desc !== doms[i-1].desc) h += `<td rowspan="${rs2(doms, i)}" class="export-text${hC}">${escAttr(doms[i].desc)}</td>`;
-        h += `<td class="text-center export-qty${hC}" data-group="domestic">${fmt(doms[i].qty)}</td>`;
-        if (!isKRW) h += '<td class="text-right bg-gray-50"></td>';
-        h += `<td class="text-right export-krw${hC}" data-group="domestic">${fmt(doms[i].krw)}</td><td class="text-right font-semibold export-tot${hC}" data-group="domestic">${fmtT(doms[i].tot)}</td><td class="text-center export-text${hC}">${escAttr(doms[i].note || '')}</td></tr>`;
-      }
-    }
-    h += `<tr class="subtotal-row"><td colspan="${col}" class="text-center">(3) 합계</td><td class="text-right" id="sub-domestic">₩${fmtT(tD)}</td><td></td></tr>`; $('#tbody-domestic').innerHTML = h;
-    const grandTotal = tF + tL + tD; const eventOnly = tL + tD; 
-    
-    const specialNote = escAttr($('#inp-det-specialNote').value.trim()); 
+    const specialNote = escAttr($('#inp-det-specialNote').value.trim());
     const ex = `(${sec.flight.replace(/\n/g, ' ')} 제외)`;
-    
     let totalHtml = `<tr class="grand-row"><td colspan="${col}" class="text-center grand-label" style="font-size:12px; color:#b91c1c;">(1)+(2)+(3) 전체 합계 금액</td><td class="text-right grand-amount" id="grand-1" style="color:#b91c1c;">₩${fmtT(grandTotal)}</td><td></td></tr><tr class="grand-row ${specialNote ? '' : 'grand-row-last'}"><td colspan="${col}" class="text-center grand-label" style="font-size:12px">(2)+(3) 행사 비용 합계 <span style="font-size:10px;font-weight:400;color:#64748b">${ex}</span></td><td class="text-right grand-amount" id="grand-2">₩${fmtT(eventOnly)}</td><td></td></tr>`;
-    
     if (specialNote) totalHtml += `<tr class="grand-row grand-row-last"><td class="text-center font-bold bg-yellow-50 export-text" style="color:#b91c1c;">특이사항</td><td colspan="${col + 1}" style="font-weight:700; color:#b91c1c; padding:10px; line-height:1.5;" class="export-text">${specialNote.replace(/\n/g, '<br>')}</td></tr>`;
-    $('#tbody-total').innerHTML = totalHtml; $('#live-total-amount').textContent = `₩ ${fmtT(grandTotal)}`;
-    
-    const taxNoteArea = $('#out-det-taxNoteArea');
-    if (taxNoteArea) {
-      taxNoteArea.style.display = $('#inp-det-showTaxNote').checked ? 'block' : 'none';
-    }
+    $('#tbody-total').innerHTML = totalHtml;
+    $('#live-total-amount').textContent = `₩ ${fmtT(grandTotal)}`;
+    return grandTotal;
   }
-  
-  function renderSimple() {
-    $('#out-sim-dep').textContent = $('#inp-sim-dep').value; 
-    $('#out-sim-inv').textContent = $('#inp-sim-inv').value; 
-    $('#out-sim-inv').className = $('#inp-sim-hl-issueDate').checked ? 'export-text hl-text' : 'export-text'; // 💡 발행일 강조 반영
-    
-    $('#out-sim-subject').textContent = $('#inp-sim-subject').value; $('#out-sim-toName').textContent = $('#inp-sim-toName').value; $('#out-sim-toAddr').textContent = $('#inp-sim-toAddr').value; $('#out-sim-toPerson').textContent = $('#inp-sim-toPerson').value; $('#out-sim-bankName').textContent = $('#inp-sim-bankName').value; $('#out-sim-bankNum').textContent = $('#inp-sim-bankNum').value; $('#out-sim-bankHolder').textContent = $('#inp-sim-bankHolder').value; $('#out-sim-due').textContent = $('#inp-sim-due').value; 
-    
-    $('#out-sim-inc').innerHTML = escAttr($('#inp-sim-inc').value).replace(/\n/g, '<br>'); 
-    $('#out-sim-exc').innerHTML = escAttr($('#inp-sim-exc').value).replace(/\n/g, '<br>');
-    
-    const simples = mergeRowsByName(getRowData('simple').filter(r => r.name.trim()).map(r => ({ ...r, qty:Number(r.qty)||0, krw:Number(r.krw)||0, tot:(Number(r.qty)||0)*(Number(r.krw)||0) })));
-    let subTotal = simples.reduce((s, r) => s + r.tot, 0); let h = ''; const minRows = 5;
-    for (let i=0; i<Math.max(simples.length, minRows); i++) {
-      if (i < simples.length) {
-        const hC = simples[i].hl ? ' hl-text' : ''; // 💡 항목 강조 반영
-        h += `<tr><td class="text-center export-text${hC}">${escAttr(simples[i].name)}</td><td class="text-center export-text${hC}">${escAttr(simples[i].desc)}</td><td class="text-right export-krw${hC}" data-group="simple">${fmt(simples[i].krw)}</td><td class="text-center export-qty${hC}" data-group="simple">${fmt(simples[i].qty)}</td><td class="text-right export-tot${hC}" data-group="simple">${fmt(simples[i].tot)}</td></tr>`;
-      }
-      else h += '<tr><td class="export-text"></td><td class="export-text"></td><td></td><td></td><td></td></tr>';
-    }
-    h += `<tr class="st-subtotal"><td colspan="4">Sub Total (KRW)</td><td><span id="st-sub">${fmtT(subTotal)}</span></td></tr>`;
-    
+  function refreshSimpleComputed() {
+    let subTotal = 0;
+    $$('#tbody-simple tr.item-row').forEach(tr => {
+      const qty = parseCurrency(readCell(tr, 'cell-qty'));
+      const krw = parseCurrency(readCell(tr, 'cell-krw'));
+      const tot = qty * krw;
+      subTotal += tot;
+      const totEl = $('.cell-tot', tr);
+      if (totEl) totEl.textContent = fmt(tot);
+      tr.classList.toggle('hl-on', tr.dataset.hl === 'true');
+    });
+    $$('#tbody-simple tr.sum-row').forEach(tr => tr.remove());
     const vatOpt = $('#inp-sim-vat').value; let vatVal = 0; let vatLabel = '부가세 불포함';
-    if (vatOpt === 'auto') { vatVal = Math.floor(subTotal * 0.1); vatLabel = '부가세 (10%)'; } else if (vatOpt === 'manual') { vatVal = parseCurrency($('#inp-sim-vat-manual').value) || 0; vatLabel = '부가세 (부분 과세)'; }
-    h += `<tr><td class="text-center export-text">부가세</td><td class="text-center export-text">${vatLabel}</td><td class="text-right">${fmt(vatVal)}</td><td class="text-center">1</td><td class="text-right export-tot" id="st-vat">${fmt(vatVal)}</td></tr>`;
-    
+    if (vatOpt === 'auto') { vatVal = Math.floor(subTotal * 0.1); vatLabel = '부가세 (10%)'; }
+    else if (vatOpt === 'manual') { vatVal = parseCurrency($('#inp-sim-vat-manual').value) || 0; vatLabel = '부가세 (부분 과세)'; }
+    let h = `<tr class="sum-row st-subtotal"><td colspan="4">Sub Total (KRW)</td><td><span id="st-sub">${fmtT(subTotal)}</span></td></tr>`;
+    h += `<tr class="sum-row"><td class="text-center">부가세</td><td class="text-center">${vatLabel}</td><td class="text-right">${fmt(vatVal)}</td><td class="text-center">1</td><td class="text-right export-tot" id="st-vat">${fmt(vatVal)}</td></tr>`;
     let extraVal = 0;
     if ($('#inp-sim-extraFee').value === 'auto_50' && vatVal > 0) {
       extraVal = Math.floor(vatVal * 0.5);
-      h += `<tr><td class="text-center export-text" style="color:#b91c1c; font-weight:bold;">기타비용</td><td class="text-center export-text" style="color:#b91c1c;">종합과세에 따른 세금 보전분</td><td class="text-right" style="color:#b91c1c;">${fmt(extraVal)}</td><td class="text-center" style="color:#b91c1c;">1</td><td class="text-right export-tot" id="st-extra" style="color:#b91c1c; font-weight:bold;">${fmt(extraVal)}</td></tr>`;
+      h += `<tr class="sum-row"><td class="text-center" style="color:#b91c1c; font-weight:bold;">기타비용</td><td class="text-center" style="color:#b91c1c;">종합과세에 따른 세금 보전분</td><td class="text-right" style="color:#b91c1c;">${fmt(extraVal)}</td><td class="text-center" style="color:#b91c1c;">1</td><td class="text-right export-tot" id="st-extra" style="color:#b91c1c; font-weight:bold;">${fmt(extraVal)}</td></tr>`;
     }
-    
     const grandTotal = subTotal + vatVal + extraVal;
-    
-    // 기납금 산출 및 표시 로직
     const deposit = parseCurrency($('#inp-sim-deposit').value) || 0;
-    
     if (deposit > 0) {
-      h += `<tr class="st-grandtotal"><td colspan="4">Total Amount (총 견적 금액)</td><td><span id="st-grand">${fmtT(grandTotal)}</span></td></tr>`;
-      h += `<tr><td colspan="4" class="text-right" style="font-weight:900; color:#2563eb; font-size:14px; background:#eff6ff;">(-) 기납금 / 예약금 (Deposit Paid)</td><td class="text-right" style="background:#eff6ff;"><span class="export-deposit" style="color:#2563eb; font-weight:900; font-size:16px;">- ${fmtT(deposit)}</span></td></tr>`;
-      h += `<tr><td colspan="4" class="text-right" style="font-weight:900; color:#e11d48; font-size:15px; background:#fff1f2;">(=) 최종 청구 잔금 (Balance Due)</td><td class="text-right" style="background:#fff1f2;"><span id="st-balance" style="color:#e11d48; font-weight:900; font-size:18px;">${fmtT(grandTotal - deposit)}</span></td></tr>`;
+      h += `<tr class="sum-row st-grandtotal"><td colspan="4">Total Amount (총 견적 금액)</td><td><span id="st-grand">${fmtT(grandTotal)}</span></td></tr>`;
+      h += `<tr class="sum-row"><td colspan="4" class="text-right" style="font-weight:900; color:#2563eb; font-size:14px; background:#eff6ff;">(-) 기납금 / 예약금 (Deposit Paid)</td><td class="text-right" style="background:#eff6ff;"><span class="export-deposit" style="color:#2563eb; font-weight:900; font-size:16px;">- ${fmtT(deposit)}</span></td></tr>`;
+      h += `<tr class="sum-row"><td colspan="4" class="text-right" style="font-weight:900; color:#e11d48; font-size:15px; background:#fff1f2;">(=) 최종 청구 잔금 (Balance Due)</td><td class="text-right" style="background:#fff1f2;"><span id="st-balance" style="color:#e11d48; font-weight:900; font-size:18px;">${fmtT(grandTotal - deposit)}</span></td></tr>`;
       $('#live-total-amount').textContent = `잔금 ₩ ${fmtT(grandTotal - deposit)}`;
     } else {
-      h += `<tr class="st-grandtotal"><td colspan="4">Grand Total (KRW)</td><td><span id="st-grand">${fmtT(grandTotal)}</span></td></tr>`;
+      h += `<tr class="sum-row st-grandtotal"><td colspan="4">Grand Total (KRW)</td><td><span id="st-grand">${fmtT(grandTotal)}</span></td></tr>`;
       $('#live-total-amount').textContent = `₩ ${fmtT(grandTotal)}`;
     }
-    
-    $('#tbody-simple').innerHTML = h; 
-    
-    const taxNoteText = escAttr($('#inp-sim-taxNote').value.trim()); 
-    $('#wrap-sim-taxNote').style.display = taxNoteText ? 'flex' : 'none'; 
-    $('#out-sim-taxNote').innerHTML = taxNoteText.replace(/\n/g, '<br>'); 
+    $('#tbody-simple').insertAdjacentHTML('beforeend', h);
   }
-  
+  function renderDetailed() {
+    applyDetDocLabel();
+    const meta = currencyMeta();
+    const exRate = meta.isKRW ? 1 : (parseCurrency($('#inp-exRate').value) || 0);
+    const sec = getSectionLabelsFromForm();
+    $('#out-clientName').textContent = $('#inp-clientName').value; $('#out-docTitle').textContent = $('#inp-docTitle').value; $('#out-travelDate').textContent = $('#inp-travelDate').value; $('#out-paxStr').textContent = $('#inp-paxStr').value;
+    $('#out-issueAndRate').textContent = meta.isKRW ? `${$('#inp-issueDate').value} / 국내행사 (환율 미적용)` : `${$('#inp-issueDate').value} / ${meta.currency} ${exRate} 기준(송금)`;
+    $('#out-issueAndRate').className = $('#inp-hl-issueDate').checked ? 'export-text hl-text' : 'export-text';
+    const isKRW = meta.isKRW;
+    $('#main-thead').innerHTML = `<tr><th style="width:9%">구분</th><th style="width:${isKRW ? '14%' : '11%'}">항목</th><th style="width:${isKRW ? '24%' : '18%'}">내용</th><th style="width:9%;font-size:10px;line-height:1.3">인원/객실수<br>차량대수</th>${!isKRW ? `<th style="width:11%;background:#fef08a;color:#0f172a">${meta.cN} 단가<br><span style="font-weight:400;color:#475569">${meta.currency}</span></th>` : ''}<th style="width:${isKRW ? '15%' : '12%'}">원화 단가<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '16%' : '14%'}">총금액<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '13%' : '16%'}">비고</th></tr>`;
+    const flightSec = $('#tbody-flight .sec-label-cell'); if (flightSec) flightSec.innerHTML = formatSecLabelForTable(sec.flight);
+    const localSec = $('#tbody-local .sec-label-cell'); if (localSec) localSec.innerHTML = formatSecLabelForTable(sec.local);
+    const domSec = $('#tbody-domestic .sec-label-cell'); if (domSec) domSec.innerHTML = formatSecLabelForTable(sec.domestic);
+    if (!$('#tbody-flight tr.item-row')) rebuildDetailedItems(initFlights, initLocals, initDomestics);
+    else if ($('#main-table').dataset.layout !== meta.layout) rebuildDetailedItems(getRowData('flight'), getRowData('local'), getRowData('domestic'));
+    else refreshDetailedComputed();
+    const taxNoteArea = $('#out-det-taxNoteArea');
+    if (taxNoteArea) taxNoteArea.style.display = $('#inp-det-showTaxNote').checked ? 'block' : 'none';
+  }
+  function renderSimple() {
+    $('#out-sim-dep').textContent = $('#inp-sim-dep').value;
+    $('#out-sim-inv').textContent = $('#inp-sim-inv').value;
+    $('#out-sim-inv').className = $('#inp-sim-hl-issueDate').checked ? 'export-text hl-text' : 'export-text';
+    $('#out-sim-subject').textContent = $('#inp-sim-subject').value; $('#out-sim-toName').textContent = $('#inp-sim-toName').value; $('#out-sim-toAddr').textContent = $('#inp-sim-toAddr').value; $('#out-sim-toPerson').textContent = $('#inp-sim-toPerson').value; $('#out-sim-bankName').textContent = $('#inp-sim-bankName').value; $('#out-sim-bankNum').textContent = $('#inp-sim-bankNum').value; $('#out-sim-bankHolder').textContent = $('#inp-sim-bankHolder').value; $('#out-sim-due').textContent = $('#inp-sim-due').value;
+    $('#out-sim-inc').innerHTML = escAttr($('#inp-sim-inc').value).replace(/\n/g, '<br>');
+    $('#out-sim-exc').innerHTML = escAttr($('#inp-sim-exc').value).replace(/\n/g, '<br>');
+    if (!$('#tbody-simple tr.item-row')) rebuildSimpleItems(initSimples);
+    else refreshSimpleComputed();
+    const taxNoteText = escAttr($('#inp-sim-taxNote').value.trim());
+    $('#wrap-sim-taxNote').style.display = taxNoteText ? 'flex' : 'none';
+    $('#out-sim-taxNote').innerHTML = taxNoteText.replace(/\n/g, '<br>');
+  }
   function calculateAndRender() { 
       ($('#inp-currency').value === 'SIMPLE_QUOTE') ? renderSimple() : renderDetailed(); 
       document.title = getAutoFileName(); // 💡 파일명 및 브라우저 탭 이름 동기화 적용
@@ -2518,6 +2515,8 @@
     if (warnings.length && !confirm('⚠️ 입력된 데이터에 확인이 필요한 항목이 있습니다.\n이대로 내보내기를 진행하시겠습니까?')) return;
     
     const clone = $('#print-section').cloneNode(true);
+    clone.querySelectorAll('.row-ctrl, .sheet-add-bar').forEach(el => el.remove());
+    clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
     const currentCurrency = $('#inp-currency').value;
     const isForeign = ['JPY', 'USD', 'CNY', 'AUD', 'SGD'].includes(currentCurrency);
     const isSimple = currentCurrency === 'SIMPLE_QUOTE';
@@ -2746,101 +2745,47 @@
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
   }
 
-  function initDragAndDrop() {
-    const containers = ['#flight-inputs-container', '#local-inputs-container', '#domestic-inputs-container', '#simple-items-container'];
-    
-    containers.forEach(selector => {
-      const container = $(selector);
-      
-      container.addEventListener('dragstart', e => {
-        const card = e.target.closest('.slot-card');
-        if(card) card.classList.add('dragging');
-      });
-      
-      container.addEventListener('dragend', e => {
-        const card = e.target.closest('.slot-card');
-        if(card) {
-          card.classList.remove('dragging');
-          calculateAndRender();
-          scheduleValidation();
-        }
-      });
-      
-      container.addEventListener('dragover', e => {
-        e.preventDefault();
-        const afterElement = getDragAfterElement(container, e.clientY);
-        const draggable = $('.dragging');
-        if(draggable) {
-          if (afterElement == null) {
-            container.appendChild(draggable);
-          } else {
-            container.insertBefore(draggable, afterElement);
-          }
-        }
-      });
-    });
-  }
-
-  function getDragAfterElement(container, y) {
-    const draggableElements = [...container.querySelectorAll('.slot-card:not(.dragging)')];
-    
-    return draggableElements.reduce((closest, child) => {
-      const box = child.getBoundingClientRect();
-      const offset = y - box.top - box.height / 2;
-      if (offset < 0 && offset > closest.offset) {
-        return { offset: offset, element: child };
-      } else {
-        return closest;
-      }
-    }, { offset: Number.NEGATIVE_INFINITY }).element;
-  }
+  function initDragAndDrop() {}
 
   function bindEvents() {
     document.addEventListener('input', e => {
+      if (e.target.closest('.item-row')) {
+        calculateAndRender();
+        scheduleValidation();
+        return;
+      }
       if (e.target.classList.contains('amount')) e.target.value = formatCurrencyValue(e.target.value);
-      if (e.target.id === 'preset-search') return;
       calculateAndRender(); scheduleValidation();
     });
     document.addEventListener('click', e => {
-      if (e.target.matches('.js-delete-row')) { e.target.closest('.slot-card')?.remove(); calculateAndRender(); scheduleValidation(); }
-      
-      // 💡 신규: 항목 강조 버튼 토글 로직
-      if (e.target.matches('.js-toggle-hl')) {
-        const card = e.target.closest('.slot-card');
-        const isHl = card.dataset.hl === 'true';
-        card.dataset.hl = !isHl;
-        if (!isHl) e.target.classList.add('active');
-        else e.target.classList.remove('active');
-        calculateAndRender();
+      const addBtn = e.target.closest('[data-add]');
+      if (addBtn) { addRow(addBtn.dataset.add); return; }
+      if (e.target.closest('.js-delete-row')) {
+        const tr = e.target.closest('tr.item-row');
+        if (!tr) return;
+        const type = tr.dataset.type;
+        const rows = getRowData(type);
+        const idx = $$(`tr.item-row[data-type="${type}"]`).indexOf(tr);
+        if (idx >= 0) rows.splice(idx, 1);
+        if (type === 'simple') rebuildSimpleItems(rows);
+        else rebuildDetailedSection(type, rows);
+        calculateAndRender(); scheduleValidation();
+        return;
       }
-
+      if (e.target.closest('.js-toggle-hl')) {
+        const tr = e.target.closest('tr.item-row');
+        if (!tr) return;
+        tr.dataset.hl = tr.dataset.hl === 'true' ? 'false' : 'true';
+        tr.classList.toggle('hl-on', tr.dataset.hl === 'true');
+        return;
+      }
       if (e.target.matches('#warning-list li')) scrollToRow(e.target.dataset.row);
     });
-    $('#btn-add-flight').addEventListener('click', () => addRow('flight'));
-    $('#btn-add-local').addEventListener('click', () => addRow('local'));
-    $('#btn-add-domestic').addEventListener('click', () => addRow('domestic'));
-    $('#btn-add-simple').addEventListener('click', () => addRow('simple'));
     $('#btn-clear-form').addEventListener('click', clearForm);
-    $('#btn-save-preset').addEventListener('click', savePreset);
-    $('#btn-load-preset').addEventListener('click', loadPreset);
-    $('#btn-delete-preset').addEventListener('click', deletePreset);
-    
-    $('#btn-export').addEventListener('click', exportData); 
-    $('#btn-export-current').addEventListener('click', exportCurrentData); 
-    
+    $('#btn-export-current').addEventListener('click', exportCurrentData);
     $('#btn-import').addEventListener('click', () => $('#import-file').click());
-    $('#btn-xlsx-import').addEventListener('click', () => $('#import-file').click());
-    $('#btn-xlsx-template').addEventListener('click', downloadExcelTemplate);
-    $('#btn-xlsx-export').addEventListener('click', exportCompletedExcel);
     $('#btn-export-xlsx').addEventListener('click', exportCompletedExcel);
     $('#import-file').addEventListener('change', importData);
-    $('#preset-search').addEventListener('input', e => updatePresetDropdown(e.target.value));
-    
-    $('#preset-select').addEventListener('change', (e) => {
-        if(e.target.value) {
-            loadPreset();
-        }
-    });
 
     $('#inp-currency').addEventListener('change', () => toggleDocMode(true));
     $('#inp-sim-vat').addEventListener('change', () => { toggleVatManual(); calculateAndRender(); scheduleValidation(); });
@@ -2855,15 +2800,16 @@
     $('#btn-export-html').addEventListener('click', downloadInteractiveHTML);
     $('#tabInput').addEventListener('click', () => switchTab('input'));
     $('#tabPreview').addEventListener('click', () => switchTab('preview'));
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && e.target.closest('.item-row [contenteditable]')) e.preventDefault();
+    });
   }
 
   document.addEventListener('DOMContentLoaded', () => {
     setTodayDates(); 
     buildInitialInputs(); 
     bindEvents(); 
-    initDragAndDrop(); 
-    updatePresetDropdown(); 
-    toggleDocMode(true); 
+    toggleDocMode(true, true); 
     calculateAndRender(); 
     scheduleValidation();
   });
