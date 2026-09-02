@@ -2849,6 +2849,7 @@
     }
     
     const onSync = 'inputmode="numeric" autocomplete="off" oninput="tmSync(this)" onkeyup="tmSync(this)" onchange="tmSync(this)"';
+    const autoLock = 'readonly tabindex="-1"';
     clone.querySelectorAll('.export-qty').forEach(el => { 
         el.innerHTML = `<input type="text" class="c-qty" value="${escAttr(el.textContent)}" data-group="${el.dataset.group || ''}" ${onSync}>`; 
         el.classList.remove('export-qty'); 
@@ -2856,20 +2857,19 @@
     
     clone.querySelectorAll('.export-krw').forEach(el => { 
         const group = el.dataset.group || '';
-        const krwHint = (isForeign && group === 'local')
-          ? 'title="원화단가 (직접 수정 가능 · 외화단가를 고치면 환율로 다시 계산됩니다)"'
-          : '';
-        el.innerHTML = `<input type="text" class="c-krw" value="${escAttr(el.textContent)}" data-group="${group}" ${krwHint} ${onSync}>`; 
+        const tr = el.closest('tr');
+        const hasFgn = !!(tr && tr.querySelector('.export-fgn, .cell-fgn, .c-fgn'));
+        const krwAttr = hasFgn
+          ? autoLock + ' title="환율로 자동 계산됩니다. 수정하려면 왼쪽 외화단가를 고치세요"'
+          : onSync;
+        el.innerHTML = `<input type="text" class="c-krw" value="${escAttr(el.textContent)}" data-group="${group}" ${krwAttr}>`; 
         el.classList.remove('export-krw'); 
     });
     
     clone.querySelectorAll('.export-tot').forEach(el => { 
         const idAttr = el.id ? `id="${el.id}"` : ''; 
         el.removeAttribute('id');
-        const inItem = !!el.closest('tr.item-row');
-        const readonlyAttr = inItem ? '' : 'readonly tabindex="-1" title="자동 계산 항목"';
-        const totSync = inItem ? onSync : '';
-        el.innerHTML = `<input type="text" class="c-tot" ${idAttr} value="${escAttr(el.textContent)}" data-group="${el.dataset.group || ''}" ${readonlyAttr} ${totSync}>`; 
+        el.innerHTML = `<input type="text" class="c-tot" ${idAttr} value="${escAttr(el.textContent)}" data-group="${el.dataset.group || ''}" ${autoLock} title="단가 × 수량으로 자동 계산됩니다">`; 
         el.classList.remove('export-tot'); 
     });
     
@@ -2946,11 +2946,11 @@
 
     let topBarSubText = '';
     if (isSimple) {
-        topBarSubText = `부가세: ${vatType === 'auto' ? '10% (자동 연동)' : (vatType === 'manual' ? '수동 입력' : '불포함')} · 단가·수량만 고쳐도 총액·합계가 바로 다시 계산됩니다. Chrome/Edge로 열어 주세요.`;
+        topBarSubText = `부가세: ${vatType === 'auto' ? '10% (자동 연동)' : (vatType === 'manual' ? '수동 입력' : '불포함')} · 단가·수량만 고치면 총액이 자동 계산됩니다. Chrome/Edge로 열어 주세요.`;
     } else if (isForeign) {
-        topBarSubText = `적용 환율: ${exRate} · 수량·원화단가·노란 외화단가만 고쳐도 행 총액과 아래 합계가 바로 다시 계산됩니다. Chrome/Edge로 열어 주세요.`;
+        topBarSubText = `적용 환율: ${exRate} · 노란 외화단가와 수량만 고치면 원화단가(환율)와 총액이 자동 계산됩니다. 환산 원화단가·총액은 수정되지 않습니다.`;
     } else {
-        topBarSubText = '수량·단가만 고쳐도 총액·합계가 바로 다시 계산됩니다. Chrome/Edge로 열어 주세요.';
+        topBarSubText = '단가·수량만 고치면 총액이 자동 계산됩니다. Chrome/Edge로 열어 주세요.';
     }
 
     const ogThumbnails = [
@@ -2976,17 +2976,27 @@
           const n = parse(v);
           return n.toLocaleString('ko-KR');
       }
-      function lineRecalc(tr, fromFgn) {
+      function valOf(el){
+          if(!el) return '';
+          return (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') ? el.value : (el.textContent || '');
+      }
+      function setVal(el, n){
+          if(!el) return;
+          const s = formatCurrency(n);
+          if(el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.value = s;
+          else el.textContent = s;
+      }
+      function lineRecalc(tr) {
           if(!tr) return;
-          const fgnEl = tr.querySelector('.c-fgn');
-          const krwEl = tr.querySelector('.c-krw');
-          const qtyEl = tr.querySelector('.c-qty');
-          const totEl = tr.querySelector('.c-tot');
-          if(fromFgn && fgnEl && krwEl) {
-              krwEl.value = formatCurrency(Math.round(parse(fgnEl.value) * EX_RATE));
+          const fgnEl = tr.querySelector('input.c-fgn');
+          const krwEl = tr.querySelector('input.c-krw');
+          const qtyEl = tr.querySelector('input.c-qty');
+          const totEl = tr.querySelector('input.c-tot');
+          if(fgnEl && krwEl) {
+              setVal(krwEl, Math.round(parse(valOf(fgnEl)) * EX_RATE));
           }
           if(krwEl && qtyEl && totEl) {
-              totEl.value = formatCurrency(parse(krwEl.value) * parse(qtyEl.value));
+              setVal(totEl, parse(valOf(krwEl)) * parse(valOf(qtyEl)));
           }
       }
       function tmSync(el) {
@@ -2996,8 +3006,8 @@
             : (el.closest && el.closest('.c-fgn, .c-krw, .c-qty, .c-tot, .c-deposit'));
           if(!field) return;
           const tr = field.closest('tr');
-          if(field.classList.contains('c-fgn')) lineRecalc(tr, true);
-          else if(field.classList.contains('c-krw') || field.classList.contains('c-qty')) lineRecalc(tr, false);
+          if(field.classList.contains('c-deposit')) { recalcAll(); return; }
+          lineRecalc(tr);
           recalcAll();
       }
       window.tmSync = tmSync;
