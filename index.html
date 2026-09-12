@@ -201,16 +201,28 @@
     .item-row .row-ctrl button { width:18px; height:18px; padding:0; border-radius:4px; font-size:10px; line-height:1; display:flex; align-items:center; justify-content:center; }
     .item-row .row-ctrl .js-delete-row { border:1px solid #fca5a5; background:#fff; color:#ef4444; font-weight:800; }
     .item-row .row-ctrl .js-delete-row:hover { background:#fee2e2; color:#b91c1c; }
-    .item-row .row-grip { position:absolute; left:1px; top:50%; transform:translateY(-50%); width:16px; height:22px; padding:0; border:none; background:transparent; color:#94a3b8; font-size:11px; font-weight:800; letter-spacing:-2px; line-height:1; cursor:grab; z-index:6; opacity:.4; touch-action:none; user-select:none; -webkit-user-drag:element; }
+    .cell-desc-td { overflow:visible !important; position:relative; padding-left:6px !important; padding-right:18px !important; vertical-align:middle; }
+    .item-row .row-grip { position:absolute; right:1px; left:auto; top:50%; transform:translateY(-50%); width:16px; height:22px; padding:0; border:none; background:transparent; color:#94a3b8; font-size:11px; font-weight:800; letter-spacing:-2px; line-height:1; cursor:grab; z-index:6; opacity:.45; touch-action:none; user-select:none; -webkit-user-drag:element; }
     .item-row:hover .row-grip, .item-row:focus-within .row-grip { opacity:1; color:#475569; }
     .item-row .row-grip:active, body.row-dragging .row-grip { cursor:grabbing; }
-    .item-row.dragging-row { opacity:.45; background:#f8fafc; }
-    .item-row.drop-before td { box-shadow: inset 0 3px 0 0 #2563eb; }
-    .item-row.drop-after td { box-shadow: inset 0 -3px 0 0 #2563eb; }
+    .item-row.drop-group .cell-desc-td { background:#eff6ff; }
+    .item-row.drop-group .cell-name-td { outline:2px solid #2563eb; outline-offset:-2px; }
+    .item-row.drop-before .cell-desc-td,
+    .item-row.drop-before .cell-qty-td,
+    .item-row.drop-before .cell-krw,
+    .item-row.drop-before .cell-fgn-td,
+    .item-row.drop-before .cell-tot,
+    .item-row.drop-before .cell-note { box-shadow: inset 0 3px 0 0 #2563eb; }
+    .item-row.drop-after .cell-desc-td,
+    .item-row.drop-after .cell-qty-td,
+    .item-row.drop-after .cell-krw,
+    .item-row.drop-after .cell-fgn-td,
+    .item-row.drop-after .cell-tot,
+    .item-row.drop-after .cell-note { box-shadow: inset 0 -3px 0 0 #2563eb; }
     body.row-dragging { cursor:grabbing; user-select:none; }
     body.row-dragging .item-row [contenteditable] { caret-color:transparent; }
-    .cell-qty { padding:0 16px; }
     .cell-name { display:block; min-height:16px; outline:none; }
+    .cell-desc { display:block; min-height:16px; }
     .cell-desc, .cell-qty, .cell-krw, .cell-fgn, .cell-note { outline:none; }
     .cell-fgn-td { overflow:visible !important; background:#fef9c3; }
     .fgn-cell-wrap { display:flex; align-items:center; gap:2px; min-width:0; width:100%; }
@@ -280,8 +292,7 @@
       .footer-brand a { display:none !important; }
       .stamp-image { position: absolute !important; left: 48px !important; bottom: -18px !important; }
       .row-ctrl, .row-grip, .sheet-add-bar { display:none !important; }
-      .cell-name-td, .cell-qty-td { padding:4px 6px !important; }
-      .cell-qty { padding:0 !important; }
+      .cell-name-td, .cell-qty-td, .cell-desc-td { padding:4px 6px !important; }
       [contenteditable="true"] { background:transparent !important; box-shadow:none !important; }
       .error-border, .error-row-container { border-color: #cbd5e1 !important; background: inherit !important; outline: none !important; box-shadow: none !important; }
       @page { size:A4 portrait; margin:10mm; }
@@ -344,7 +355,7 @@
           <button type="button" id="btn-export-current" class="btn-export-current">📤 현재 문서 JSON</button>
         </div>
       </div>
-      <p class="work-hint">왼쪽에서는 통화·기본정보·특이사항만 넣고, <strong>항목·단가·수량은 오른쪽 견적서 표에서 바로 수정</strong>합니다. 같은 항목명은 한 칸으로 묶입니다. 행 추가는 표 아래 + 버튼, 삭제는 각 행의 ✕, 순서 변경은 수량 칸 왼쪽 <strong>⋮⋮</strong>를 드래그합니다. 외화 단가는 입력 중 천단위 쉼표가 붙습니다. 웹 저장은 이 브라우저 보관함이고, 엑셀·JSON 파일도 왼쪽에서 열 수 있습니다.</p>
+      <p class="work-hint">왼쪽에서는 통화·기본정보·특이사항만 넣고, <strong>항목·단가·수량은 오른쪽 견적서 표에서 바로 수정</strong>합니다. 같은 항목명은 한 칸으로 묶입니다. 행 추가는 표 아래 + 버튼, 삭제는 각 행의 ✕입니다. 내용 칸 오른쪽 <strong>⋮⋮</strong>를 식비·입장료처럼 묶인 항목(또는 그 내용 줄) 위에 놓으면 그 항목에 합쳐집니다. 외화 단가는 입력 중 천단위 쉼표가 붙습니다. 웹 저장은 이 브라우저 보관함이고, 엑셀·JSON 파일도 왼쪽에서 열 수 있습니다.</p>
       <div class="form-group highlight">
         <div class="section-title cyan">통화 지역 선택</div>
         <select id="inp-currency" class="form-select" style="padding:10px; font-size:14px; color:#2563eb; border-color:#93c5fd;">
@@ -853,7 +864,7 @@
     return `<div class="row-ctrl no-print"><button type="button" class="btn-toggle-hl js-toggle-hl" title="색상 강조">💡</button><button type="button" class="btn-delete-row js-delete-row" title="항목 삭제">✕</button></div>`;
   }
   function rowGripHtml() {
-    return `<button type="button" class="row-grip js-drag-row no-print" draggable="true" title="드래그하여 순서 변경" aria-label="순서 변경">⋮⋮</button>`;
+    return `<button type="button" class="row-grip js-drag-row no-print" draggable="true" title="이 줄을 식비·입장료 같은 항목 위에 놓으면 그 항목에 합쳐집니다" aria-label="순서 변경">⋮⋮</button>`;
   }
   function cellKey(v) {
     return String(v || '').replace(/\u00a0/g, ' ').trim();
@@ -863,20 +874,21 @@
   }
   function itemSpanFlags(list, i) {
     const name = cellKey(list[i].name);
-    const desc = cellKey(list[i].desc);
     const prevName = i ? cellKey(list[i - 1].name) : null;
-    const prevDesc = i ? cellKey(list[i - 1].desc) : null;
     const showName = i === 0 || !name || name !== prevName;
-    const showDesc = i === 0 || !desc || name !== prevName || desc !== prevDesc;
     return {
       showName,
-      showDesc,
+      showDesc: true,
       nameSpan: showName ? rs(list, i, 'name') : 1,
-      descSpan: showDesc ? rs2(list, i) : 1
+      descSpan: 1
     };
   }
   function qtyCellHtml(type, qty) {
-    return `<td class="text-center cell-qty-td">${rowGripHtml()}${rowCtrlHtml()}<div class="export-qty cell-qty" data-group="${type}" contenteditable="true">${escAttr(qty)}</div></td>`;
+    return `<td class="text-center cell-qty-td">${rowCtrlHtml()}<div class="export-qty cell-qty" data-group="${type}" contenteditable="true">${escAttr(qty)}</div></td>`;
+  }
+  function descCellHtml(desc, center) {
+    const align = center ? ' text-center' : '';
+    return `<td class="cell-desc-td${align}"><div class="export-text cell-desc" contenteditable="true">${escAttr(desc || '')}</div>${rowGripHtml()}</td>`;
   }
   function readCell(tr, cls) {
     const el = $('.' + cls, tr);
@@ -922,7 +934,6 @@
     const hlClass = data.hl ? ' hl-on' : '';
     const qty = (data.qty === '' || data.qty == null) ? '' : fmt(data.qty);
     const name = escAttr(data.name || '');
-    const desc = escAttr(data.desc || '');
     const note = escAttr(data.note || '');
     const sec = isFirst
       ? `<td rowspan="${Math.max(count, 1)}" class="text-center font-bold bg-gray-50 export-text sec-label-cell">${secHtml}</td>`
@@ -943,10 +954,8 @@
     const nameTd = showName
       ? `<td class="text-center cell-name-td"${rowspanAttr(nameSpan)}><div class="cell-name export-text" contenteditable="true">${name}</div></td>`
       : '';
-    const descTd = showDesc
-      ? `<td class="export-text cell-desc"${rowspanAttr(descSpan)} contenteditable="true">${desc}</td>`
-      : '';
-    return `<tr class="item-row ${type}-item${hlClass}" data-type="${type}" data-hl="${data.hl ? 'true' : 'false'}">${sec}${nameTd}${descTd}${qtyCellHtml(type, qty)}${fgnTd}${krwTd}<td class="text-right font-semibold export-tot cell-tot cell-computed" data-group="${type}"></td><td class="text-center export-text cell-note" contenteditable="true">${note}</td></tr>`;
+    const descTd = showDesc ? descCellHtml(data.desc || '', false) : '';
+    return `<tr class="item-row ${type}-item${hlClass}" data-type="${type}" data-hl="${data.hl ? 'true' : 'false'}" data-item-name="${escAttr(data.name || '')}">${sec}${nameTd}${descTd}${qtyCellHtml(type, qty)}${fgnTd}${krwTd}<td class="text-right font-semibold export-tot cell-tot cell-computed" data-group="${type}"></td><td class="text-center export-text cell-note" contenteditable="true">${note}</td></tr>`;
   }
   function rebuildDetailedSection(type, rows) {
     const meta = currencyMeta();
@@ -980,10 +989,8 @@
     const nameTd = showName
       ? `<td class="text-center cell-name-td"${rowspanAttr(nameSpan)}><div class="cell-name export-text" contenteditable="true">${escAttr(data.name || '')}</div></td>`
       : '';
-    const descTd = showDesc
-      ? `<td class="text-center export-text cell-desc"${rowspanAttr(descSpan)} contenteditable="true">${escAttr(data.desc || '')}</td>`
-      : '';
-    return `<tr class="item-row simple-item${hlClass}" data-type="simple" data-hl="${data.hl ? 'true' : 'false'}">${nameTd}${descTd}<td class="text-right export-krw cell-krw" data-group="simple" contenteditable="true">${escAttr(fmt(data.krw))}</td>${qtyCellHtml('simple', qty)}<td class="text-right export-tot cell-tot cell-computed" data-group="simple"></td></tr>`;
+    const descTd = showDesc ? descCellHtml(data.desc || '', true) : '';
+    return `<tr class="item-row simple-item${hlClass}" data-type="simple" data-hl="${data.hl ? 'true' : 'false'}" data-item-name="${escAttr(data.name || '')}">${nameTd}${descTd}<td class="text-right export-krw cell-krw" data-group="simple" contenteditable="true">${escAttr(fmt(data.krw))}</td>${qtyCellHtml('simple', qty)}<td class="text-right export-tot cell-tot cell-computed" data-group="simple"></td></tr>`;
   }
   function rebuildSimpleItems(rows) {
     const current = rows != null ? rows : getRowData('simple');
@@ -3331,43 +3338,114 @@
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
   }
 
-  const rowDrag = { active: false, moved: false, type: '', fromIndex: -1, insertAt: -1, pointerId: null, startX: 0, startY: 0 };
+  const rowDrag = { active: false, moved: false, type: '', fromIndex: -1, insertAt: -1, targetIndex: -1, adoptName: '', pointerId: null, startX: 0, startY: 0 };
   function itemRowsOf(type) {
     return $$(`tr.item-row[data-type="${type}"]`);
   }
+  function rowHitEl(tr) {
+    return $('.cell-desc-td', tr) || $('.cell-qty-td', tr) || $('.cell-tot', tr) || tr;
+  }
+  function rowHitRect(tr) {
+    return rowHitEl(tr).getBoundingClientRect();
+  }
   function clearRowDropMarks() {
-    $$('.item-row.drop-before, .item-row.drop-after, .item-row.dragging-row').forEach(el => {
-      el.classList.remove('drop-before', 'drop-after', 'dragging-row');
+    $$('.item-row.drop-before, .item-row.drop-after, .item-row.dragging-row, .item-row.drop-group').forEach(el => {
+      el.classList.remove('drop-before', 'drop-after', 'dragging-row', 'drop-group');
     });
   }
-  function insertIndexFromPoint(type, y) {
+  function groupRangeAt(type, index) {
     const rows = itemRowsOf(type);
-    if (!rows.length) return 0;
-    const first = rows[0].getBoundingClientRect();
-    const last = rows[rows.length - 1].getBoundingClientRect();
-    if (y < first.top) return 0;
-    if (y > last.bottom) return rows.length;
-    for (let i = 0; i < rows.length; i++) {
-      const r = rows[i].getBoundingClientRect();
-      if (y < r.top + r.height / 2) return i;
-    }
-    return rows.length;
+    const key = cellKey(rows[index] && rows[index].dataset.itemName);
+    if (!key) return { start: index, end: index + 1 };
+    let start = index;
+    let end = index + 1;
+    while (start > 0 && cellKey(rows[start - 1].dataset.itemName) === key) start--;
+    while (end < rows.length && cellKey(rows[end].dataset.itemName) === key) end++;
+    return { start, end };
   }
-  function applyRowDropMarks(type, insertAt, fromIndex) {
+  function elemUnderDrag(x, y) {
+    const list = document.elementsFromPoint ? document.elementsFromPoint(x, y) : [document.elementFromPoint(x, y)];
+    for (let i = 0; i < list.length; i++) {
+      const el = list[i];
+      if (!el || !el.closest) continue;
+      if (el.closest('.row-grip, .row-ctrl')) continue;
+      const tr = el.closest('tr.item-row');
+      if (tr && rowDrag.type && itemRowsOf(rowDrag.type).indexOf(tr) === rowDrag.fromIndex) continue;
+      if (el.closest('.sec-label-cell')) continue;
+      return el;
+    }
+    return null;
+  }
+  function dropFromPoint(type, x, y) {
+    const rows = itemRowsOf(type);
+    if (!rows.length) return { insertAt: 0, targetIndex: 0, adoptName: '' };
+    const el = elemUnderDrag(x, y);
+    const nameCell = el && el.closest ? el.closest('.cell-name-td') : null;
+    const itemRow = el && el.closest ? el.closest('tr.item-row') : null;
+    if (nameCell) {
+      const owner = nameCell.closest('tr.item-row');
+      if (owner && owner.dataset.type === type) {
+        const idx = rows.indexOf(owner);
+        if (idx >= 0) {
+          const g = groupRangeAt(type, idx);
+          const adoptName = owner.dataset.itemName || '';
+          for (let i = g.start; i < g.end; i++) {
+            const r = rowHitRect(rows[i]);
+            if (y < r.top + r.height / 2) return { insertAt: i, targetIndex: i, adoptName };
+          }
+          return { insertAt: g.end, targetIndex: g.end - 1, adoptName };
+        }
+      }
+    }
+    if (itemRow && itemRow.dataset.type === type) {
+      const idx = rows.indexOf(itemRow);
+      if (idx >= 0) {
+        const r = rowHitRect(itemRow);
+        const insertAt = y < r.top + r.height / 2 ? idx : idx + 1;
+        return { insertAt, targetIndex: idx, adoptName: itemRow.dataset.itemName || '' };
+      }
+    }
+    const first = rowHitRect(rows[0]);
+    const last = rowHitRect(rows[rows.length - 1]);
+    if (y < first.top) return { insertAt: 0, targetIndex: 0, adoptName: rows[0].dataset.itemName || '' };
+    if (y > last.bottom) return { insertAt: rows.length, targetIndex: rows.length - 1, adoptName: rows[rows.length - 1].dataset.itemName || '' };
+    for (let i = 0; i < rows.length; i++) {
+      const r = rowHitRect(rows[i]);
+      if (y < r.top + r.height / 2) return { insertAt: i, targetIndex: i, adoptName: rows[i].dataset.itemName || '' };
+      if (y <= r.bottom) return { insertAt: i + 1, targetIndex: i, adoptName: rows[i].dataset.itemName || '' };
+    }
+    return { insertAt: rows.length, targetIndex: rows.length - 1, adoptName: rows[rows.length - 1].dataset.itemName || '' };
+  }
+  function updateDragHover(type, x, y) {
+    const info = dropFromPoint(type, x, y);
+    rowDrag.insertAt = info.insertAt;
+    rowDrag.targetIndex = info.targetIndex;
+    rowDrag.adoptName = info.adoptName || '';
+    applyRowDropMarks(type, info.insertAt, rowDrag.fromIndex, rowDrag.adoptName);
+  }
+  function applyRowDropMarks(type, insertAt, fromIndex, adoptName) {
     clearRowDropMarks();
     const rows = itemRowsOf(type);
     if (fromIndex >= 0 && rows[fromIndex]) rows[fromIndex].classList.add('dragging-row');
+    if (cellKey(adoptName)) {
+      rows.forEach((tr, i) => {
+        if (cellKey(tr.dataset.itemName) !== cellKey(adoptName)) return;
+        const g = groupRangeAt(type, i);
+        if (insertAt >= g.start && insertAt <= g.end) tr.classList.add('drop-group');
+      });
+    }
     if (!rows.length) return;
     if (insertAt >= rows.length) rows[rows.length - 1].classList.add('drop-after');
     else rows[insertAt].classList.add('drop-before');
   }
-  function moveItemRow(type, fromIndex, toIndex) {
+  function moveItemRow(type, fromIndex, toIndex, adoptName) {
     const rows = getRowData(type);
     if (fromIndex < 0 || fromIndex >= rows.length) return;
     let insertAt = toIndex;
     if (fromIndex < insertAt) insertAt--;
     if (insertAt === fromIndex || insertAt < 0) return;
     const [item] = rows.splice(fromIndex, 1);
+    if (cellKey(adoptName)) item.name = adoptName;
     rows.splice(insertAt, 0, item);
     if (type === 'simple') rebuildSimpleItems(rows);
     else rebuildDetailedSection(type, rows);
@@ -3376,14 +3454,14 @@
   }
   function endRowDrag() {
     if (!rowDrag.active) return;
-    const { type, fromIndex, insertAt, moved } = rowDrag;
+    const { type, fromIndex, insertAt, adoptName, moved } = rowDrag;
     rowDrag.active = false;
     rowDrag.moved = false;
     rowDrag.pointerId = null;
     document.body.classList.remove('row-dragging');
     clearRowDropMarks();
     if (!moved || !type) return;
-    moveItemRow(type, fromIndex, insertAt);
+    moveItemRow(type, fromIndex, insertAt, adoptName);
   }
   function initDragAndDrop() {
     document.addEventListener('dragstart', e => {
@@ -3397,25 +3475,26 @@
       rowDrag.type = type;
       rowDrag.fromIndex = itemRowsOf(type).indexOf(tr);
       rowDrag.insertAt = rowDrag.fromIndex;
+      rowDrag.targetIndex = rowDrag.fromIndex;
+      rowDrag.adoptName = tr.dataset.itemName || '';
       rowDrag.pointerId = null;
       if (e.dataTransfer) {
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/plain', `${type}:${rowDrag.fromIndex}`);
       }
       document.body.classList.add('row-dragging');
-      applyRowDropMarks(type, rowDrag.insertAt, rowDrag.fromIndex);
+      applyRowDropMarks(type, rowDrag.insertAt, rowDrag.fromIndex, rowDrag.adoptName);
     });
     document.addEventListener('dragover', e => {
       if (!rowDrag.active || !rowDrag.type) return;
       e.preventDefault();
       if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
-      rowDrag.insertAt = insertIndexFromPoint(rowDrag.type, e.clientY);
-      applyRowDropMarks(rowDrag.type, rowDrag.insertAt, rowDrag.fromIndex);
+      updateDragHover(rowDrag.type, e.clientX, e.clientY);
     });
     document.addEventListener('drop', e => {
       if (!rowDrag.active) return;
       e.preventDefault();
-      rowDrag.insertAt = insertIndexFromPoint(rowDrag.type, e.clientY);
+      updateDragHover(rowDrag.type, e.clientX, e.clientY);
       rowDrag.moved = true;
       endRowDrag();
     });
@@ -3433,6 +3512,8 @@
       rowDrag.type = type;
       rowDrag.fromIndex = itemRowsOf(type).indexOf(tr);
       rowDrag.insertAt = rowDrag.fromIndex;
+      rowDrag.targetIndex = rowDrag.fromIndex;
+      rowDrag.adoptName = tr.dataset.itemName || '';
       rowDrag.pointerId = e.pointerId;
       rowDrag.startX = e.clientX;
       rowDrag.startY = e.clientY;
@@ -3448,8 +3529,7 @@
       if (!rowDrag.moved && dist < 5) return;
       rowDrag.moved = true;
       document.body.classList.add('row-dragging');
-      rowDrag.insertAt = insertIndexFromPoint(rowDrag.type, e.clientY);
-      applyRowDropMarks(rowDrag.type, rowDrag.insertAt, rowDrag.fromIndex);
+      updateDragHover(rowDrag.type, e.clientX, e.clientY);
     });
     document.addEventListener('pointerup', endRowDrag);
     document.addEventListener('pointercancel', endRowDrag);
