@@ -196,11 +196,20 @@
     .cell-name-td { overflow:visible !important; padding:6px 8px !important; vertical-align:middle; }
     .cell-qty-td { overflow:visible !important; padding:4px 6px !important; vertical-align:middle; }
     .cell-desc[rowspan], .cell-name-td[rowspan] { vertical-align:middle; }
-    .item-row .row-ctrl { position:absolute; left:2px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:1px; z-index:5; opacity:0; pointer-events:none; }
+    .item-row .row-ctrl { position:absolute; right:2px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:1px; z-index:5; opacity:0; pointer-events:none; }
     .item-row:hover .row-ctrl, .item-row:focus-within .row-ctrl { opacity:1; pointer-events:auto; }
     .item-row .row-ctrl button { width:18px; height:18px; padding:0; border-radius:4px; font-size:10px; line-height:1; display:flex; align-items:center; justify-content:center; }
     .item-row .row-ctrl .js-delete-row { border:1px solid #fca5a5; background:#fff; color:#ef4444; font-weight:800; }
     .item-row .row-ctrl .js-delete-row:hover { background:#fee2e2; color:#b91c1c; }
+    .item-row .row-grip { position:absolute; left:1px; top:50%; transform:translateY(-50%); width:16px; height:22px; padding:0; border:none; background:transparent; color:#94a3b8; font-size:11px; font-weight:800; letter-spacing:-2px; line-height:1; cursor:grab; z-index:6; opacity:.4; touch-action:none; user-select:none; -webkit-user-drag:element; }
+    .item-row:hover .row-grip, .item-row:focus-within .row-grip { opacity:1; color:#475569; }
+    .item-row .row-grip:active, body.row-dragging .row-grip { cursor:grabbing; }
+    .item-row.dragging-row { opacity:.45; background:#f8fafc; }
+    .item-row.drop-before td { box-shadow: inset 0 3px 0 0 #2563eb; }
+    .item-row.drop-after td { box-shadow: inset 0 -3px 0 0 #2563eb; }
+    body.row-dragging { cursor:grabbing; user-select:none; }
+    body.row-dragging .item-row [contenteditable] { caret-color:transparent; }
+    .cell-qty { padding:0 16px; }
     .cell-name { display:block; min-height:16px; outline:none; }
     .cell-desc, .cell-qty, .cell-krw, .cell-fgn, .cell-note { outline:none; }
     .cell-fgn-td { overflow:visible !important; background:#fef9c3; }
@@ -270,8 +279,9 @@
       .main-table td.sec-label-cell { overflow: visible !important; line-height: 1.3 !important; font-size: 10px !important; padding: 4px 3px !important; }
       .footer-brand a { display:none !important; }
       .stamp-image { position: absolute !important; left: 48px !important; bottom: -18px !important; }
-      .row-ctrl, .sheet-add-bar { display:none !important; }
+      .row-ctrl, .row-grip, .sheet-add-bar { display:none !important; }
       .cell-name-td, .cell-qty-td { padding:4px 6px !important; }
+      .cell-qty { padding:0 !important; }
       [contenteditable="true"] { background:transparent !important; box-shadow:none !important; }
       .error-border, .error-row-container { border-color: #cbd5e1 !important; background: inherit !important; outline: none !important; box-shadow: none !important; }
       @page { size:A4 portrait; margin:10mm; }
@@ -334,7 +344,7 @@
           <button type="button" id="btn-export-current" class="btn-export-current">📤 현재 문서 JSON</button>
         </div>
       </div>
-      <p class="work-hint">왼쪽에서는 통화·기본정보·특이사항만 넣고, <strong>항목·단가·수량은 오른쪽 견적서 표에서 바로 수정</strong>합니다. 같은 항목명은 한 칸으로 묶입니다. 행 추가는 표 아래 + 버튼, 삭제는 각 행의 ✕입니다. 웹 저장은 이 브라우저 보관함이고, 엑셀·JSON 파일도 왼쪽에서 열 수 있습니다.</p>
+      <p class="work-hint">왼쪽에서는 통화·기본정보·특이사항만 넣고, <strong>항목·단가·수량은 오른쪽 견적서 표에서 바로 수정</strong>합니다. 같은 항목명은 한 칸으로 묶입니다. 행 추가는 표 아래 + 버튼, 삭제는 각 행의 ✕, 순서 변경은 수량 칸 왼쪽 <strong>⋮⋮</strong>를 드래그합니다. 외화 단가는 입력 중 천단위 쉼표가 붙습니다. 웹 저장은 이 브라우저 보관함이고, 엑셀·JSON 파일도 왼쪽에서 열 수 있습니다.</p>
       <div class="form-group highlight">
         <div class="section-title cyan">통화 지역 선택</div>
         <select id="inp-currency" class="form-select" style="padding:10px; font-size:14px; color:#2563eb; border-color:#93c5fd;">
@@ -702,6 +712,62 @@
     parts[0] = Number(parts[0] || 0).toLocaleString('ko-KR');
     return (isNegative ? '-' : '') + parts.join('.');
   }
+  function caretOffsetFromEnd(el) {
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount || !el.contains(sel.focusNode)) return 0;
+    const range = sel.getRangeAt(0);
+    const after = range.cloneRange();
+    after.selectNodeContents(el);
+    after.setStart(range.endContainer, range.endOffset);
+    return after.toString().length;
+  }
+  function setCaretAt(el, pos) {
+    const sel = window.getSelection();
+    if (!sel) return;
+    const range = document.createRange();
+    let remaining = Math.max(0, pos);
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+    let node = walker.nextNode();
+    if (!node) {
+      range.selectNodeContents(el);
+      range.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      return;
+    }
+    while (node) {
+      const len = node.textContent.length;
+      if (remaining <= len) {
+        range.setStart(node, remaining);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        return;
+      }
+      remaining -= len;
+      node = walker.nextNode();
+    }
+    range.selectNodeContents(el);
+    range.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+  function formatAmountInPlace(el) {
+    if (!el) return;
+    const raw = el.tagName === 'INPUT' ? el.value : (el.textContent || '');
+    const formatted = formatCurrencyValue(raw);
+    if (formatted === raw) return;
+    if (el.tagName === 'INPUT') {
+      const fromEnd = String(raw).length - (el.selectionStart || 0);
+      el.value = formatted;
+      const pos = Math.max(0, formatted.length - fromEnd);
+      try { el.setSelectionRange(pos, pos); } catch (err) {}
+      return;
+    }
+    const fromEnd = caretOffsetFromEnd(el);
+    el.textContent = formatted;
+    setCaretAt(el, Math.max(0, formatted.length - fromEnd));
+  }
   
   function getFormattedDate(type) {
     const now = new Date();
@@ -786,6 +852,9 @@
   function rowCtrlHtml() {
     return `<div class="row-ctrl no-print"><button type="button" class="btn-toggle-hl js-toggle-hl" title="색상 강조">💡</button><button type="button" class="btn-delete-row js-delete-row" title="항목 삭제">✕</button></div>`;
   }
+  function rowGripHtml() {
+    return `<button type="button" class="row-grip js-drag-row no-print" draggable="true" title="드래그하여 순서 변경" aria-label="순서 변경">⋮⋮</button>`;
+  }
   function cellKey(v) {
     return String(v || '').replace(/\u00a0/g, ' ').trim();
   }
@@ -807,7 +876,7 @@
     };
   }
   function qtyCellHtml(type, qty) {
-    return `<td class="text-center cell-qty-td">${rowCtrlHtml()}<div class="export-qty cell-qty" data-group="${type}" contenteditable="true">${escAttr(qty)}</div></td>`;
+    return `<td class="text-center cell-qty-td">${rowGripHtml()}${rowCtrlHtml()}<div class="export-qty cell-qty" data-group="${type}" contenteditable="true">${escAttr(qty)}</div></td>`;
   }
   function readCell(tr, cls) {
     const el = $('.' + cls, tr);
@@ -2959,7 +3028,7 @@
     if (warnings.length && !confirm('⚠️ 입력된 데이터에 확인이 필요한 항목이 있습니다.\n이대로 내보내기를 진행하시겠습니까?')) return;
     
     const clone = $('#print-section').cloneNode(true);
-    clone.querySelectorAll('.row-ctrl, .sheet-add-bar').forEach(el => el.remove());
+    clone.querySelectorAll('.row-ctrl, .row-grip, .sheet-add-bar').forEach(el => el.remove());
     clone.querySelectorAll('.error-border, .error-row-container').forEach(el => {
       el.classList.remove('error-border', 'error-row-container');
     });
@@ -3102,6 +3171,15 @@
   window.EXTRA_TYPE = '${extraType}';
   function parse(v){ return Number(String(v).replace(/[^0-9.-]/g,''))||0; }
   function fmt(n){ return (Number(n)||0).toLocaleString('ko-KR'); }
+  function fmtLive(v){
+    var str = String(v==null?'':v);
+    var neg = /^\s*-/.test(str);
+    var s = str.replace(/[^0-9.]/g,'');
+    if(!s) return neg ? '-' : '';
+    var parts = s.split('.');
+    parts[0] = Number(parts[0]||0).toLocaleString('ko-KR');
+    return (neg?'-':'') + parts.join('.');
+  }
   function hasClass(el, cls){
     if(!el) return false;
     if(el.classList && el.classList.contains) return el.classList.contains(cls);
@@ -3203,6 +3281,16 @@
   }
   window.tmSync = function(el){
     if(el && hasClass(el, 'c-deposit')){ recalcAll(); syncAttrs(); return; }
+    if(el && (hasClass(el,'c-fgn') || hasClass(el,'c-krw')) && el.tagName==='INPUT'){
+      var before = el.value;
+      var formatted = fmtLive(before);
+      if(formatted !== before){
+        var fromEnd = before.length - (el.selectionStart||0);
+        el.value = formatted;
+        var pos = Math.max(0, formatted.length - fromEnd);
+        try { el.setSelectionRange(pos, pos); } catch(err){}
+      }
+    }
     recalcSheet();
   };
   window.tmBeforePrint = function(){ recalcSheet(); };
@@ -3243,7 +3331,129 @@
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
   }
 
-  function initDragAndDrop() {}
+  const rowDrag = { active: false, moved: false, type: '', fromIndex: -1, insertAt: -1, pointerId: null, startX: 0, startY: 0 };
+  function itemRowsOf(type) {
+    return $$(`tr.item-row[data-type="${type}"]`);
+  }
+  function clearRowDropMarks() {
+    $$('.item-row.drop-before, .item-row.drop-after, .item-row.dragging-row').forEach(el => {
+      el.classList.remove('drop-before', 'drop-after', 'dragging-row');
+    });
+  }
+  function insertIndexFromPoint(type, y) {
+    const rows = itemRowsOf(type);
+    if (!rows.length) return 0;
+    const first = rows[0].getBoundingClientRect();
+    const last = rows[rows.length - 1].getBoundingClientRect();
+    if (y < first.top) return 0;
+    if (y > last.bottom) return rows.length;
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i].getBoundingClientRect();
+      if (y < r.top + r.height / 2) return i;
+    }
+    return rows.length;
+  }
+  function applyRowDropMarks(type, insertAt, fromIndex) {
+    clearRowDropMarks();
+    const rows = itemRowsOf(type);
+    if (fromIndex >= 0 && rows[fromIndex]) rows[fromIndex].classList.add('dragging-row');
+    if (!rows.length) return;
+    if (insertAt >= rows.length) rows[rows.length - 1].classList.add('drop-after');
+    else rows[insertAt].classList.add('drop-before');
+  }
+  function moveItemRow(type, fromIndex, toIndex) {
+    const rows = getRowData(type);
+    if (fromIndex < 0 || fromIndex >= rows.length) return;
+    let insertAt = toIndex;
+    if (fromIndex < insertAt) insertAt--;
+    if (insertAt === fromIndex || insertAt < 0) return;
+    const [item] = rows.splice(fromIndex, 1);
+    rows.splice(insertAt, 0, item);
+    if (type === 'simple') rebuildSimpleItems(rows);
+    else rebuildDetailedSection(type, rows);
+    calculateAndRender();
+    scheduleValidation();
+  }
+  function endRowDrag() {
+    if (!rowDrag.active) return;
+    const { type, fromIndex, insertAt, moved } = rowDrag;
+    rowDrag.active = false;
+    rowDrag.moved = false;
+    rowDrag.pointerId = null;
+    document.body.classList.remove('row-dragging');
+    clearRowDropMarks();
+    if (!moved || !type) return;
+    moveItemRow(type, fromIndex, insertAt);
+  }
+  function initDragAndDrop() {
+    document.addEventListener('dragstart', e => {
+      const grip = e.target.closest('.js-drag-row');
+      if (!grip) return;
+      const tr = grip.closest('tr.item-row');
+      if (!tr) { e.preventDefault(); return; }
+      const type = tr.dataset.type;
+      rowDrag.active = true;
+      rowDrag.moved = true;
+      rowDrag.type = type;
+      rowDrag.fromIndex = itemRowsOf(type).indexOf(tr);
+      rowDrag.insertAt = rowDrag.fromIndex;
+      rowDrag.pointerId = null;
+      if (e.dataTransfer) {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', `${type}:${rowDrag.fromIndex}`);
+      }
+      document.body.classList.add('row-dragging');
+      applyRowDropMarks(type, rowDrag.insertAt, rowDrag.fromIndex);
+    });
+    document.addEventListener('dragover', e => {
+      if (!rowDrag.active || !rowDrag.type) return;
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+      rowDrag.insertAt = insertIndexFromPoint(rowDrag.type, e.clientY);
+      applyRowDropMarks(rowDrag.type, rowDrag.insertAt, rowDrag.fromIndex);
+    });
+    document.addEventListener('drop', e => {
+      if (!rowDrag.active) return;
+      e.preventDefault();
+      rowDrag.insertAt = insertIndexFromPoint(rowDrag.type, e.clientY);
+      rowDrag.moved = true;
+      endRowDrag();
+    });
+    document.addEventListener('dragend', () => {
+      if (rowDrag.active) endRowDrag();
+    });
+    document.addEventListener('pointerdown', e => {
+      const grip = e.target.closest('.js-drag-row');
+      if (!grip) return;
+      const tr = grip.closest('tr.item-row');
+      if (!tr) return;
+      const type = tr.dataset.type;
+      rowDrag.active = true;
+      rowDrag.moved = false;
+      rowDrag.type = type;
+      rowDrag.fromIndex = itemRowsOf(type).indexOf(tr);
+      rowDrag.insertAt = rowDrag.fromIndex;
+      rowDrag.pointerId = e.pointerId;
+      rowDrag.startX = e.clientX;
+      rowDrag.startY = e.clientY;
+      if (e.pointerType !== 'mouse') {
+        e.preventDefault();
+        try { grip.setPointerCapture(e.pointerId); } catch (err) {}
+      }
+    });
+    document.addEventListener('pointermove', e => {
+      if (!rowDrag.active) return;
+      if (rowDrag.pointerId != null && e.pointerId !== rowDrag.pointerId) return;
+      const dist = Math.abs(e.clientX - rowDrag.startX) + Math.abs(e.clientY - rowDrag.startY);
+      if (!rowDrag.moved && dist < 5) return;
+      rowDrag.moved = true;
+      document.body.classList.add('row-dragging');
+      rowDrag.insertAt = insertIndexFromPoint(rowDrag.type, e.clientY);
+      applyRowDropMarks(rowDrag.type, rowDrag.insertAt, rowDrag.fromIndex);
+    });
+    document.addEventListener('pointerup', endRowDrag);
+    document.addEventListener('pointercancel', endRowDrag);
+  }
 
   function isImeEvent(e) {
     return !!(e.isComposing || e.keyCode === 229);
@@ -3261,6 +3471,8 @@
       if (e.target.closest('.item-row')) {
         if (amountField(e.target)) {
           if (e.isComposing) return;
+          const moneyEl = e.target.closest('.cell-fgn, .cell-krw');
+          if (moneyEl) formatAmountInPlace(moneyEl);
           recalcSheetTotals();
         } else if ($('#inp-currency').value === 'SIMPLE_QUOTE') refreshSimpleComputed();
         scheduleValidation();
@@ -3272,12 +3484,20 @@
     });
     document.addEventListener('compositionend', e => {
       if (!e.target.closest('.item-row')) return;
-      if (amountField(e.target)) recalcSheetTotals();
+      if (amountField(e.target)) {
+        const moneyEl = e.target.closest('.cell-fgn, .cell-krw');
+        if (moneyEl) formatAmountInPlace(moneyEl);
+        recalcSheetTotals();
+      }
       else if ($('#inp-currency').value === 'SIMPLE_QUOTE') refreshSimpleComputed();
       scheduleValidation();
     });
     document.addEventListener('focusout', e => {
-      if (amountField(e.target)) recalcSheetTotals();
+      if (amountField(e.target)) {
+        const moneyEl = e.target.closest('.cell-fgn, .cell-krw');
+        if (moneyEl) formatAmountInPlace(moneyEl);
+        recalcSheetTotals();
+      }
       const nameOrDesc = e.target.closest && e.target.closest('.cell-name, .cell-desc');
       if (!nameOrDesc) return;
       const tr = e.target.closest('tr.item-row');
@@ -3285,7 +3505,7 @@
       const tbody = tr.parentElement;
       const next = e.relatedTarget;
       if (next && tbody && tbody.contains(next)) return;
-      if (next && next.closest && next.closest('.row-ctrl, .js-delete-row, .js-toggle-hl, [data-add]')) return;
+      if (next && next.closest && next.closest('.row-ctrl, .row-grip, .js-drag-row, .js-delete-row, .js-toggle-hl, [data-add]')) return;
       const type = tr.dataset.type;
       const rows = getRowData(type);
       if (type === 'simple') rebuildSimpleItems(rows);
@@ -3360,7 +3580,8 @@
   document.addEventListener('DOMContentLoaded', () => {
     setTodayDates(); 
     buildInitialInputs(); 
-    bindEvents(); 
+    bindEvents();
+    initDragAndDrop(); 
     toggleDocMode(true, true); 
     updatePresetDropdown();
     calculateAndRender(); 
