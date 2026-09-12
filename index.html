@@ -3443,8 +3443,12 @@
     if (fromIndex < 0 || fromIndex >= rows.length) return;
     let insertAt = toIndex;
     if (fromIndex < insertAt) insertAt--;
-    if (insertAt === fromIndex || insertAt < 0) return;
-    const [item] = rows.splice(fromIndex, 1);
+    if (insertAt < 0) return;
+    const item = rows[fromIndex];
+    const nextName = cellKey(adoptName) ? adoptName : item.name;
+    const nameChanged = cellKey(nextName) !== cellKey(item.name);
+    if (insertAt === fromIndex && !nameChanged) return;
+    rows.splice(fromIndex, 1);
     if (cellKey(adoptName)) item.name = adoptName;
     rows.splice(insertAt, 0, item);
     if (type === 'simple') rebuildSimpleItems(rows);
@@ -3462,6 +3466,12 @@
     clearRowDropMarks();
     if (!moved || !type) return;
     moveItemRow(type, fromIndex, insertAt, adoptName);
+  }
+  function endPointerRowDrag(e) {
+    // 마우스는 HTML5 drag(drop/dragend)로 처리. pointercancel이 드래그를 중간에 끊지 않게 함.
+    if (rowDrag.pointerId == null) return;
+    if (e && e.pointerId != null && e.pointerId !== rowDrag.pointerId) return;
+    endRowDrag();
   }
   function initDragAndDrop() {
     document.addEventListener('dragstart', e => {
@@ -3504,6 +3514,8 @@
     document.addEventListener('pointerdown', e => {
       const grip = e.target.closest('.js-drag-row');
       if (!grip) return;
+      // 마우스는 native HTML5 DnD만 사용 (pointercancel과 충돌 방지)
+      if (e.pointerType === 'mouse') return;
       const tr = grip.closest('tr.item-row');
       if (!tr) return;
       const type = tr.dataset.type;
@@ -3517,22 +3529,20 @@
       rowDrag.pointerId = e.pointerId;
       rowDrag.startX = e.clientX;
       rowDrag.startY = e.clientY;
-      if (e.pointerType !== 'mouse') {
-        e.preventDefault();
-        try { grip.setPointerCapture(e.pointerId); } catch (err) {}
-      }
+      e.preventDefault();
+      try { grip.setPointerCapture(e.pointerId); } catch (err) {}
     });
     document.addEventListener('pointermove', e => {
-      if (!rowDrag.active) return;
-      if (rowDrag.pointerId != null && e.pointerId !== rowDrag.pointerId) return;
+      if (!rowDrag.active || rowDrag.pointerId == null) return;
+      if (e.pointerId !== rowDrag.pointerId) return;
       const dist = Math.abs(e.clientX - rowDrag.startX) + Math.abs(e.clientY - rowDrag.startY);
       if (!rowDrag.moved && dist < 5) return;
       rowDrag.moved = true;
       document.body.classList.add('row-dragging');
       updateDragHover(rowDrag.type, e.clientX, e.clientY);
     });
-    document.addEventListener('pointerup', endRowDrag);
-    document.addEventListener('pointercancel', endRowDrag);
+    document.addEventListener('pointerup', endPointerRowDrag);
+    document.addEventListener('pointercancel', endPointerRowDrag);
   }
 
   function isImeEvent(e) {
