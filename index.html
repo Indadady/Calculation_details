@@ -143,19 +143,20 @@
     .doc-label-option input:checked + span { border-color:#2563eb; background:#eff6ff; color:#1d4ed8; box-shadow:0 0 0 2px rgba(37,99,235,.15); }
     .doc-label-option:hover span { border-color:#94a3b8; }
     .info-table, .main-table, .simple-table { width:100%; border-collapse:collapse; }
-    .info-table th, .info-table td { border:1px solid #cbd5e1; padding:5px 8px; font-size:12px; }
+    .info-table th, .info-table td { border:1px solid #cbd5e1; padding:5px 8px; font-size:13px; }
     .info-table th { background:#f8fafc; color:#334155; font-weight:700; text-align:center; width:28%; }
     .info-table td { color:#0f172a; }
     .main-table { table-layout:fixed; border-top:2px solid #0f172a; border-bottom:2px solid #0f172a; }
-    .main-table th, .main-table td { border:1px solid #cbd5e1; padding:6px 8px; font-size:12px; vertical-align:middle; overflow:hidden; word-break:keep-all; color:#1e293b; }
-    .main-table td.sec-label-cell { line-height:1.3; font-size:10px; padding:4px 3px; overflow:visible; white-space:normal; vertical-align:middle; }
+    .main-table th, .main-table td { border:1px solid #cbd5e1; padding:6px 8px; font-size:13px; line-height:1.25; vertical-align:middle; overflow:hidden; word-break:keep-all; color:#1e293b; }
+    .main-table td.sec-label-cell { line-height:1.3; font-size:11px; padding:4px 3px; overflow:visible; white-space:normal; vertical-align:middle; }
+    .main-table .cell-qty, .main-table .cell-krw, .main-table .cell-tot, .main-table .cell-fgn { white-space:nowrap; font-variant-numeric:tabular-nums; }
     .main-table th { text-align:center; font-weight:700; background:#f8fafc; color:#0f172a; }
     .main-table tbody tr { height:28px; }
     .text-center { text-align:center; } .text-right { text-align:right; } .font-bold { font-weight:700; } .font-semibold { font-weight:600; }
     .bg-gray-50 { background:#f8fafc; } .bg-yellow-50 { background:#fef9c3; }
     .subtotal-row { background:#f1f5f9; font-weight:700; } .subtotal-row td { border-bottom:2px solid #cbd5e1 !important; padding:8px; }
     .grand-row { background:#f8fafc; font-weight:800; } .grand-row td { border-top:2px solid #0f172a !important; padding:8px; } .grand-row-last td { border-bottom:none !important; }
-    .grand-amount { font-size:14px; } .grand-label { font-size:12px; }
+    .grand-amount { font-size:15px; } .grand-label { font-size:13px; }
     .footer-notes { font-size:11px; color:#475569; padding-top:12px; }
     .footer-notes p.title { font-size:12px; font-weight:700; margin-bottom:6px; color:#1e293b; }
     .footer-notes p.body { line-height:1.6; letter-spacing:-.02em; }
@@ -238,20 +239,21 @@
     .item-row.hl-on td, .item-row.hl-on [contenteditable] { color:#dc2626 !important; font-weight:900 !important; }
     .cell-note { overflow-wrap:anywhere; word-break:keep-all; }
     .pc-1 .main-table tbody tr { height:26px; }
-    .pc-2 .main-table th, .pc-2 .main-table td, .sheet-dense .main-table th, .sheet-dense .main-table td { padding:4px 5px; font-size:11px; }
+    .pc-2 .main-table th, .pc-2 .main-table td, .sheet-dense .main-table th, .sheet-dense .main-table td { padding:3px 4px; font-size:13px; line-height:1.2; }
     .pc-2 .main-table tbody tr, .sheet-dense .main-table tbody tr { height:22px; }
-    .pc-3 .main-table th, .pc-3 .main-table td { padding:3px 4px; font-size:11px; }
+    .pc-3 .main-table th, .pc-3 .main-table td { padding:2px 4px; font-size:12.5px; line-height:1.2; }
     .pc-3 .main-table tbody tr { height:20px; }
     .pc-3 .doc-title-area h2, .sheet-dense .doc-title-area h2 { font-size:22px; }
     .pc-3 .doc-title-area, .sheet-dense .doc-title-area { margin-bottom:12px; }
     .pc-3 .doc-header, .sheet-dense .doc-header { margin-bottom:12px; }
-    .pc-4 .main-table th, .pc-4 .main-table td { padding:2px 4px; font-size:10px; }
+    .pc-4 .main-table th, .pc-4 .main-table td { padding:2px 3px; font-size:12px; line-height:1.15; }
     .pc-4 .main-table tbody tr { height:18px; }
     .pc-4 .doc-title-area h2 { font-size:20px; }
-    .pc-5 .main-table th, .pc-5 .main-table td { padding:2px 3px; font-size:10px; }
+    .pc-5 .main-table th, .pc-5 .main-table td { padding:1px 3px; font-size:11.5px; line-height:1.15; }
     .pc-5 .main-table tbody tr { height:17px; }
-    .pc-6 .main-table th, .pc-6 .main-table td { padding:1px 3px; font-size:9px; }
+    .pc-6 .main-table th, .pc-6 .main-table td { padding:1px 2px; font-size:11px; line-height:1.15; }
     .pc-6 .main-table tbody tr { height:16px; }
+    .pc-2 .main-table td.grand-amount, .pc-3 .main-table td.grand-amount, .pc-4 .main-table td.grand-amount, .pc-5 .main-table td.grand-amount, .pc-6 .main-table td.grand-amount, .sheet-dense .main-table td.grand-amount { font-size:13px; }
     .sheet-dense { padding:28px 28px 28px 32px; }
     .panel-input-scroll::-webkit-scrollbar, .panel-preview::-webkit-scrollbar { width:6px; }
     .panel-input-scroll::-webkit-scrollbar-track, .panel-preview::-webkit-scrollbar-track { background:#f8fafc; }
@@ -291,11 +293,12 @@
       .main-table thead { display: table-header-group; }
       .main-table tr, .simple-table tr { page-break-inside: avoid; }
       .main-table th, .main-table td, .simple-table th, .simple-table td { overflow: hidden !important; white-space: normal !important; word-break: keep-all !important; word-wrap: anywhere !important; overflow-wrap: anywhere !important; }
-      .main-table td.sec-label-cell { overflow: visible !important; line-height: 1.3 !important; font-size: 10px !important; padding: 4px 3px !important; }
+      .main-table td.sec-label-cell { overflow: visible !important; line-height: 1.3 !important; font-size: 11px !important; padding: 3px 2px !important; }
       .footer-brand a { display:none !important; }
       .stamp-image { position: absolute !important; left: 48px !important; bottom: -18px !important; }
       .row-ctrl, .row-grip, .sheet-add-bar { display:none !important; }
-      .cell-name-td, .cell-qty-td, .cell-desc-td, .cell-qty-td:has(.row-grip) { padding:4px 6px !important; }
+      .cell-name-td, .cell-qty-td, .cell-desc-td, .cell-qty-td:has(.row-grip) { padding:2px 4px !important; }
+      .main-table .cell-qty, .main-table .cell-krw, .main-table .cell-tot, .main-table .cell-fgn { white-space:nowrap !important; }
       [contenteditable="true"] { background:transparent !important; box-shadow:none !important; }
       .error-border, .error-row-container { border-color: #cbd5e1 !important; background: inherit !important; outline: none !important; box-shadow: none !important; }
       @page { size:A4 portrait; margin:10mm; }
@@ -519,7 +522,7 @@
                 <tr><th>행사명</th><td id="out-docTitle" class="export-text" style="font-weight:800;"></td></tr>
                 <tr><th>여행일</th><td id="out-travelDate" class="export-text"></td></tr>
                 <tr><th>여행인원</th><td id="out-paxStr" class="export-text"></td></tr>
-                <tr><th>발송일자/환율</th><td id="out-issueAndRate" class="export-text" style="font-size:11px;"></td></tr>
+                <tr><th>발송일자/환율</th><td id="out-issueAndRate" class="export-text" style="font-size:12px;"></td></tr>
               </table>
             </div>
             <div class="doc-header-right"><img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHfgIX70O5k6Anuo0UgALIdaG9jSga9auHu3uyz0uEirylGPAJnjN_qQbvEGMUvPqUQf_g9FMNUHRxlDcUBf4vZ3Mpy4TnA9WxbmzWYK11gt2zuy_Irl4wctNFjcjLyPo0GPXV792o_J7L9guRMuDfeC1gy7USwywjYbECZgzcsHybuGRRAXAnO1eNmP8/s320/logo.png" alt="TOURMAKER"></div>
@@ -2902,7 +2905,7 @@
     const sec = getSectionLabelsFromForm();
     const specialNote = escAttr($('#inp-det-specialNote').value.trim());
     const ex = `(${sec.flight.replace(/\n/g, ' ')} 제외)`;
-    let totalHtml = `<tr class="grand-row"><td colspan="${col}" class="text-center grand-label" style="font-size:12px; color:#b91c1c;">(1)+(2)+(3) 전체 합계 금액</td><td class="text-right grand-amount" id="grand-1" style="color:#b91c1c;">₩${fmtT(grandTotal)}</td><td></td></tr><tr class="grand-row ${specialNote ? '' : 'grand-row-last'}"><td colspan="${col}" class="text-center grand-label" style="font-size:12px">(2)+(3) 행사 비용 합계 <span style="font-size:10px;font-weight:400;color:#64748b">${ex}</span></td><td class="text-right grand-amount" id="grand-2">₩${fmtT(eventOnly)}</td><td></td></tr>`;
+    let totalHtml = `<tr class="grand-row"><td colspan="${col}" class="text-center grand-label" style="font-size:13px; color:#b91c1c;">(1)+(2)+(3) 전체 합계 금액</td><td class="text-right grand-amount" id="grand-1" style="color:#b91c1c;">₩${fmtT(grandTotal)}</td><td></td></tr><tr class="grand-row ${specialNote ? '' : 'grand-row-last'}"><td colspan="${col}" class="text-center grand-label" style="font-size:13px">(2)+(3) 행사 비용 합계 <span style="font-size:11px;font-weight:400;color:#64748b">${ex}</span></td><td class="text-right grand-amount" id="grand-2">₩${fmtT(eventOnly)}</td><td></td></tr>`;
     if (specialNote) totalHtml += `<tr class="grand-row grand-row-last"><td class="text-center font-bold bg-yellow-50 export-text" style="color:#b91c1c;">특이사항</td><td colspan="${col + 1}" style="font-weight:700; color:#b91c1c; padding:10px; line-height:1.5;" class="export-text">${specialNote.replace(/\n/g, '<br>')}</td></tr>`;
     $('#tbody-total').innerHTML = totalHtml;
     $('#live-total-amount').textContent = `₩ ${fmtT(grandTotal)}`;
@@ -2959,7 +2962,7 @@
     const thead = $('#main-thead');
     const theadSig = `${meta.layout}|${meta.cN}|${meta.currency}|${meta.cS}`;
     if (thead.dataset.sig !== theadSig) {
-      thead.innerHTML = `<tr><th style="width:9%">구분</th><th style="width:${isKRW ? '14%' : '11%'}">항목</th><th style="width:${isKRW ? '24%' : '18%'}">내용</th><th style="width:9%;font-size:10px;line-height:1.3">인원/객실수<br>차량대수</th>${!isKRW ? `<th style="width:11%;background:#fef08a;color:#0f172a">${meta.cN} 단가<br><span style="font-weight:400;color:#475569">${meta.currency} ${meta.cS}</span></th>` : ''}<th style="width:${isKRW ? '15%' : '12%'}">원화 단가<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '16%' : '14%'}">총금액<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '13%' : '16%'}">비고</th></tr>`;
+      thead.innerHTML = `<tr><th style="width:9%">구분</th><th style="width:${isKRW ? '14%' : '11%'}">항목</th><th style="width:${isKRW ? '24%' : '18%'}">내용</th><th style="width:9%;font-size:11px;line-height:1.25">인원/객실수<br>차량대수</th>${!isKRW ? `<th style="width:11%;background:#fef08a;color:#0f172a">${meta.cN} 단가<br><span style="font-weight:400;color:#475569">${meta.currency} ${meta.cS}</span></th>` : ''}<th style="width:${isKRW ? '15%' : '12%'}">원화 단가<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '16%' : '14%'}">총금액<br><span style="font-weight:400">KRW</span></th><th style="width:${isKRW ? '13%' : '16%'}">비고</th></tr>`;
       thead.dataset.sig = theadSig;
     }
     $('#main-table').dataset.currency = meta.currency;
@@ -3126,8 +3129,8 @@
       body{background:#f1f5f9;display:flex;flex-direction:column;align-items:center;padding:40px 20px;margin:0;font-family:'Noto Sans KR','Malgun Gothic',sans-serif;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
       .a4-sheet{background:#fff;width:100%;max-width:850px;padding:40px;box-shadow:0 10px 40px rgba(0,0,0,.1);border-radius:4px;margin-bottom:40px;position:relative}
       table{width:100%;border-collapse:collapse;table-layout:fixed;word-break:keep-all}
-      th,td{border:1px solid #cbd5e1;padding:6px 8px;font-size:12px;overflow:hidden;vertical-align:middle}
-      td.sec-label-cell{overflow:visible;line-height:1.3;font-size:10px;padding:4px 3px;white-space:normal}
+      th,td{border:1px solid #cbd5e1;padding:6px 8px;font-size:13px;line-height:1.25;overflow:hidden;vertical-align:middle}
+      td.sec-label-cell{overflow:visible;line-height:1.3;font-size:11px;padding:4px 3px;white-space:normal}
       th{background:#f8fafc;font-weight:bold;text-align:center;color:#0f172a}
       .text-center{text-align:center}.text-right{text-align:right}.font-bold{font-weight:bold}.bg-gray-50{background:#f8fafc}.bg-yellow-50{background:#fef9c3}
       .subtotal-row td{background:#f1f5f9;font-weight:bold;border-bottom:2px solid #cbd5e1}.grand-row td{background:#f8fafc;font-weight:bold;border-top:2px solid #0f172a}.grand-row-last td{border-bottom:none !important}
