@@ -1804,7 +1804,6 @@
       ws.getCell(r, totC).value = { formula: rawGrandFormula, result: computed.grandRaw };
       ejStyle(ws.getCell(r, totC), Object.assign({}, amountFill, { font: ejFont({ size: 11, bold: true }) }));
       ejPaint(ws, r, noteC, r, noteC, noteFill);
-      ws.getCell(r, noteC).value = '부가세 불포함 금액';
       const rawGrandAddr = a1(r, totC);
       r++;
 
@@ -1834,7 +1833,6 @@
         ws.getCell(r, totC).value = { formula: rawGrandFormula, result: computed.grand };
         ejStyle(ws.getCell(r, totC), amountFill);
         ejPaint(ws, r, noteC, r, noteC, noteFill);
-        ws.getCell(r, noteC).value = '부가세 불포함 금액';
       }
       r++;
     }
@@ -3003,7 +3001,7 @@
     const roundLabel = roundUnitLabel(round.unit);
     let totalHtml = '';
     if (round.unit > 0 && round.cut > 0) {
-      totalHtml += `<tr class="grand-row"><td colspan="${col}" class="text-center grand-label" style="font-size:13px;">(1)+(2)+(3) 전체 합계 금액</td><td class="text-right grand-amount" id="grand-1">₩${fmtT(rawGrand)}</td><td class="text-center" style="font-size:11px;color:#64748b;">부가세 불포함</td></tr>`;
+      totalHtml += `<tr class="grand-row"><td colspan="${col}" class="text-center grand-label" style="font-size:13px;">(1)+(2)+(3) 전체 합계 금액</td><td class="text-right grand-amount" id="grand-1">₩${fmtT(rawGrand)}</td><td></td></tr>`;
       totalHtml += `<tr class="grand-row"><td colspan="${col}" class="text-center grand-label" style="font-size:13px; color:#2563eb;">(-) ${roundLabel}</td><td class="text-right grand-amount" id="grand-cut" style="color:#2563eb;">-₩${fmtT(round.cut)}</td><td></td></tr>`;
       totalHtml += `<tr class="grand-row"><td colspan="${col}" class="text-center grand-label" style="font-size:13px; color:#b91c1c;">(=) 최종 합계 금액</td><td class="text-right grand-amount" id="grand-final" style="color:#b91c1c;">₩${fmtT(grandTotal)}</td><td class="text-center" style="font-size:11px;color:#b91c1c;font-weight:700;">${roundLabel}</td></tr>`;
     } else {
