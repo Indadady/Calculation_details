@@ -439,6 +439,17 @@
              <input type="checkbox" id="inp-det-showTaxNote" checked style="width:16px; height:16px; cursor:pointer; accent-color:#2563eb;">
              [세금계산서 발행 관련 안내문] 하단에 노출하기
           </label>
+          <div class="form-row cols-1" style="margin-bottom:12px;">
+            <div>
+              <label class="form-label" for="inp-det-roundUnit" style="color:#be123c;">전체 합계 절사</label>
+              <select id="inp-det-roundUnit" class="form-select" style="border-color:#fca5a5;">
+                <option value="0">적용 안 함</option>
+                <option value="1000">천원단위 절사 (예: 37,194,850 → 37,194,000)</option>
+                <option value="10000">만원단위 절사 (예: 37,194,850 → 37,190,000)</option>
+              </select>
+              <p class="hint-text" style="margin-top:6px; margin-bottom:0;">(1)+(2)+(3) 전체 합계에서 끝자리를 잘라 최종 합계로 반영합니다. 계약용으로 금액을 깔끔하게 맞출 때 사용하세요.</p>
+            </div>
+          </div>
           <div class="form-row cols-1">
             <textarea id="inp-det-specialNote" class="form-input" style="height:60px; resize:vertical; font-weight:600; color:#b91c1c;" placeholder="필요 시 기안 및 계약용 특이사항을 자유롭게 입력하세요. (비워두면 출력되지 않습니다.)"></textarea>
           </div>
@@ -1223,11 +1234,28 @@
     return warnings;
   }
   function scheduleValidation() { clearTimeout(state.warningTimer); state.warningTimer = setTimeout(renderWarnings, 300); }
+  function getDetRoundUnit() {
+    const n = Number($('#inp-det-roundUnit')?.value) || 0;
+    return (n === 1000 || n === 10000) ? n : 0;
+  }
+  function applyRoundDown(amount, unit) {
+    const raw = Number(amount) || 0;
+    const u = Number(unit) || 0;
+    if (u <= 0) return { raw, final: raw, cut: 0, unit: 0 };
+    const final = Math.floor(raw / u) * u;
+    return { raw, final, cut: raw - final, unit: u };
+  }
+  function roundUnitLabel(unit) {
+    if (Number(unit) === 10000) return '만원단위 절사';
+    if (Number(unit) === 1000) return '천원단위 절사';
+    return '적용 안 함';
+  }
   function getFormData() {
     return {
       currency: $('#inp-currency').value, 
       clientName: $('#inp-clientName').value, docTitle: $('#inp-docTitle').value, travelDate: $('#inp-travelDate').value, paxStr: $('#inp-paxStr').value, issueDate: $('#inp-issueDate').value, exRate: parseCurrency($('#inp-exRate').value), detSpecialNote: $('#inp-det-specialNote').value,
       detShowTaxNote: $('#inp-det-showTaxNote').checked,
+      detRoundUnit: getDetRoundUnit(),
       detDocLabelMode: getDetDocLabelMode(),
       detIssueHl: $('#inp-hl-issueDate').checked, // 💡 발송일 강조 여부 저장
       secFlight: $('#inp-sec-flight').value,
@@ -1244,7 +1272,9 @@
     const hasCustomSec = data.secFlight != null || data.secLocal != null || data.secDomestic != null;
     $('#inp-currency').value = data.currency || 'JPY'; toggleDocMode(false, true);
     $('#inp-clientName').value = data.clientName || ''; $('#inp-docTitle').value = data.docTitle || ''; $('#inp-travelDate').value = data.travelDate || ''; $('#inp-paxStr').value = data.paxStr || ''; $('#inp-issueDate').value = data.issueDate || getFormattedDate('dot'); $('#inp-exRate').value = data.exRate ? fmt(data.exRate) : fmt(getExRateDefault(data.currency || 'JPY')); $('#inp-det-specialNote').value = data.detSpecialNote || '';
-    $('#inp-det-showTaxNote').checked = data.detShowTaxNote !== false; 
+    $('#inp-det-showTaxNote').checked = data.detShowTaxNote !== false;
+    const ru = Number(data.detRoundUnit) || 0;
+    $('#inp-det-roundUnit').value = (ru === 1000 || ru === 10000) ? String(ru) : '0';
     if (data.detDocLabelMode === 'quote') {
       $('#inp-det-docLabel-quote').checked = true;
     } else {
@@ -1464,6 +1494,7 @@
   const EJ_FONT = '맑은 고딕';
   const EJ_BLACK = { argb: 'FF000000' };
   const EJ_RED = { argb: 'FFC00000' };
+  const EJ_BLUE = { argb: 'FF2563EB' };
   const EJ_HL = { argb: 'FFFF0000' };
   const EJ_TEAL_INFO = 'FFABEDEF';
   const EJ_TEAL_HEAD = 'FFA1CFCB';
@@ -1764,13 +1795,49 @@
     };
     const noteFill = { font: ejFont({ size: 10, bold: true }), fill: ejFill(EJ_GRAND_BG), alignment: ejAlign('center'), border: ejBorder('medium', 'medium', 'medium', 'hair') };
 
-    ws.getRow(r).height = 24.95;
-    ejMerge(ws, r, 2, r, totC - 1, '(1)+(2)+(3) 전체 합계 금액', grandFill);
-    ws.getCell(r, totC).value = { formula: `${subAddrs[0]}+${subAddrs[1]}+${subAddrs[2]}`, result: computed.grand };
-    ejStyle(ws.getCell(r, totC), amountFill);
-    ejPaint(ws, r, noteC, r, noteC, noteFill);
-    ws.getCell(r, noteC).value = '부가세 불포함 금액';
-    r++;
+    const rawGrandFormula = `${subAddrs[0]}+${subAddrs[1]}+${subAddrs[2]}`;
+    const roundUnit = Number(computed.roundUnit) || 0;
+    const roundLabel = roundUnitLabel(roundUnit);
+    if (roundUnit > 0 && computed.roundCut > 0) {
+      ws.getRow(r).height = 24.95;
+      ejMerge(ws, r, 2, r, totC - 1, '(1)+(2)+(3) 전체 합계 금액', grandFill);
+      ws.getCell(r, totC).value = { formula: rawGrandFormula, result: computed.grandRaw };
+      ejStyle(ws.getCell(r, totC), Object.assign({}, amountFill, { font: ejFont({ size: 11, bold: true }) }));
+      ejPaint(ws, r, noteC, r, noteC, noteFill);
+      ws.getCell(r, noteC).value = '부가세 불포함 금액';
+      const rawGrandAddr = a1(r, totC);
+      r++;
+
+      ws.getRow(r).height = 24.95;
+      ejMerge(ws, r, 2, r, totC - 1, `(-) ${roundLabel}`, Object.assign({}, grandFill, { font: ejFont({ size: 10, bold: true, color: EJ_BLUE }) }));
+      ws.getCell(r, totC).value = { formula: `-(${rawGrandAddr}-INT(${rawGrandAddr}/${roundUnit})*${roundUnit})`, result: -computed.roundCut };
+      ejStyle(ws.getCell(r, totC), Object.assign({}, amountFill, { font: ejFont({ size: 11, bold: true, color: EJ_BLUE }) }));
+      ejPaint(ws, r, noteC, r, noteC, noteFill);
+      r++;
+
+      ws.getRow(r).height = 24.95;
+      ejMerge(ws, r, 2, r, totC - 1, '(=) 최종 합계 금액', grandFill);
+      ws.getCell(r, totC).value = { formula: `INT((${rawGrandFormula})/${roundUnit})*${roundUnit}`, result: computed.grand };
+      ejStyle(ws.getCell(r, totC), amountFill);
+      ejPaint(ws, r, noteC, r, noteC, noteFill);
+      ws.getCell(r, noteC).value = roundLabel;
+      r++;
+    } else {
+      ws.getRow(r).height = 24.95;
+      ejMerge(ws, r, 2, r, totC - 1, '(1)+(2)+(3) 전체 합계 금액', grandFill);
+      if (roundUnit > 0) {
+        ws.getCell(r, totC).value = { formula: `INT((${rawGrandFormula})/${roundUnit})*${roundUnit}`, result: computed.grand };
+        ejStyle(ws.getCell(r, totC), amountFill);
+        ejPaint(ws, r, noteC, r, noteC, noteFill);
+        ws.getCell(r, noteC).value = roundLabel;
+      } else {
+        ws.getCell(r, totC).value = { formula: rawGrandFormula, result: computed.grand };
+        ejStyle(ws.getCell(r, totC), amountFill);
+        ejPaint(ws, r, noteC, r, noteC, noteFill);
+        ws.getCell(r, noteC).value = '부가세 불포함 금액';
+      }
+      r++;
+    }
 
     const ex = `(${String(computed.sec.flight).replace(/\n/g, ' ')} 제외)`;
     ws.getRow(r).height = 24.95;
@@ -2350,6 +2417,14 @@
     if (s.includes('50') || s.includes('auto_50') || s.includes('추가')) return 'auto_50';
     return '0';
   }
+  function parseRoundUnit(v) {
+    const s = cellStr(v).toLowerCase().replace(/\s+/g, '');
+    if (s.includes('10000') || s.includes('만원')) return 10000;
+    if (s.includes('1000') || s.includes('천원')) return 1000;
+    const n = Number(String(v).replace(/[^0-9]/g, ''));
+    if (n === 10000 || n === 1000) return n;
+    return 0;
+  }
   function parseItemGroup(v) {
     const s = cellStr(v).replace(/\s/g, '').toLowerCase();
     if (['flight', '1', '항공', '항공료', '교통', '교통비'].includes(s)) return 'flight';
@@ -2375,7 +2450,7 @@
   function blankExcelData() {
     return {
       currency: 'JPY', clientName: '', docTitle: '', travelDate: '', paxStr: '', issueDate: '',
-      exRate: EXRATE_DEFAULTS.JPY, detSpecialNote: '', detShowTaxNote: true, detDocLabelMode: 'calculation', detIssueHl: false,
+      exRate: EXRATE_DEFAULTS.JPY, detSpecialNote: '', detShowTaxNote: true, detRoundUnit: 0, detDocLabelMode: 'calculation', detIssueHl: false,
       flights: [], locals: [], domestics: [],
       simDep: '', simInv: '', simSubject: '', simToName: '', simToAddr: '', simToPerson: '',
       simBankName: '신협', simBankNum: '131-022-382094', simBankHolder: '주식회사 투어메이커',
@@ -2415,6 +2490,9 @@
       'detSpecialNote': () => { data.detSpecialNote = cellStr(value); },
       '세금계산서안내': () => { data.detShowTaxNote = cellStr(value) === '' ? true : parseYn(value); },
       'detShowTaxNote': () => { data.detShowTaxNote = parseYn(value); },
+      '합계절사': () => { data.detRoundUnit = parseRoundUnit(value); },
+      'detRoundUnit': () => { data.detRoundUnit = parseRoundUnit(value); },
+      '전체합계절사': () => { data.detRoundUnit = parseRoundUnit(value); },
       '출발일코드': () => { data.simDep = cellStr(value); },
       'simDep': () => { data.simDep = cellStr(value); },
       '발행일': () => { data.simInv = cellStr(value); },
@@ -2532,6 +2610,7 @@
       ['구분_국내', data.secDomestic || '', ''],
       ['특이사항', data.detSpecialNote || '', '산출내역서 하단 특이사항'],
       ['세금계산서안내', data.detShowTaxNote === false ? 'N' : 'Y', 'Y 또는 N'],
+      ['합계절사', roundUnitLabel(data.detRoundUnit), '적용 안 함 / 천원단위 절사 / 만원단위 절사'],
       ['출발일코드', data.simDep || '', '일반 견적서용'],
       ['발행일', data.simInv || '', '일반 견적서용'],
       ['발행일강조', data.simIssueHl ? 'Y' : 'N', 'Y 또는 N'],
@@ -2698,7 +2777,16 @@
     const tF = flights.reduce((s, r) => s + r.tot, 0);
     const tL = locals.reduce((s, r) => s + r.tot, 0);
     const tD = doms.reduce((s, r) => s + r.tot, 0);
-    return { currency, isKRW, exRate, sec, cN, cS, flights, locals, doms, tF, tL, tD, grand: tF + tL + tD, eventOnly: tL + tD };
+    const rawGrand = tF + tL + tD;
+    const round = applyRoundDown(rawGrand, data.detRoundUnit);
+    return {
+      currency, isKRW, exRate, sec, cN, cS, flights, locals, doms, tF, tL, tD,
+      grandRaw: rawGrand,
+      grand: round.final,
+      roundCut: round.cut,
+      roundUnit: round.unit,
+      eventOnly: tL + tD
+    };
   }
 
   function getSimpleComputed(data) {
@@ -2804,6 +2892,7 @@
     $('#inp-sim-deposit').value = '';
     
     $('#inp-det-showTaxNote').checked = true;
+    $('#inp-det-roundUnit').value = '0';
     $('#inp-det-docLabel-calc').checked = true;
     $('#inp-hl-issueDate').checked = false;
     $('#inp-sim-hl-issueDate').checked = false;
@@ -2904,12 +2993,24 @@
     const subF = $('#sub-flight'); if (subF) subF.textContent = '₩' + fmtT(tF);
     const subL = $('#sub-local'); if (subL) subL.textContent = '₩' + fmtT(tL);
     const subD = $('#sub-domestic'); if (subD) subD.textContent = '₩' + fmtT(tD);
-    const grandTotal = tF + tL + tD;
+    const rawGrand = tF + tL + tD;
+    const round = applyRoundDown(rawGrand, getDetRoundUnit());
+    const grandTotal = round.final;
     const eventOnly = tL + tD;
     const sec = getSectionLabelsFromForm();
     const specialNote = escAttr($('#inp-det-specialNote').value.trim());
     const ex = `(${sec.flight.replace(/\n/g, ' ')} 제외)`;
-    let totalHtml = `<tr class="grand-row"><td colspan="${col}" class="text-center grand-label" style="font-size:13px; color:#b91c1c;">(1)+(2)+(3) 전체 합계 금액</td><td class="text-right grand-amount" id="grand-1" style="color:#b91c1c;">₩${fmtT(grandTotal)}</td><td></td></tr><tr class="grand-row ${specialNote ? '' : 'grand-row-last'}"><td colspan="${col}" class="text-center grand-label" style="font-size:13px">(2)+(3) 행사 비용 합계 <span style="font-size:11px;font-weight:400;color:#64748b">${ex}</span></td><td class="text-right grand-amount" id="grand-2">₩${fmtT(eventOnly)}</td><td></td></tr>`;
+    const roundLabel = roundUnitLabel(round.unit);
+    let totalHtml = '';
+    if (round.unit > 0 && round.cut > 0) {
+      totalHtml += `<tr class="grand-row"><td colspan="${col}" class="text-center grand-label" style="font-size:13px;">(1)+(2)+(3) 전체 합계 금액</td><td class="text-right grand-amount" id="grand-1">₩${fmtT(rawGrand)}</td><td class="text-center" style="font-size:11px;color:#64748b;">부가세 불포함</td></tr>`;
+      totalHtml += `<tr class="grand-row"><td colspan="${col}" class="text-center grand-label" style="font-size:13px; color:#2563eb;">(-) ${roundLabel}</td><td class="text-right grand-amount" id="grand-cut" style="color:#2563eb;">-₩${fmtT(round.cut)}</td><td></td></tr>`;
+      totalHtml += `<tr class="grand-row"><td colspan="${col}" class="text-center grand-label" style="font-size:13px; color:#b91c1c;">(=) 최종 합계 금액</td><td class="text-right grand-amount" id="grand-final" style="color:#b91c1c;">₩${fmtT(grandTotal)}</td><td class="text-center" style="font-size:11px;color:#b91c1c;font-weight:700;">${roundLabel}</td></tr>`;
+    } else {
+      const note = round.unit > 0 ? roundLabel : '';
+      totalHtml += `<tr class="grand-row"><td colspan="${col}" class="text-center grand-label" style="font-size:13px; color:#b91c1c;">(1)+(2)+(3) 전체 합계 금액</td><td class="text-right grand-amount" id="grand-1" style="color:#b91c1c;">₩${fmtT(grandTotal)}</td><td class="text-center" style="font-size:11px;color:${round.unit > 0 ? '#b91c1c' : '#64748b'};">${note}</td></tr>`;
+    }
+    totalHtml += `<tr class="grand-row ${specialNote ? '' : 'grand-row-last'}"><td colspan="${col}" class="text-center grand-label" style="font-size:13px">(2)+(3) 행사 비용 합계 <span style="font-size:11px;font-weight:400;color:#64748b">${ex}</span></td><td class="text-right grand-amount" id="grand-2">₩${fmtT(eventOnly)}</td><td></td></tr>`;
     if (specialNote) totalHtml += `<tr class="grand-row grand-row-last"><td class="text-center font-bold bg-yellow-50 export-text" style="color:#b91c1c;">특이사항</td><td colspan="${col + 1}" style="font-weight:700; color:#b91c1c; padding:10px; line-height:1.5;" class="export-text">${specialNote.replace(/\n/g, '<br>')}</td></tr>`;
     $('#tbody-total').innerHTML = totalHtml;
     $('#live-total-amount').textContent = `₩ ${fmtT(grandTotal)}`;
@@ -3064,6 +3165,7 @@
     const exRate = parseCurrency($('#inp-exRate').value) || 1;
     const vatType = $('#inp-sim-vat').value;
     const extraType = $('#inp-sim-extraFee').value;
+    const roundUnit = getDetRoundUnit();
     
     if (isSimple) {
         const detGroup = clone.querySelector('#detailed-preview-group');
@@ -3195,6 +3297,7 @@
   window.EX_RATE = ${isForeign ? exRate : 1};
   window.VAT_TYPE = '${vatType}';
   window.EXTRA_TYPE = '${extraType}';
+  window.ROUND_UNIT = ${roundUnit};
   function parse(v){ return Number(String(v).replace(/[^0-9.-]/g,''))||0; }
   function fmt(n){ return (Number(n)||0).toLocaleString('ko-KR'); }
   function fmtLive(v){
@@ -3262,7 +3365,20 @@
       setTxt('sub-flight', '₩'+fmt(fs));
       setTxt('sub-local', '₩'+fmt(ls));
       setTxt('sub-domestic', '₩'+fmt(ds));
-      setTxt('grand-1', '₩'+fmt(fs+ls+ds));
+      var raw = fs+ls+ds;
+      var unit = Number(window.ROUND_UNIT)||0;
+      var finalAmt = unit > 0 ? Math.floor(raw/unit)*unit : raw;
+      var cut = raw - finalAmt;
+      var g1 = document.getElementById('grand-1');
+      var gCut = document.getElementById('grand-cut');
+      var gFinal = document.getElementById('grand-final');
+      if(gCut && gFinal){
+        setTxt('grand-1', '₩'+fmt(raw));
+        setTxt('grand-cut', '-₩'+fmt(cut));
+        setTxt('grand-final', '₩'+fmt(finalAmt));
+      } else if(g1){
+        setTxt('grand-1', '₩'+fmt(finalAmt));
+      }
       setTxt('grand-2', '₩'+fmt(ls+ds));
     } else if(document.getElementById('simple-table')){
       var subTotal = sumGroup('simple');
@@ -3722,6 +3838,7 @@
     $('#inp-sim-extraFee').addEventListener('change', () => { calculateAndRender(); scheduleValidation(); });
     
     $('#inp-det-showTaxNote').addEventListener('change', () => { calculateAndRender(); });
+    $('#inp-det-roundUnit').addEventListener('change', () => { calculateAndRender(); scheduleValidation(); });
     $$('input[name="det-doc-label"]').forEach(el => el.addEventListener('change', () => { calculateAndRender(); }));
     $('#inp-hl-issueDate').addEventListener('change', () => { calculateAndRender(); });
     $('#inp-sim-hl-issueDate').addEventListener('change', () => { calculateAndRender(); });
